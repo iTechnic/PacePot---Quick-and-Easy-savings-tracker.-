@@ -1,0 +1,9 @@
+{
+  "name": "pacepot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A static browser-based savings target planner.",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}
