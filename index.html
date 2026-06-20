@@ -69,7 +69,7 @@
 
     .app-shell {
       display: grid;
-      grid-template-columns: 340px minmax(0, 1fr);
+      grid-template-columns: 360px minmax(0, 1fr);
       min-height: 100vh;
     }
 
@@ -83,6 +83,7 @@
       top: 0;
       height: 100vh;
       overflow: auto;
+      min-width: 0;
     }
 
     main {
@@ -204,34 +205,142 @@
     .budget-list {
       display: grid;
       gap: 8px;
+    }
+
+    .budget-list-panel {
       margin-top: 12px;
+      border: 1px solid color-mix(in srgb, var(--line) 74%, transparent);
+      border-radius: var(--radius);
+      background: var(--panel-soft);
+      overflow: hidden;
+    }
+
+    .budget-list-toggle {
+      width: 100%;
+      min-height: 46px;
+      border: 0;
+      border-radius: 0;
+      padding: 11px 12px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+      background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+      color: var(--ink);
+      box-shadow: none;
+      text-align: left;
+    }
+
+    .budget-list-toggle:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .budget-list-toggle strong {
+      overflow-wrap: anywhere;
+    }
+
+    .budget-list-count {
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .budget-list-summary {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .budget-list-toggle::after {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform .2s ease;
+      margin-top: -4px;
+    }
+
+    .budget-list-panel.collapsed .budget-list-toggle::after {
+      transform: rotate(-45deg);
+      margin-top: 0;
+    }
+
+    .budget-list-shell {
+      max-height: 320px;
+      overflow: auto;
+      padding: 10px;
+      border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+      transition: max-height .26s ease, padding-top .26s ease, padding-bottom .26s ease, opacity .18s ease;
+      opacity: 1;
+    }
+
+    .budget-list-panel.collapsed .budget-list-shell {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      opacity: 0;
+      border-top-width: 0;
+      border-top-color: transparent;
     }
 
     .budget-item {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto auto;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      grid-template-areas:
+        "main edit remove"
+        "amount edit remove";
       gap: 8px;
       align-items: center;
       padding: 9px;
       border: 1px solid color-mix(in srgb, var(--line) 74%, transparent);
       border-radius: 7px;
       background: var(--panel-soft);
+      min-width: 0;
+    }
+
+    .budget-item > div:first-child {
+      grid-area: main;
+      min-width: 0;
     }
 
     .budget-item strong {
       display: block;
       font-size: .9rem;
-      overflow-wrap: anywhere;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
     }
 
     .budget-item span {
+      display: block;
       color: var(--muted);
       font-size: .78rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .budget-item .amount {
+      grid-area: amount;
       font-weight: 800;
-      white-space: nowrap;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      min-width: 0;
+      justify-self: start;
+      line-height: 1.15;
+    }
+
+    .budget-item [data-budget-action="edit"] {
+      grid-area: edit;
+    }
+
+    .budget-item [data-budget-action="delete"] {
+      grid-area: remove;
     }
 
     .budget-item.income .amount {
@@ -609,6 +718,32 @@
       border-top: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
       color: var(--muted);
       font-size: .86rem;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      min-height: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--muted);
+      box-shadow: none;
+      font-size: .86rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .footer-link:hover {
+      color: var(--ink);
+      transform: none;
+      box-shadow: none;
     }
 
     .site-footer strong {
@@ -1378,7 +1513,17 @@
           </label>
           <button type="button" id="addBudgetItem">Add</button>
         </div>
-        <div class="budget-list" id="budgetList"></div>
+        <div class="budget-list-panel" id="budgetListPanel">
+          <button class="budget-list-toggle" id="budgetListToggle" type="button" aria-expanded="true" aria-controls="budgetListShell">
+            <span class="budget-list-summary">
+              <strong>Income & outgoings</strong>
+              <span class="budget-list-count" id="budgetListCount">0 items</span>
+            </span>
+          </button>
+          <div class="budget-list-shell" id="budgetListShell">
+            <div class="budget-list" id="budgetList"></div>
+          </div>
+        </div>
         <div class="metric">
           Estimated money left each month
           <strong id="availableAmount">&pound;0</strong>
@@ -1577,8 +1722,17 @@
       </div>
 
       <footer class="site-footer">
-        <span><strong>PacePot</strong> - savings targets that fit real life.</span>
-        <span>Created by Maks Wittenbeck, 2026.</span>
+        <div>
+          <strong>PacePot v1.0</strong> - savings targets that fit real life.
+          <span>Created by Maks Wittenbeck, 2026.</span>
+        </div>
+        <div class="footer-links" aria-label="PacePot information links">
+          <button class="footer-link" id="privacyBtn" type="button">Privacy</button>
+          <span aria-hidden="true">·</span>
+          <button class="footer-link" id="termsBtn" type="button">Terms</button>
+          <span aria-hidden="true">·</span>
+          <button class="footer-link" id="contactBtn" type="button">Contact</button>
+        </div>
       </footer>
     </main>
   </div>
@@ -1661,6 +1815,111 @@
     </div>
   </div>
 
+  <div class="history-modal" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+    <div class="history-panel help-panel">
+      <div class="history-top">
+        <div>
+          <h4 id="privacyTitle">Privacy</h4>
+          <p class="subtle">Plain English version: PacePot is designed to work without accounts or a database.</p>
+        </div>
+        <button class="ghost icon-btn" id="privacyClose" type="button" title="Close privacy" aria-label="Close privacy">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="help-content">
+        <section class="help-section">
+          <h5>What PacePot stores</h5>
+          <p>PacePot saves planner information such as salary, budget items, savings targets, saving entries, and optional investment values in your browser using local storage.</p>
+          <p>This means your planner data stays on the device and browser you use. PacePot does not require a login, account, or password.</p>
+        </section>
+        <section class="help-section">
+          <h5>What PacePot does not do</h5>
+          <ul>
+            <li>It does not send your planner data to a PacePot server.</li>
+            <li>It does not sell your planner data.</li>
+            <li>It does not ask for bank logins, card details, or account passwords.</li>
+          </ul>
+        </section>
+        <section class="help-section">
+          <h5>Backups and browser storage</h5>
+          <p>If you clear browser data, change device, or use a private browsing session, your saved planner data may be removed. Use Backup to download a copy if you want to keep it safe.</p>
+        </section>
+        <section class="help-section">
+          <h5>External links</h5>
+          <p>The Support PacePot button opens Buy Me a Coffee in a new tab. That service has its own privacy and payment process.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-modal" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+    <div class="history-panel help-panel">
+      <div class="history-top">
+        <div>
+          <h4 id="termsTitle">Terms of use</h4>
+          <p class="subtle">A short set of terms for using PacePot sensibly.</p>
+        </div>
+        <button class="ghost icon-btn" id="termsClose" type="button" title="Close terms" aria-label="Close terms">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="help-content">
+        <section class="help-section">
+          <h5>Planning tool only</h5>
+          <p>PacePot is a savings planning tool. It is not financial advice, investment advice, legal advice, or tax advice.</p>
+        </section>
+        <section class="help-section">
+          <h5>Your responsibility</h5>
+          <p>You are responsible for checking your own numbers and making your own money decisions. PacePot calculations are designed to help planning, but they should not replace professional advice where needed.</p>
+        </section>
+        <section class="help-section">
+          <h5>Availability and accuracy</h5>
+          <p>PacePot is provided free and as-is. The app may change over time, and no guarantee is made that it will always be available, error-free, or suitable for every financial situation.</p>
+        </section>
+        <section class="help-section">
+          <h5>Responsible use</h5>
+          <p>Do not use PacePot to store passwords, bank login details, card numbers, or highly sensitive private information.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-modal" id="contactModal" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+    <div class="history-panel help-panel">
+      <div class="history-top">
+        <div>
+          <h4 id="contactTitle">Contact and feedback</h4>
+          <p class="subtle">Ideas, bugs, rough edges, or feature requests are welcome.</p>
+        </div>
+        <button class="ghost icon-btn" id="contactClose" type="button" title="Close contact" aria-label="Close contact">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="help-content">
+        <section class="help-section">
+          <h5>Send feedback</h5>
+          <p>Email <a href="mailto:mwittenbeckwork04@gmail.com">mwittenbeckwork04@gmail.com</a> with feedback, bug reports, or ideas for PacePot.</p>
+          <p>Please avoid sending private financial details, bank information, passwords, or anything you would not want shared by email.</p>
+        </section>
+        <section class="help-section">
+          <h5>Helpful details to include</h5>
+          <ul>
+            <li>What you were trying to do.</li>
+            <li>What happened instead.</li>
+            <li>The device and browser you were using.</li>
+            <li>Any feature idea that would make PacePot easier to use.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
   <div class="celebration-modal" id="celebrationModal" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle">
     <div class="celebration-panel">
       <div class="celebration-burst" aria-hidden="true"><span>100%</span></div>
@@ -1693,6 +1952,9 @@
       budgetValue: document.querySelector("#budgetValue"),
       budgetForm: document.querySelector("#budgetForm"),
       addBudgetItem: document.querySelector("#addBudgetItem"),
+      budgetListPanel: document.querySelector("#budgetListPanel"),
+      budgetListToggle: document.querySelector("#budgetListToggle"),
+      budgetListCount: document.querySelector("#budgetListCount"),
       budgetList: document.querySelector("#budgetList"),
       budgetPie: document.querySelector("#budgetPie"),
       totalOutgoings: document.querySelector("#totalOutgoings"),
@@ -1737,6 +1999,15 @@
       helpBtn: document.querySelector("#helpBtn"),
       helpModal: document.querySelector("#helpModal"),
       helpClose: document.querySelector("#helpClose"),
+      privacyBtn: document.querySelector("#privacyBtn"),
+      privacyModal: document.querySelector("#privacyModal"),
+      privacyClose: document.querySelector("#privacyClose"),
+      termsBtn: document.querySelector("#termsBtn"),
+      termsModal: document.querySelector("#termsModal"),
+      termsClose: document.querySelector("#termsClose"),
+      contactBtn: document.querySelector("#contactBtn"),
+      contactModal: document.querySelector("#contactModal"),
+      contactClose: document.querySelector("#contactClose"),
       importBtn: document.querySelector("#importBtn"),
       importFile: document.querySelector("#importFile"),
       backupBtn: document.querySelector("#backupBtn"),
@@ -1769,6 +2040,10 @@
     });
 
     els.addBudgetItem.addEventListener("click", addBudgetItem);
+    els.budgetListToggle.addEventListener("click", () => {
+      state.budgetListCollapsed = !state.budgetListCollapsed;
+      saveAndRender();
+    });
     els.budgetForm.addEventListener("submit", (event) => {
       event.preventDefault();
       if (document.activeElement === els.budgetName || document.activeElement === els.budgetValue) {
@@ -1889,6 +2164,21 @@
     els.helpModal.addEventListener("click", (event) => {
       if (event.target === els.helpModal) closeHelp();
     });
+    els.privacyBtn.addEventListener("click", () => openInfoModal(els.privacyModal, els.privacyClose));
+    els.privacyClose.addEventListener("click", () => closeInfoModal(els.privacyModal));
+    els.privacyModal.addEventListener("click", (event) => {
+      if (event.target === els.privacyModal) closeInfoModal(els.privacyModal);
+    });
+    els.termsBtn.addEventListener("click", () => openInfoModal(els.termsModal, els.termsClose));
+    els.termsClose.addEventListener("click", () => closeInfoModal(els.termsModal));
+    els.termsModal.addEventListener("click", (event) => {
+      if (event.target === els.termsModal) closeInfoModal(els.termsModal);
+    });
+    els.contactBtn.addEventListener("click", () => openInfoModal(els.contactModal, els.contactClose));
+    els.contactClose.addEventListener("click", () => closeInfoModal(els.contactModal));
+    els.contactModal.addEventListener("click", (event) => {
+      if (event.target === els.contactModal) closeInfoModal(els.contactModal);
+    });
     els.celebrationClose.addEventListener("click", closeCelebration);
     els.celebrationModal.addEventListener("click", (event) => {
       if (event.target === els.celebrationModal) closeCelebration();
@@ -1904,6 +2194,9 @@
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeHistory();
       if (event.key === "Escape") closeHelp();
+      if (event.key === "Escape") closeInfoModal(els.privacyModal);
+      if (event.key === "Escape") closeInfoModal(els.termsModal);
+      if (event.key === "Escape") closeInfoModal(els.contactModal);
       if (event.key === "Escape") closeCelebration();
     });
 
@@ -1914,6 +2207,7 @@
       state.salary = "";
       state.accountBalance = "";
       state.budgetItems = [];
+      state.budgetListCollapsed = false;
       state.investments = [];
       state.savingsPot = "";
       state.currency = "GBP";
@@ -1946,6 +2240,7 @@
         name,
         value
       });
+      state.budgetListCollapsed = false;
       els.budgetName.value = "";
       els.budgetValue.value = "";
       saveAndRender("Budget item added.");
@@ -2273,6 +2568,12 @@
     }
 
     function renderBudget(budget) {
+      const itemCount = state.budgetItems.length;
+      els.budgetListPanel.classList.toggle("collapsed", Boolean(state.budgetListCollapsed));
+      els.budgetListToggle.setAttribute("aria-expanded", String(!state.budgetListCollapsed));
+      els.budgetListCount.textContent = itemCount
+        ? `${itemCount} item${itemCount === 1 ? "" : "s"} · +${money(budget.extraIncome)} / -${money(budget.outgoings)}`
+        : "0 items";
       els.budgetList.innerHTML = state.budgetItems.length ? state.budgetItems.map((item) => `
         <div class="budget-item ${item.type}">
           <div>
@@ -2593,6 +2894,15 @@
       els.helpModal.classList.remove("show");
     }
 
+    function openInfoModal(modal, closeButton) {
+      modal.classList.add("show");
+      closeButton.focus();
+    }
+
+    function closeInfoModal(modal) {
+      modal.classList.remove("show");
+    }
+
     function isComplete(target) {
       return savedFor(target) >= Number(target.amount || 0) && Number(target.amount || 0) > 0;
     }
@@ -2797,6 +3107,7 @@
         salary: toMoney(parsed?.salary),
         accountBalance: toMoney(parsed?.accountBalance),
         savingsPot: toMoney(parsed?.savingsPot),
+        budgetListCollapsed: Boolean(parsed?.budgetListCollapsed),
         budgetItems,
         investments: Array.isArray(parsed?.investments) ? parsed.investments.map(normalizeInvestment).filter(Boolean) : [],
         currency: ["GBP", "USD", "EUR", "CAD", "AUD"].includes(parsed?.currency) ? parsed.currency : "GBP",
