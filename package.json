@@ -5,5 +5,8 @@
   "description": "A static browser-based savings target planner.",
   "scripts": {
     "start": "npx serve ."
+  },
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
   }
 }
