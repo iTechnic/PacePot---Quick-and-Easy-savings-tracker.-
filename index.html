@@ -3,7 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PacePot</title>
+  <title>PacePot – Free Savings Goal Tracker</title>
+  <meta name="description" content="Track your savings goals, monitor progress, and stay motivated with PacePot. A free savings tracker for holidays, cars, house deposits, emergency funds, and more. No login needed and your data stays in your browser.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#f4f6f8">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:title" content="PacePot – Free Savings Goal Tracker">
+  <meta property="og:description" content="Track your savings goals, monitor progress, and stay motivated with PacePot. A free savings tracker for holidays, cars, house deposits, emergency funds, and more. No login needed and your data stays in your browser.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PacePot">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:image" content="/og-image.png">
+  <meta property="og:image:alt" content="PacePot free savings goal tracker preview">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PacePot – Free Savings Goal Tracker">
+  <meta name="twitter:description" content="Track your savings goals, monitor progress, and stay motivated with PacePot. A free savings tracker for holidays, cars, house deposits, emergency funds, and more. No login needed and your data stays in your browser.">
+  <meta name="twitter:image" content="/og-image.png">
   <style>
     :root {
       color-scheme: light;
@@ -364,6 +383,34 @@
       box-shadow: 0 8px 18px rgba(17, 31, 48, .16);
     }
 
+    .support-link {
+      border: 1px solid color-mix(in srgb, var(--green) 30%, var(--silver));
+      min-height: 42px;
+      border-radius: 7px;
+      padding: 10px 14px;
+      background: linear-gradient(180deg, var(--green-soft), color-mix(in srgb, var(--green-soft) 72%, white));
+      color: color-mix(in srgb, var(--green) 76%, var(--ink));
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform .15s ease, box-shadow .15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .support-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(31, 138, 98, .13);
+    }
+
+    .support-link:focus-visible {
+      outline: 3px solid rgba(31, 138, 98, .2);
+      outline-offset: 2px;
+    }
+
     button:disabled {
       cursor: not-allowed;
       opacity: .52;
@@ -550,6 +597,23 @@
       grid-template-columns: minmax(290px, 420px) minmax(0, 1fr);
       gap: 18px;
       align-items: start;
+    }
+
+    .site-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    .site-footer strong {
+      color: var(--ink);
+      font-weight: 800;
     }
 
     .setup-column {
@@ -1249,6 +1313,7 @@
       .summary-strip { grid-template-columns: 1fr 1fr; }
       .plan-guidance { grid-template-columns: 1fr; }
       .plan-steps { justify-content: flex-start; }
+      .site-footer { display: grid; }
       .target-card { grid-template-columns: 1fr; }
       .progress-viz { min-height: 190px; }
       .target-grid { grid-template-columns: 1fr; }
@@ -1346,6 +1411,7 @@
           <p class="privacy-note">No sign-ups. Your data is stored in this browser.</p>
         </div>
         <div class="actions">
+          <a class="support-link" href="https://buymeacoffee.com/pacepot" target="_blank" rel="noopener noreferrer" title="Support PacePot">Support PacePot</a>
           <button class="ghost" id="helpBtn" type="button" title="Open help"><span class="mini-i">i</span> Help</button>
           <button class="ghost" id="importBtn" type="button" title="Import a backup">Import</button>
           <button class="ghost" id="backupBtn" type="button" title="Download a backup">Backup</button>
@@ -1509,6 +1575,11 @@
           <div class="targets" id="targets"></div>
         </section>
       </div>
+
+      <footer class="site-footer">
+        <span><strong>PacePot</strong> - savings targets that fit real life.</span>
+        <span>Created by Maks Wittenbeck, 2026.</span>
+      </footer>
     </main>
   </div>
 
