@@ -1098,6 +1098,11 @@
       background: var(--blue-soft);
     }
 
+    .recovery.plan {
+      border-left-color: var(--green);
+      background: color-mix(in srgb, var(--green-soft) 70%, var(--panel));
+    }
+
     .recovery strong {
       font-size: .95rem;
     }
@@ -1143,6 +1148,13 @@
 
     .transactions-head strong {
       font-size: .9rem;
+    }
+
+    .transactions-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .small-btn {
@@ -1212,6 +1224,28 @@
       padding: 8px 18px 18px;
       display: grid;
       gap: 8px;
+    }
+
+    .history-chart {
+      margin: 10px 18px 4px;
+      padding: 12px;
+      border: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+      border-radius: var(--radius);
+      background: var(--panel-soft);
+    }
+
+    .history-chart svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-height: 120px;
+    }
+
+    .history-chart-note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.35;
     }
 
     .history-row {
@@ -1665,6 +1699,20 @@
               Target date
               <input id="targetDate" type="date">
             </label>
+            <div class="field-row">
+              <label>
+                Planned contribution
+                <input id="targetRecurringAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="50">
+              </label>
+              <label>
+                Repeats
+                <select id="targetRecurringCadence">
+                  <option value="">No repeat plan</option>
+                  <option value="week">Weekly</option>
+                  <option value="month">Monthly</option>
+                </select>
+              </label>
+            </div>
             <button type="submit">Add target</button>
           </form>
         </section>
@@ -1723,7 +1771,7 @@
 
       <footer class="site-footer">
         <div>
-          <strong>PacePot v1.0</strong> - savings targets that fit real life.
+          <strong>PacePot v1.1</strong> - savings targets that fit real life.
           <span>Created by Maks Wittenbeck, 2026.</span>
         </div>
         <div class="footer-links" aria-label="PacePot information links">
@@ -1750,6 +1798,7 @@
           </svg>
         </button>
       </div>
+      <div class="history-chart" id="historyChart"></div>
       <div class="history-list" id="historyList"></div>
     </div>
   </div>
@@ -1788,6 +1837,7 @@
             <li>Add income and outgoing items. Use names like rent, debt, side hustle, subscriptions, or transport.</li>
             <li>Look at estimated money left each month, then choose a planned monthly savings pot that still leaves breathing room.</li>
             <li>Create a target with an amount, deadline, pace type, and priority.</li>
+            <li>Optionally add a planned weekly or monthly contribution if you already know your regular saving amount.</li>
             <li>Use suggested allocation to decide how to split your savings pot across goals.</li>
             <li>Whenever you save money, add a saved amount to the target. Progress, history, recovery, and totals update automatically.</li>
             <li>If you track investments, add them in the optional investments section and update their values manually when needed.</li>
@@ -1986,6 +2036,8 @@
       targetCadence: document.querySelector("#targetCadence"),
       targetPriority: document.querySelector("#targetPriority"),
       targetDate: document.querySelector("#targetDate"),
+      targetRecurringAmount: document.querySelector("#targetRecurringAmount"),
+      targetRecurringCadence: document.querySelector("#targetRecurringCadence"),
       targets: document.querySelector("#targets"),
       investmentForm: document.querySelector("#investmentForm"),
       investmentName: document.querySelector("#investmentName"),
@@ -2015,6 +2067,7 @@
       historyModal: document.querySelector("#historyModal"),
       historyTitle: document.querySelector("#historyTitle"),
       historySummary: document.querySelector("#historySummary"),
+      historyChart: document.querySelector("#historyChart"),
       historyList: document.querySelector("#historyList"),
       historyClose: document.querySelector("#historyClose"),
       celebrationModal: document.querySelector("#celebrationModal"),
@@ -2073,9 +2126,16 @@
       const cadence = els.targetCadence.value;
       const priority = els.targetPriority.value;
       const dueDate = els.targetDate.value;
+      const recurringAmount = toMoney(els.targetRecurringAmount.value);
+      const recurringCadence = els.targetRecurringCadence.value;
 
       if (!name || amount <= 0 || !dueDate) {
         showToast("Add a name, amount and target date.");
+        return;
+      }
+
+      if (recurringAmount > 0 && !["week", "month"].includes(recurringCadence)) {
+        showToast("Choose weekly or monthly for the planned contribution.");
         return;
       }
 
@@ -2085,6 +2145,8 @@
         amount,
         cadence,
         priority,
+        recurringAmount,
+        recurringCadence: recurringAmount > 0 ? recurringCadence : "",
         createdAt: isoDate(today),
         dueDate,
         deposits: saved > 0 ? [{ id: makeId(), amount: saved, date: isoDate(today), note: "Starting amount" }] : []
@@ -2150,9 +2212,14 @@
         celebrateIfCompleted(target, wasComplete);
       }
 
+      if (action.dataset.action === "planned") {
+        addPlannedContribution(target);
+      }
+
       if (action.dataset.action === "history") {
         openHistory(target);
       }
+
     });
 
     els.historyClose.addEventListener("click", closeHistory);
@@ -2330,10 +2397,21 @@
       const priorityInput = window.prompt("Priority: high, medium or low", target.priority || "medium");
       if (priorityInput === null) return;
       const priority = priorityInput.toLowerCase();
+      const recurringAmountInput = window.prompt("Planned recurring contribution amount (optional)", target.recurringAmount || "");
+      if (recurringAmountInput === null) return;
+      const recurringCadenceInput = window.prompt("Recurring contribution: week, month or leave blank", target.recurringCadence || "");
+      if (recurringCadenceInput === null) return;
 
       const cleanAmount = toMoney(amount);
+      const recurringAmount = toMoney(recurringAmountInput);
+      const recurringCadence = recurringCadenceInput.toLowerCase().trim();
       if (!name.trim() || cleanAmount <= 0 || Number.isNaN(parseDate(dueDate).getTime()) || !cadenceLabels[cadence] || !priorityLabels[priority]) {
         showToast("Check the name, amount, date, pace and priority.");
+        return;
+      }
+
+      if (recurringAmount > 0 && !["week", "month"].includes(recurringCadence)) {
+        showToast("Use week or month for the recurring contribution.");
         return;
       }
 
@@ -2342,6 +2420,8 @@
       target.dueDate = dueDate;
       target.cadence = cadence;
       target.priority = priority;
+      target.recurringAmount = recurringAmount;
+      target.recurringCadence = recurringAmount > 0 ? recurringCadence : "";
       saveAndRender("Target updated.");
       celebrateIfCompleted(target, wasComplete);
     }
@@ -2368,6 +2448,24 @@
       deposit.note = note.trim() || "Saved";
       saveAndRender("Saving entry updated.");
       openHistory(target);
+      celebrateIfCompleted(target, wasComplete);
+    }
+
+    function addPlannedContribution(target) {
+      const amount = toMoney(target.recurringAmount);
+      if (amount <= 0 || !["week", "month"].includes(target.recurringCadence)) {
+        showToast("This target does not have a planned contribution.");
+        return;
+      }
+
+      const wasComplete = isComplete(target);
+      target.deposits.unshift({
+        id: makeId(),
+        amount,
+        date: isoDate(today),
+        note: `Planned ${target.recurringCadence === "week" ? "weekly" : "monthly"} contribution`
+      });
+      saveAndRender("Planned contribution added.");
       celebrateIfCompleted(target, wasComplete);
     }
 
@@ -2739,6 +2837,43 @@
       return { high: 4, medium: 2, low: 1 }[priority] || 2;
     }
 
+    function recurringLabel(target) {
+      const amount = toMoney(target.recurringAmount);
+      const cadence = target.recurringCadence;
+      if (amount <= 0 || !["week", "month"].includes(cadence)) return "";
+      return `${money(amount)} ${cadence === "week" ? "weekly" : "monthly"}`;
+    }
+
+    function recurringMonthlyValue(target) {
+      const amount = toMoney(target.recurringAmount);
+      if (amount <= 0) return 0;
+      if (target.recurringCadence === "week") return amount * 52 / 12;
+      if (target.recurringCadence === "month") return amount;
+      return 0;
+    }
+
+    function recurringGuidanceTemplate(target, monthlyNeeded) {
+      const plannedMonthly = recurringMonthlyValue(target);
+      if (plannedMonthly <= 0 || remainingFor(target) <= 0) return "";
+
+      const difference = plannedMonthly - monthlyNeeded;
+      if (difference >= 0) {
+        return `
+          <div class="recovery plan">
+            <strong>Repeat plan covers this pace.</strong>
+            <span>Your ${recurringLabel(target)} plan is about ${money(plannedMonthly)} per month, which covers the ${money(monthlyNeeded)} monthly pace needed.</span>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="recovery warn">
+          <strong>Repeat plan is ${money(Math.abs(difference))} short per month.</strong>
+          <span>Your ${recurringLabel(target)} plan is about ${money(plannedMonthly)} per month. Add a little extra or move the deadline to stay comfortable.</span>
+        </div>
+      `;
+    }
+
     function milestoneMessage(progress) {
       if (progress >= 100) return { title: "100% complete", body: "This target is fully funded." };
       if (progress >= 75) return { title: "75% milestone", body: "You are close enough now that the finish line feels real." };
@@ -2760,6 +2895,8 @@
       const milestone = milestoneMessage(progress);
       const affordable = monthly <= budgetTotals().savingsPot;
       const recent = target.deposits.slice(0, 3);
+      const recurring = recurringLabel(target);
+      const recurringGuidance = recurringGuidanceTemplate(target, monthly);
 
       return `
         <article class="target-card" style="--progress: ${progress}%">
@@ -2802,8 +2939,10 @@
               <div class="mini-stat"><span>Saved</span><strong>${money(saved)}</strong></div>
               <div class="mini-stat"><span>Remaining</span><strong>${money(remaining)}</strong></div>
               <div class="mini-stat"><span>Needed ${cadenceLabel.short}</span><strong>${money(pace)}</strong></div>
+              ${recurring ? `<div class="mini-stat"><span>Planned repeat</span><strong>${recurring}</strong></div>` : ""}
             </div>
             ${recoveryTemplate(recovery, cadenceLabel)}
+            ${recurringGuidance}
             ${milestone ? `<div class="recovery milestone"><strong>${milestone.title}</strong><span>${milestone.body}</span></div>` : ""}
             <div class="progress-line" aria-hidden="true"><i></i></div>
             <div class="deposit-row">
@@ -2812,6 +2951,7 @@
                 <input data-deposit-input="${target.id}" type="number" min="0" step="0.01" inputmode="decimal" placeholder="${complete ? "Complete" : "50"}" ${complete ? "disabled" : ""}>
               </label>
               <button type="button" data-action="deposit" data-id="${target.id}" ${complete ? "disabled" : ""}>${complete ? "Done" : "Add"}</button>
+              ${recurring && !complete ? `<button class="ghost" type="button" data-action="planned" data-id="${target.id}">Add planned</button>` : ""}
               <button class="ghost icon-btn" type="button" data-action="edit-target" data-id="${target.id}" title="Edit target" aria-label="Edit ${escapeHtml(target.name)}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="m5 16-.8 3.8L8 19l10.5-10.5-3-3L5 16Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -2826,7 +2966,9 @@
             <div class="transactions">
               <div class="transactions-head">
                 <strong>Recent saving entries</strong>
-                <button class="ghost small-btn" type="button" data-action="history" data-id="${target.id}">History</button>
+                <div class="transactions-actions">
+                  <button class="ghost small-btn" type="button" data-action="history" data-id="${target.id}">History</button>
+                </div>
               </div>
               ${recent.length ? recent.map((deposit) => `
                 <div class="transaction">
@@ -2865,6 +3007,7 @@
       const deposits = [...target.deposits].sort((a, b) => parseDate(b.date) - parseDate(a.date));
       els.historyTitle.textContent = `${target.name} history`;
       els.historySummary.textContent = `${money(savedFor(target))} saved across ${deposits.length} entr${deposits.length === 1 ? "y" : "ies"}.`;
+      els.historyChart.innerHTML = historyChartTemplate(target);
       els.historyList.innerHTML = deposits.length ? deposits.map((deposit) => `
         <div class="history-row">
           <div>
@@ -2878,6 +3021,56 @@
       `).join("") : `<div class="history-empty">No saving entries have been added yet.</div>`;
       els.historyModal.classList.add("show");
       els.historyClose.focus();
+    }
+
+    function historyChartTemplate(target) {
+      const deposits = [...target.deposits]
+        .filter((deposit) => !Number.isNaN(parseDate(deposit.date).getTime()))
+        .sort((a, b) => parseDate(a.date) - parseDate(b.date));
+
+      if (!deposits.length) {
+        return `<div class="history-chart-note">No graph yet. Add a saving entry and PacePot will show progress over time here.</div>`;
+      }
+
+      let running = 0;
+      const points = deposits.map((deposit) => {
+        running += Number(deposit.amount || 0);
+        return { date: parseDate(deposit.date), total: running };
+      });
+
+      if (points.length === 1) {
+        points.unshift({ date: startDateFor(target), total: 0 });
+      }
+
+      const minTime = Math.min(...points.map((point) => point.date.getTime()));
+      const maxTime = Math.max(...points.map((point) => point.date.getTime()));
+      const maxTotal = Math.max(Number(target.amount || 0), ...points.map((point) => point.total), 1);
+      const width = 520;
+      const height = 174;
+      const pad = 22;
+      const innerW = width - pad * 2;
+      const innerH = height - 52;
+      const xFor = (time) => pad + ((time - minTime) / Math.max(1, maxTime - minTime)) * innerW;
+      const yFor = (value) => height - pad - (value / maxTotal) * innerH;
+      const path = points.map((point, index) => `${index ? "L" : "M"} ${xFor(point.date.getTime()).toFixed(1)} ${yFor(point.total).toFixed(1)}`).join(" ");
+      const area = `${path} L ${xFor(points[points.length - 1].date.getTime()).toFixed(1)} ${height - pad} L ${xFor(points[0].date.getTime()).toFixed(1)} ${height - pad} Z`;
+      const targetY = yFor(target.amount).toFixed(1);
+      const last = points[points.length - 1];
+      const first = points[0];
+
+      return `
+        <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Cumulative saving history graph">
+          <line x1="${pad}" y1="${targetY}" x2="${width - pad}" y2="${targetY}" stroke="var(--line)" stroke-dasharray="5 6" stroke-width="2"/>
+          <text x="${width - pad}" y="${Math.max(14, Number(targetY) - 6)}" text-anchor="end" font-size="12" font-weight="800" fill="var(--muted)">Target ${money(target.amount)}</text>
+          <path d="${area}" fill="var(--green-soft)"/>
+          <path d="${path}" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          ${points.map((point) => `<circle cx="${xFor(point.date.getTime()).toFixed(1)}" cy="${yFor(point.total).toFixed(1)}" r="4.5" fill="var(--panel)" stroke="var(--green)" stroke-width="3"/>`).join("")}
+          <circle cx="${xFor(last.date.getTime()).toFixed(1)}" cy="${yFor(last.total).toFixed(1)}" r="7" fill="var(--green)" stroke="var(--panel)" stroke-width="4"/>
+          <text x="${pad}" y="${height - 7}" font-size="12" font-weight="800" fill="var(--muted)">${formatShortDate(isoDate(first.date))}</text>
+          <text x="${width - pad}" y="${height - 7}" text-anchor="end" font-size="12" font-weight="800" fill="var(--muted)">${formatShortDate(isoDate(last.date))}</text>
+        </svg>
+        <div class="history-chart-note">Graph shows cumulative savings over time. Dotted line is the target amount.</div>
+      `;
     }
 
     function closeHistory() {
@@ -3055,6 +3248,12 @@
       return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" }).format(date);
     }
 
+    function formatShortDate(value) {
+      const date = parseDate(value);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(date);
+    }
+
     function isoDate(date) {
       return date.toISOString().slice(0, 10);
     }
@@ -3155,6 +3354,8 @@
         amount,
         cadence: ["day", "week", "month"].includes(target.cadence) ? target.cadence : "month",
         priority: ["high", "medium", "low"].includes(target.priority) ? target.priority : "medium",
+        recurringAmount: toMoney(target.recurringAmount),
+        recurringCadence: ["week", "month"].includes(target.recurringCadence) && toMoney(target.recurringAmount) > 0 ? target.recurringCadence : "",
         dueDate: validDateValue(target.dueDate) || isoDate(today),
         createdAt: validDateValue(target.createdAt) || validDateValue(deposits[deposits.length - 1]?.date) || isoDate(today),
         deposits: deposits.map((deposit) => ({
