@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wedding Savings Calculator | PacePot</title>
+  <meta name="description" content="Use PacePot's wedding savings calculator to plan monthly savings for venue costs, outfits, suppliers, rings, and the big day.">
+  <meta name="robots" content="index, follow">
+  <!-- Replace this placeholder with the code from Google Search Console. -->
+  <meta name="google-site-verification" content="PASTE_VERIFICATION_CODE_HERE">
+  <link rel="canonical" href="https://pacepot.com/wedding-savings-calculator">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/seo-page.css">
+  <meta property="og:title" content="Wedding Savings Calculator | PacePot">
+  <meta property="og:description" content="Plan monthly savings for wedding costs with PacePot's free savings goal tracker.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pacepot.com/wedding-savings-calculator">
+  <meta property="og:image" content="https://pacepot.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Wedding Savings Calculator | PacePot">
+  <meta name="twitter:description" content="Work out how much to save each month for your wedding target.">
+  <meta name="twitter:image" content="https://pacepot.com/og-image.png">
+  <script src="/analytics-config.js" defer></script>
+  <script src="/analytics.js" defer></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Wedding Savings Calculator","url":"https://pacepot.com/wedding-savings-calculator","description":"A wedding savings calculator for planning monthly savings toward wedding costs."}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I save for a wedding?","acceptedAnswer":{"@type":"Answer","text":"Set a total wedding savings target, subtract what you have saved, and divide the rest by the months until the date."}},{"@type":"Question","name":"Can I track separate wedding costs?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can add separate targets for venue, outfits, rings, honeymoon, or supplier payments."}},{"@type":"Question","name":"Can PacePot help with a wedding budget?","acceptedAnswer":{"@type":"Answer","text":"PacePot helps track savings targets. It is not a full wedding budget planner, but it can support the saving side."}}]}</script>
+</head>
+<body data-seo-page="true">
+  <div class="page">
+    <header class="topbar"><a class="brand" href="/">PacePot</a><nav class="nav"><a href="/">Open app</a><a href="/holiday-savings-calculator">Holiday</a><a href="/emergency-fund-calculator">Emergency fund</a></nav></header>
+    <main>
+      <section class="hero"><span class="kicker">Savings calculator</span><h1>Wedding Savings Calculator</h1><p class="intro">Use this wedding savings calculator to work out how much to save each month for your wedding target. Track the big total or split costs into smaller PacePot goals.</p><a class="button" href="/">Open the free PacePot calculator</a></section>
+      <div class="grid">
+        <section class="section"><h2>How it works</h2><p>Add your wedding target, what you have already saved, and the date you need the money. PacePot shows the monthly pace and lets you add saving entries as you go.</p><ul><li>Track one overall wedding target.</li><li>Or create separate targets for venue, outfits, rings, and honeymoon.</li><li>Use what-if scenarios to see if saving more finishes earlier.</li></ul></section>
+        <section class="section"><h2>Practical examples</h2><div class="examples"><div class="example"><strong>&pound;8,000 in 20 months</strong><p>From zero, that is about &pound;400 per month.</p></div><div class="example"><strong>&pound;5,000 left after deposits</strong><p>Over 10 months, that is about &pound;500 per month.</p></div><div class="example"><strong>Separate honeymoon target</strong><p>Create another target if you want honeymoon savings separate from wedding costs.</p></div></div></section>
+      </div>
+      <section class="section"><h2>Wedding savings FAQ</h2><div class="faq"><div class="faq-item"><h3>How do I calculate monthly wedding savings?</h3><p>Subtract current savings from the wedding target, then divide by the number of months left.</p></div><div class="faq-item"><h3>Can I track payments already made?</h3><p>Yes. Add already saved or paid amounts as contributions so your remaining amount stays updated.</p></div><div class="faq-item"><h3>Is PacePot free?</h3><p>Yes. PacePot is free and stores your planner data in your browser.</p></div></div></section>
+      <section class="cta"><h2>Plan your wedding savings</h2><p>Open PacePot and turn your wedding target into a monthly saving plan.</p><a class="button" href="/">Use PacePot free</a><div class="links"><a href="/holiday-savings-calculator">Holiday savings</a><a href="/house-deposit-savings-calculator">House deposit savings</a></div></section>
+    </main>
+    <footer class="footer">PacePot v1.1 - savings targets that fit real life.</footer>
+  </div>
+</body>
+</html>

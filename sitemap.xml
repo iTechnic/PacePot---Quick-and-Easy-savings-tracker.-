@@ -1,0 +1,22 @@
+{
+  "name": "PacePot",
+  "short_name": "PacePot",
+  "description": "A free savings goal tracker with no login. Data stays in your browser.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#f4f6f8",
+  "icons": [
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
