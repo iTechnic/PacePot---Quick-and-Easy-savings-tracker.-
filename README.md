@@ -36,20 +36,15 @@ Google Analytics 4 has been added using this Measurement ID:
 G-0P34GS77N3
 ```
 
-The setup lives in:
+The setup is installed directly in the `<head>` of each HTML page using the standard Google tag:
+
+To replace the Measurement ID in future, search the HTML files for:
 
 ```text
-analytics-config.js
-analytics.js
+G-0P34GS77N3
 ```
 
-To replace the Measurement ID in future, open `analytics-config.js` and update:
-
-```js
-window.PACEPOT_GA_MEASUREMENT_ID = "G-0P34GS77N3";
-```
-
-PacePot only sends generic events such as `goal_created`, `goal_updated`, `contribution_added`, `main_calculator_used`, and `seo_page_viewed`. It does not send goal names, amounts, or personal financial values.
+PacePot only sends generic events such as `goal_created`, `goal_updated`, `contribution_added`, and `seo_page_viewed`. It does not send goal names, amounts, or personal financial values.
 
 ## Google Search Console
 

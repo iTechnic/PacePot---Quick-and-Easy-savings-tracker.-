@@ -1,9 +1,9 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PacePot – Free Savings Goal Tracker</title>
+  <title>PacePot - Free Savings Goal Tracker</title>
   <meta name="description" content="Track your savings goals, monitor progress, and stay motivated with PacePot. A free savings tracker for holidays, cars, house deposits, emergency funds, and more. No login needed and your data stays in your browser.">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#f4f6f8">
@@ -15,7 +15,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <meta property="og:title" content="PacePot – Free Savings Goal Tracker">
+  <meta property="og:title" content="PacePot - Free Savings Goal Tracker">
   <meta property="og:description" content="Track your savings goals, monitor progress, and stay motivated with PacePot. A free savings tracker for holidays, cars, house deposits, emergency funds, and more. No login needed and your data stays in your browser.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://pacepot.com/">
@@ -24,11 +24,25 @@
   <meta property="og:image" content="https://pacepot.com/og-image.png">
   <meta property="og:image:alt" content="PacePot free savings goal tracker preview">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="PacePot – Free Savings Goal Tracker">
+  <meta name="twitter:title" content="PacePot - Free Savings Goal Tracker">
   <meta name="twitter:description" content="Track your savings goals, monitor progress, and stay motivated with PacePot. A free savings tracker for holidays, cars, house deposits, emergency funds, and more. No login needed and your data stays in your browser.">
   <meta name="twitter:image" content="https://pacepot.com/og-image.png">
-  <script src="/analytics-config.js" defer></script>
-  <script src="/analytics.js" defer></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0P34GS77N3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0P34GS77N3');
+    window.trackPacePotEvent = function (eventName) {
+      if (typeof gtag === 'function') gtag('event', eventName);
+    };
+    document.addEventListener('DOMContentLoaded', function () {
+      if (document.body && document.body.dataset && document.body.dataset.seoPage === 'true') {
+        window.trackPacePotEvent('seo_page_viewed');
+      }
+    });
+  </script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -222,6 +236,11 @@
 
     .field-row.three {
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+
+    .field-row.three.investment-fields {
+      grid-template-columns: 1fr;
+      gap: 10px;
     }
 
     .metric {
@@ -2264,7 +2283,7 @@
                 Account name
                 <input id="investmentName" type="text" maxlength="50" placeholder="Stocks & Shares ISA, pension, crypto wallet">
               </label>
-              <div class="field-row three">
+              <div class="field-row three investment-fields">
                 <label>
                   Current value
                   <input id="investmentValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
@@ -2283,7 +2302,7 @@
                 <label>
                   Access
                   <select id="investmentAccess">
-                    <option value="long-term">Long-term / do not count as cushion</option>
+                    <option value="long-term">Long-term only</option>
                     <option value="accessible">Accessible in an emergency</option>
                   </select>
                 </label>
@@ -2313,7 +2332,7 @@
 
       <footer class="site-footer">
         <div>
-          <strong>PacePot v1.1</strong> - savings targets that fit real life.
+          <strong>PacePot v1.2</strong> - savings targets that fit real life.
           <span>Created by Maks Wittenbeck, 2026.</span>
         </div>
         <div class="footer-links" aria-label="PacePot information links">
