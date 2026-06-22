@@ -1667,7 +1667,11 @@
     els.addBudgetItem.addEventListener("click", addBudgetItem);
     els.budgetListToggle.addEventListener("click", () => {
       state.budgetListCollapsed = !state.budgetListCollapsed;
-      saveAndRender();
+      // Toggle only the budget panel — avoid a full re-render that would
+      // rebuild every target card and make the what-if panels jitter.
+      els.budgetListPanel.classList.toggle("collapsed", Boolean(state.budgetListCollapsed));
+      els.budgetListToggle.setAttribute("aria-expanded", String(!state.budgetListCollapsed));
+      persistState();
     });
     els.budgetForm.addEventListener("submit", (event) => {
       event.preventDefault();
