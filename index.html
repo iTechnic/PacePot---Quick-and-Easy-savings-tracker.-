@@ -998,7 +998,7 @@
     .ob-btn-skip:hover { color: var(--ink); }
     .ob-btn-back { background: transparent; color: var(--muted); font-size: .84rem; font-weight: 700; border: 0; cursor: pointer; padding: 4px 0; text-align: left; font-family: inherit; transition: color var(--motion-fast); }
     .ob-btn-back:hover { color: var(--ink); }
-    .ob-categories { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+    .ob-categories { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
     .ob-cat { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 14px 6px; min-height: 80px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); background: var(--surface-2); cursor: pointer; font-size: .78rem; font-weight: 700; color: var(--ink); transition: all var(--motion-fast) var(--ease); font-family: inherit; text-align: center; line-height: 1.3; }
     .ob-cat:hover, .ob-cat:focus-visible { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); transform: translateY(-2px); box-shadow: var(--shadow-sm); outline: none; }
     .ob-cat-icon { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -1014,7 +1014,7 @@
     .ob-result-num { font-size: 1.7rem; font-weight: 900; color: var(--accent-strong); line-height: 1.1; }
     .ob-result-sub { font-size: .85rem; color: var(--muted); margin-top: 3px; }
     .ob-placeholder { color: var(--silver); font-size: .88rem; }
-    @media (max-width: 480px) { .ob-categories { grid-template-columns: repeat(2, 1fr); } .ob-row { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) { .ob-categories { grid-template-columns: repeat(3, 1fr); } .ob-row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -1065,8 +1065,10 @@
         <button class="ob-cat" type="button" data-name="Debt payoff"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>Debt payoff</button>
         <button class="ob-cat" type="button" data-name="Retirement pot"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>Retirement</button>
         <button class="ob-cat" type="button" data-name="Baby fund"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>Baby fund</button>
+        <button class="ob-cat" type="button" data-name="Other goal"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>Other</button>
       </div>
       <button class="ob-btn-back" id="ob-back-1" type="button">&larr; Back</button>
+      <button class="ob-btn-skip" id="ob-skip-2" type="button">Skip for now — I'll set a goal later</button>
     </div>
 
     <!-- Step 3: Setup -->
@@ -3766,6 +3768,8 @@
 
       document.getElementById('ob-back-1').addEventListener('click', function() { goTo(1); });
       document.getElementById('ob-back-2').addEventListener('click', function() { goTo(2); });
+      var skip2 = document.getElementById('ob-skip-2');
+      if (skip2) skip2.addEventListener('click', dismiss);
 
       document.getElementById('ob-amount').addEventListener('input', obUpdate);
       document.getElementById('ob-saved-amt').addEventListener('input', obUpdate);
