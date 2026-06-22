@@ -126,7 +126,7 @@
     }
 
     /* ============================================================
-       SIDEBAR — DARK
+       SIDEBAR - DARK
        ============================================================ */
     aside {
       background: #0f172a;
@@ -648,7 +648,7 @@
     .toast.show { transform: translateY(0); opacity: 1; }
 
     /* ============================================================
-       MODALS — BASE
+       MODALS - BASE
        ============================================================ */
     .modal {
       position: fixed; inset: 0; z-index: 25; display: none; align-items: center; justify-content: center;
@@ -742,7 +742,7 @@
     @keyframes modalIn { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
     /* ============================================================
-       RESPONSIVE — TABLET
+       RESPONSIVE - TABLET
        ============================================================ */
     @media (max-width: 1100px) {
       .app-shell { grid-template-columns: 1fr; }
@@ -759,7 +759,7 @@
     }
 
     /* ============================================================
-       RESPONSIVE — MOBILE
+       RESPONSIVE - MOBILE
        ============================================================ */
     @media (max-width: 720px) {
       main, .sidebar-inner { padding: 18px 16px; }
@@ -837,11 +837,11 @@
           <label>
             Currency
             <select id="currency">
-              <option value="GBP">GBP &mdash; Pound</option>
-              <option value="USD">USD &mdash; Dollar</option>
-              <option value="EUR">EUR &mdash; Euro</option>
-              <option value="CAD">CAD &mdash; Canadian dollar</option>
-              <option value="AUD">AUD &mdash; Australian dollar</option>
+              <option value="GBP">GBP (Pound)</option>
+              <option value="USD">USD (Dollar)</option>
+              <option value="EUR">EUR (Euro)</option>
+              <option value="CAD">CAD (Canadian dollar)</option>
+              <option value="AUD">AUD (Australian dollar)</option>
             </select>
           </label>
           <div class="budget-add">
@@ -1080,7 +1080,7 @@
 
     <footer class="site-footer">
       <div>
-        <strong>PacePot v3.0</strong> &mdash; savings targets that fit real life.
+        <strong>PacePot v3.0</strong>. Savings targets that fit real life.
         <span>Created by Maks Wittenbeck, 2026.</span>
       </div>
       <div class="footer-links" aria-label="PacePot information links">
@@ -1351,7 +1351,7 @@
           <li>Optionally add a planned weekly or monthly contribution if you already know your regular saving amount.</li>
           <li>Use suggested allocation to decide how to split your savings pot across goals.</li>
           <li>Whenever you save money, add a saved amount to the target. Progress, history, recovery, and totals update automatically.</li>
-          <li>Use the edit icon (pencil) on any target, budget item, investment, or saving entry to update it with a proper form &mdash; no more pop-up prompts.</li>
+          <li>Use the edit icon (pencil) on any target, budget item, investment, or saving entry to update it with a proper form. No more pop-up prompts.</li>
         </ol>
       </section>
       <section class="help-section">
@@ -1667,7 +1667,7 @@
     els.addBudgetItem.addEventListener("click", addBudgetItem);
     els.budgetListToggle.addEventListener("click", () => {
       state.budgetListCollapsed = !state.budgetListCollapsed;
-      // Toggle only the budget panel — avoid a full re-render that would
+      // Toggle only the budget panel - avoid a full re-render that would
       // rebuild every target card and make the what-if panels jitter.
       els.budgetListPanel.classList.toggle("collapsed", Boolean(state.budgetListCollapsed));
       els.budgetListToggle.setAttribute("aria-expanded", String(!state.budgetListCollapsed));
