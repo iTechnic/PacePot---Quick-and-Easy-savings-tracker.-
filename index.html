@@ -1,0 +1,3405 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacePot - Free Savings Goal Tracker</title>
+  <meta name="description" content="Track your savings goals, monitor progress, and stay on pace with PacePot. Free savings planner for holidays, cars, house deposits, emergency funds, and more. No login needed and your data stays in your browser.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="google-site-verification" content="PASTE_VERIFICATION_CODE_HERE">
+  <link rel="canonical" href="https://pacepot.com/">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:title" content="PacePot - Free Savings Goal Tracker">
+  <meta property="og:description" content="Track savings goals and stay on pace with PacePot. Free savings planner for holidays, cars, house deposits, emergency funds, and more. No login needed.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pacepot.com/">
+  <meta property="og:site_name" content="PacePot">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:image" content="https://pacepot.com/og-image.png">
+  <meta property="og:image:alt" content="PacePot free savings goal tracker preview">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PacePot - Free Savings Goal Tracker">
+  <meta name="twitter:description" content="Track savings goals and stay on pace with PacePot. Free savings planner for holidays, cars, house deposits, emergency funds, and more. No login needed.">
+  <meta name="twitter:image" content="https://pacepot.com/og-image.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0P34GS77N3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0P34GS77N3');
+    window.trackPacePotEvent = function (eventName) {
+      if (typeof gtag === 'function') gtag('event', eventName);
+    };
+    document.addEventListener('DOMContentLoaded', function () {
+      if (document.body && document.body.dataset && document.body.dataset.seoPage === 'true') {
+        window.trackPacePotEvent('seo_page_viewed');
+      }
+    });
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "PacePot",
+      "description": "A free savings goal calculator that helps users work out how much to save each month to reach a goal by a chosen date.",
+      "url": "https://pacepot.com/",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" }
+    }
+  </script>
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM
+       ============================================================ */
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+
+      --ink: #0f172a;
+      --muted: #64748b;
+      --faint: #94a3b8;
+      --bg: #edf1f7;
+      --surface: #ffffff;
+      --surface-2: #f7f9fc;
+      --surface-3: #f0f4f9;
+      --border: rgba(15,23,42,.08);
+      --border-mid: rgba(15,23,42,.12);
+      --border-strong: rgba(15,23,42,.16);
+      --accent: #059669;
+      --accent-strong: #047857;
+      --accent-soft: #ecfdf5;
+      --accent-mid: #6ee7b7;
+      --line: rgba(15,23,42,.08);
+      --line-bright: rgba(255,255,255,.75);
+      --silver: #94a3b8;
+      --silver-strong: #64748b;
+      --panel: var(--surface);
+      --panel-soft: var(--surface-2);
+      --field: var(--surface);
+      --button-bg: #0f172a;
+      --button-ink: #ffffff;
+      --green: var(--accent);
+      --green-soft: var(--accent-soft);
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --red: #dc2626;
+      --chrome: linear-gradient(135deg,rgba(255,255,255,.9),rgba(148,163,184,.35) 44%,rgba(255,255,255,.95) 100%);
+      --shadow-xs: 0 1px 3px rgba(15,23,42,.05);
+      --shadow-sm: 0 2px 8px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.04);
+      --shadow: 0 4px 16px rgba(15,23,42,.07),0 2px 6px rgba(15,23,42,.04);
+      --shadow-soft: var(--shadow);
+      --shadow-lift: 0 8px 28px rgba(15,23,42,.11),0 3px 10px rgba(15,23,42,.05);
+      --shadow-xl: 0 24px 64px rgba(15,23,42,.16),0 8px 24px rgba(15,23,42,.08);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 6px;
+      --radius-lg: 16px;
+      --radius-full: 999px;
+      --motion: 200ms;
+      --motion-fast: 140ms;
+      --ease: cubic-bezier(0.16,1,0.3,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    [hidden] { display: none !important; }
+    button, input, select { font: inherit; }
+
+    /* ============================================================
+       APP SHELL
+       ============================================================ */
+    body { min-height: 100vh; background: var(--bg); color: var(--ink); }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 348px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    /* ============================================================
+       SIDEBAR — DARK
+       ============================================================ */
+    aside {
+      background: #0f172a;
+      border-right: 1px solid rgba(255,255,255,.05);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.1) transparent;
+      --ink: #f1f5f9;
+      --muted: #94a3b8;
+      --faint: #64748b;
+      --border: rgba(255,255,255,.08);
+      --border-mid: rgba(255,255,255,.12);
+      --border-strong: rgba(255,255,255,.16);
+      --line: rgba(255,255,255,.08);
+      --line-bright: rgba(255,255,255,.04);
+      --silver: rgba(255,255,255,.28);
+      --silver-strong: rgba(255,255,255,.42);
+      --panel: rgba(255,255,255,.07);
+      --panel-soft: rgba(255,255,255,.04);
+      --surface: rgba(255,255,255,.07);
+      --surface-2: rgba(255,255,255,.04);
+      --field: rgba(255,255,255,.08);
+      --accent: #10b981;
+      --accent-strong: #34d399;
+      --accent-soft: rgba(16,185,129,.18);
+      --accent-mid: rgba(52,211,153,.35);
+      --green: #34d399;
+      --green-soft: rgba(52,211,153,.15);
+      --red: #f87171;
+      --amber: #fbbf24;
+      --amber-soft: rgba(251,191,36,.14);
+      --blue: #60a5fa;
+      --blue-soft: rgba(96,165,250,.14);
+      --button-ink: #0f172a;
+      --shadow-soft: 0 2px 10px rgba(0,0,0,.35);
+      --shadow: 0 4px 18px rgba(0,0,0,.4);
+      --shadow-lift: 0 8px 28px rgba(0,0,0,.45);
+      --shadow-xs: 0 1px 4px rgba(0,0,0,.3);
+      color: var(--ink);
+    }
+    aside::-webkit-scrollbar { width: 3px; }
+    aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+
+    .sidebar-inner { padding: 24px 20px 32px; }
+
+    /* ============================================================
+       BRAND
+       ============================================================ */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand::before {
+      content: "";
+      width: 38px; height: 38px;
+      flex: 0 0 auto;
+      border-radius: 10px;
+      background:
+        radial-gradient(circle at 50% 33%, rgba(255,255,255,.92) 0 18%, transparent 19%),
+        linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 8px 20px rgba(16,185,129,.35), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.2; margin: 0; }
+    .brand-kicker { display: block; font-size: .65rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+    .subtle { color: var(--muted); font-size: .84rem; line-height: 1.5; margin: 3px 0 0; }
+
+    /* Mobile sidebar toggle */
+    .sidebar-toggle-btn {
+      display: none;
+      width: 100%;
+      min-height: 40px;
+      margin-bottom: 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      cursor: pointer;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 14px;
+      font-size: .86rem;
+      font-weight: 700;
+      transition: background var(--motion-fast) var(--ease);
+      box-shadow: none;
+    }
+    .sidebar-toggle-btn:hover { background: rgba(255,255,255,.1); transform: none; box-shadow: none; }
+    .sidebar-toggle-btn .toggle-icon {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 600;
+    }
+    .sidebar-toggle-btn .toggle-chevron {
+      width: 8px; height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform var(--motion) var(--ease);
+      margin-top: -2px;
+    }
+    aside.sidebar-closed .sidebar-toggle-btn .toggle-chevron { transform: rotate(-135deg); margin-top: 2px; }
+    .sidebar-toggle-count { color: var(--accent-strong); font-size: .78rem; font-weight: 700; }
+
+    /* The collapsible body of the sidebar */
+    .sidebar-body {
+      transition: max-height 280ms var(--ease), opacity 200ms var(--ease);
+    }
+
+    /* ============================================================
+       SECTION TITLES
+       ============================================================ */
+    .section-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 22px 0 10px; }
+    h2 { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; color: var(--muted); margin: 0; }
+
+    /* ============================================================
+       SIDEBAR FORM ELEMENTS
+       ============================================================ */
+    aside label { display: grid; gap: 6px; color: var(--ink); font-size: .83rem; font-weight: 600; margin-bottom: 12px; }
+    aside input, aside select {
+      width: 100%;
+      background: var(--field);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      color: var(--ink);
+      outline: none;
+      min-height: 42px;
+      transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+    }
+    aside input::placeholder { color: var(--faint); opacity: 1; }
+    aside select option { background: #1e293b; color: #f1f5f9; }
+    aside input:hover, aside select:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.1); }
+    aside input:focus, aside select:focus { border-color: rgba(16,185,129,.6); background: rgba(255,255,255,.1); box-shadow: 0 0 0 3px rgba(16,185,129,.18); }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field-row.three { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+    .field-row.three.investment-fields { grid-template-columns: 1fr; gap: 8px; }
+
+    .budget-add { display: grid; gap: 8px; margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--border); }
+
+    /* ============================================================
+       BUDGET LIST PANEL
+       ============================================================ */
+    .budget-list-panel { margin-top: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: rgba(255,255,255,.04); overflow: hidden; }
+    .budget-list-toggle {
+      width: 100%; min-height: 44px; border: 0; border-radius: 0; padding: 11px 13px;
+      display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; align-items: start;
+      background: transparent; color: var(--ink); box-shadow: none; text-align: left; cursor: pointer;
+      transition: background var(--motion-fast) var(--ease);
+    }
+    .budget-list-toggle:hover { background: rgba(255,255,255,.04); transform: none; box-shadow: none; }
+    .budget-list-toggle strong { overflow-wrap: anywhere; font-weight: 700; font-size: .86rem; }
+    .budget-list-count { color: var(--muted); font-size: .74rem; font-weight: 600; margin-top: 2px; overflow-wrap: anywhere; }
+    .budget-list-summary { display: grid; gap: 2px; min-width: 0; }
+    .budget-list-toggle::after {
+      content: ""; width: 8px; height: 8px;
+      border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg); transition: transform var(--motion) var(--ease); margin-top: -1px; flex-shrink: 0;
+    }
+    .budget-list-panel.collapsed .budget-list-toggle::after { transform: rotate(-45deg); margin-top: 3px; }
+    .budget-list-shell {
+      max-height: 300px; overflow: auto; padding: 8px; border-top: 1px solid var(--border);
+      transition: max-height 240ms var(--ease), padding 200ms var(--ease), opacity 160ms var(--ease);
+    }
+    .budget-list-panel.collapsed .budget-list-shell { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; overflow: hidden; border-top-width: 0; }
+    .budget-list { display: grid; gap: 6px; }
+    .budget-item {
+      display: grid; grid-template-columns: minmax(0,1fr) auto auto auto; gap: 7px; align-items: center;
+      padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius-xs);
+      background: rgba(255,255,255,.05); min-width: 0;
+      transition: background var(--motion-fast) var(--ease);
+    }
+    .budget-item:hover { background: rgba(255,255,255,.09); }
+    .budget-item > div:first-child { min-width: 0; }
+    .budget-item strong { display: block; font-size: .84rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    .budget-item > div:first-child span { display: block; color: var(--muted); font-size: .74rem; margin-top: 1px; }
+    .budget-item .amount { font-weight: 700; font-size: .86rem; white-space: nowrap; }
+    .budget-item.income .amount { color: var(--green); }
+    .budget-item.outgoing .amount { color: var(--red); }
+
+    /* ============================================================
+       METRIC / QUICK VIEW
+       ============================================================ */
+    .metric { display: grid; gap: 4px; padding: 14px; background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.2); border-radius: var(--radius-sm); margin-top: 12px; color: var(--muted); font-size: .8rem; }
+    .metric strong { font-size: 1.8rem; line-height: 1; color: var(--accent-strong); font-weight: 900; letter-spacing: -.03em; }
+
+    /* ============================================================
+       BUDGET PIE CHART
+       ============================================================ */
+    .budget-chart {
+      display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 14px; align-items: center;
+      margin-top: 14px; padding: 13px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: rgba(255,255,255,.04);
+    }
+    .pie {
+      width: 92px; aspect-ratio: 1; border-radius: 50%;
+      background: conic-gradient(var(--red) 0 var(--outgoing-slice,0%), var(--green) var(--outgoing-slice,0%) var(--planned-slice,0%), rgba(255,255,255,.1) var(--planned-slice,0%) 100%);
+      display: grid; place-items: center; box-shadow: 0 4px 16px rgba(0,0,0,.3);
+    }
+    .pie::after { content: ""; width: 50px; aspect-ratio: 1; border-radius: 50%; background: #0f172a; border: 1px solid rgba(255,255,255,.06); }
+    .chart-legend { display: grid; gap: 7px; font-size: .8rem; }
+    .legend-row { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); align-items: center; }
+    .legend-row strong { color: var(--ink); font-weight: 700; white-space: nowrap; font-size: .82rem; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; background: var(--green); flex-shrink: 0; }
+    .dot.outgoing { background: var(--red); }
+    .dot.planned { background: var(--green); }
+    .dot.leftover { background: rgba(255,255,255,.15); }
+
+    /* ============================================================
+       MAIN AREA
+       ============================================================ */
+    main { padding: 32px 28px 40px; overflow: hidden; }
+
+    /* ============================================================
+       TOOLBAR
+       ============================================================ */
+    .toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+    .toolbar h3 { font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 800; letter-spacing: -.025em; line-height: 1.1; margin: 0; color: var(--ink); }
+    .motto { margin: 5px 0 0; color: var(--muted); font-size: .9rem; font-weight: 500; }
+    .seo-intro { max-width: 640px; margin: 6px 0 0; color: var(--faint); font-size: .85rem; line-height: 1.5; }
+    .privacy-note {
+      display: inline-flex; align-items: center; gap: 7px; margin-top: 10px;
+      padding: 5px 11px; border: 1px solid var(--border-mid); border-radius: var(--radius-full);
+      background: var(--surface); color: var(--muted); font-size: .76rem; font-weight: 600; box-shadow: var(--shadow-xs);
+    }
+    .privacy-note::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); flex-shrink: 0; }
+
+    /* ============================================================
+       ACTIONS
+       ============================================================ */
+    .actions { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; }
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    button {
+      border: 1px solid transparent;
+      min-height: 40px;
+      border-radius: var(--radius-sm);
+      padding: 9px 15px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: var(--button-ink);
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      transition: transform var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), opacity var(--motion-fast) var(--ease);
+      white-space: nowrap; font-weight: 700; font-size: .87rem; letter-spacing: -.01em;
+      box-shadow: 0 3px 10px rgba(5,150,105,.2);
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(5,150,105,.26); }
+    button:active { transform: translateY(0) scale(.99); box-shadow: 0 2px 6px rgba(5,150,105,.18); }
+    button:disabled { cursor: not-allowed; opacity: .42; transform: none; box-shadow: none; }
+
+    button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .ghost { background: var(--surface); color: var(--ink); border-color: var(--border-mid); box-shadow: var(--shadow-xs); }
+    .ghost:hover { background: var(--surface-2); border-color: var(--border-strong); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+    .danger { color: var(--red); border-color: rgba(220,38,38,.18); }
+    .danger:hover { border-color: rgba(220,38,38,.3); box-shadow: 0 4px 14px rgba(220,38,38,.08); }
+    .support-link {
+      min-height: 40px; border-radius: var(--radius-sm); padding: 9px 15px;
+      background: var(--accent-soft); color: var(--accent-strong); border: 1px solid rgba(5,150,105,.22);
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      text-decoration: none; font-weight: 700; font-size: .87rem;
+      transition: transform var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
+      white-space: nowrap;
+    }
+    .support-link:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(5,150,105,.14); border-color: rgba(5,150,105,.38); }
+    .support-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .small-btn { min-height: 32px; padding: 5px 10px; font-size: .8rem; }
+    .icon-btn { width: 36px; min-height: 36px; padding: 0; border-radius: var(--radius-sm); }
+
+    /* ============================================================
+       FINANCE ALERT
+       ============================================================ */
+    .finance-alert { display: none; margin-bottom: 20px; padding: 13px 16px; border: 1px solid rgba(220,38,38,.18); border-left: 3px solid var(--red); border-radius: var(--radius-sm); background: #fef2f2; color: #991b1b; font-size: .87rem; line-height: 1.5; }
+    .finance-alert.show { display: block; }
+    .finance-alert strong { display: block; font-weight: 700; margin-bottom: 3px; }
+
+    /* ============================================================
+       PLAN GUIDANCE
+       ============================================================ */
+    .plan-guidance { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 16px; align-items: center; margin-bottom: 20px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--border-mid); border-radius: var(--radius); box-shadow: var(--shadow-xs); transition: box-shadow var(--motion) var(--ease); }
+    .plan-guidance:hover { box-shadow: var(--shadow-sm); }
+    .plan-guidance strong { display: block; font-size: .94rem; font-weight: 700; margin-bottom: 3px; }
+    .plan-guidance span { color: var(--muted); font-size: .86rem; line-height: 1.5; }
+    .plan-steps { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .step-chip { display: inline-flex; align-items: center; min-height: 26px; border-radius: var(--radius-full); padding: 3px 10px; border: 1px solid var(--border-mid); background: var(--surface-2); color: var(--muted); font-size: .73rem; font-weight: 700; white-space: nowrap; transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease); }
+    .step-chip.done { color: var(--accent-strong); background: var(--accent-soft); border-color: rgba(5,150,105,.25); }
+
+    /* ============================================================
+       SUMMARY STRIP
+       ============================================================ */
+    .summary-strip { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 20px; }
+    .summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow-xs); min-height: 82px; position: relative; overflow: hidden; transition: transform var(--motion) var(--ease), box-shadow var(--motion) var(--ease); }
+    .summary:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .summary::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(180deg, var(--accent), rgba(5,150,105,.2)); opacity: .6; }
+    .summary .label { color: var(--muted); font-size: .72rem; font-weight: 700; margin-bottom: 7px; text-transform: uppercase; letter-spacing: .06em; }
+    .summary .value { font-size: clamp(1.1rem, 1.6vw, 1.4rem); font-weight: 800; line-height: 1.1; overflow-wrap: anywhere; letter-spacing: -.02em; color: var(--ink); }
+
+    /* ============================================================
+       ALLOCATION PANEL
+       ============================================================ */
+    .allocation-panel { margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow-xs); transition: box-shadow var(--motion) var(--ease); }
+    .allocation-panel:hover { box-shadow: var(--shadow-sm); }
+    .allocation-panel h4 { margin: 0 0 4px; font-size: .96rem; font-weight: 700; }
+    .allocation-list { display: grid; gap: 7px; margin-top: 12px; }
+    .allocation-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 11px 13px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease); }
+    .allocation-row:hover { background: var(--surface); border-color: rgba(5,150,105,.2); }
+    .allocation-row > div strong { display: block; font-weight: 700; font-size: .9rem; overflow-wrap: anywhere; }
+    .allocation-row > div span { color: var(--muted); font-size: .8rem; display: block; margin-top: 2px; }
+    .allocation-row > strong { font-weight: 800; color: var(--accent-strong); font-size: .96rem; white-space: nowrap; }
+    .allocation-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 12px; flex-wrap: wrap; }
+
+    /* ============================================================
+       WORKSPACE
+       ============================================================ */
+    .workspace { display: grid; grid-template-columns: minmax(260px, 300px) minmax(0,1fr); gap: 20px; align-items: start; }
+    .setup-column { display: grid; gap: 16px; }
+    .targets-zone { min-width: 0; }
+
+    /* ============================================================
+       PANEL CARDS
+       ============================================================ */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-xs); padding: 20px; transition: box-shadow var(--motion) var(--ease); }
+    .panel:hover { box-shadow: var(--shadow-sm); }
+    .panel h4 { margin: 0 0 16px; font-size: .96rem; font-weight: 700; }
+    details.panel { padding: 0; overflow: hidden; }
+    details.panel summary { list-style: none; cursor: pointer; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-weight: 700; font-size: .92rem; transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease); }
+    details.panel summary:hover { background: var(--surface-2); color: var(--accent-strong); }
+    details.panel summary::-webkit-details-marker { display: none; }
+    .details-cue { color: var(--muted); font-size: .78rem; font-weight: 600; }
+    details[open] .details-cue::after { content: "Hide"; }
+    details:not([open]) .details-cue::after { content: "Show"; }
+    .details-body { padding: 0 20px 20px; animation: detailsIn 200ms var(--ease); }
+
+    /* ============================================================
+       MAIN FORM ELEMENTS
+       ============================================================ */
+    label { display: grid; gap: 6px; color: var(--ink); font-size: .84rem; font-weight: 600; margin-bottom: 12px; }
+    input, select { width: 100%; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); padding: 10px 12px; background: var(--field); color: var(--ink); outline: none; min-height: 42px; transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease); }
+    input:hover, select:hover { border-color: rgba(5,150,105,.3); }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(5,150,105,.12); }
+    input::placeholder { color: var(--faint); opacity: 1; }
+
+    /* ============================================================
+       TARGETS HEADING + FILTER
+       ============================================================ */
+    .targets-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .targets-heading h4 { margin: 0; font-size: 1.02rem; font-weight: 700; }
+    .target-bulk-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+    .target-bulk-actions[hidden] { display: none; }
+
+    .target-filter {
+      display: flex;
+      gap: 4px;
+      background: var(--surface-3);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      border: 1px solid var(--border);
+    }
+    .filter-btn {
+      min-height: 28px; padding: 3px 12px; border-radius: 6px; font-size: .78rem; font-weight: 700;
+      background: transparent; border: 1px solid transparent; color: var(--muted); box-shadow: none;
+      transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
+    }
+    .filter-btn:hover { background: var(--surface); color: var(--ink); box-shadow: none; transform: none; }
+    .filter-btn.active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-xs); border-color: var(--border-mid); }
+
+    .targets { display: grid; gap: 12px; }
+
+    /* ============================================================
+       TARGET CARDS
+       ============================================================ */
+    .target-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xs); overflow: visible; transition: box-shadow var(--motion) var(--ease), border-color var(--motion) var(--ease); }
+    .target-card:hover { box-shadow: var(--shadow-sm); border-color: rgba(5,150,105,.18); }
+    .target-card.is-collapsed { border-radius: var(--radius); }
+    .target-collapse-summary { display: none; grid-template-columns: minmax(0,1fr) auto; gap: 14px; align-items: center; min-width: 0; padding: 16px 18px; }
+    .target-card.is-collapsed .target-collapse-summary { display: grid; }
+    .target-summary-main { display: grid; gap: 8px; min-width: 0; }
+    .target-summary-title { display: flex; align-items: center; gap: 7px; min-width: 0; flex-wrap: wrap; }
+    .target-summary-title h5 { margin: 0; font-size: .96rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -.01em; }
+    .target-summary-track { height: 4px; border-radius: var(--radius-full); background: var(--surface-3); overflow: hidden; }
+    .target-summary-track i { display: block; width: var(--progress, 0%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent-strong), var(--accent)); transition: width 300ms var(--ease); }
+    .target-summary-meta { display: flex; flex-wrap: wrap; gap: 5px 12px; color: var(--muted); font-size: .78rem; line-height: 1.35; }
+    .target-summary-meta strong { color: var(--accent-strong); font-weight: 700; }
+    .target-summary-actions { display: flex; align-items: center; gap: 7px; }
+    .target-toggle { width: 36px; min-width: 36px; min-height: 36px; padding: 0; }
+    .target-toggle svg { transition: transform var(--motion) var(--ease); }
+    .target-card.is-collapsed .target-toggle svg { transform: rotate(-90deg); }
+    .target-full { display: grid; grid-template-columns: minmax(180px,220px) minmax(0,1fr); gap: 20px; align-items: start; padding: 20px; max-height: 2000px; opacity: 1; overflow: visible; transition: max-height 300ms var(--ease), opacity 220ms var(--ease), padding 220ms var(--ease); }
+    .target-card.is-collapsed .target-full { max-height: 0; opacity: 0; overflow: hidden; pointer-events: none; visibility: hidden; padding-top: 0; padding-bottom: 0; }
+    .target-details { min-width: 0; }
+
+    /* ============================================================
+       PROGRESS VIZ
+       ============================================================ */
+    .progress-viz { position: relative; min-height: 200px; display: grid; align-content: space-between; gap: 16px; padding: 18px; border: 1.5px solid rgba(5,150,105,.14); border-radius: var(--radius); overflow: hidden; background: radial-gradient(circle at 90% 10%, rgba(5,150,105,.07), transparent 45%), linear-gradient(155deg, #f0fdf9 0%, #ffffff 60%); box-shadow: 0 4px 16px rgba(5,150,105,.06); }
+    .progress-viz::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, rgba(5,150,105,.025) 0 1px, transparent 1px 12px); pointer-events: none; }
+    .progress-viz > * { position: relative; z-index: 1; }
+    .progress-kicker { color: var(--accent-strong); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .progress-score { display: flex; align-items: flex-end; gap: 4px; margin-top: 6px; }
+    .progress-score strong { font-size: clamp(2.8rem, 5.5vw, 4.2rem); line-height: .88; letter-spacing: -.04em; color: var(--accent-strong); font-weight: 900; }
+    .progress-score span { color: var(--muted); font-weight: 700; padding-bottom: 6px; font-size: 1rem; }
+    .journey { display: grid; gap: 10px; }
+    .journey-track { position: relative; height: 8px; border-radius: var(--radius-full); background: rgba(5,150,105,.1); box-shadow: inset 0 1px 2px rgba(5,150,105,.08); }
+    .journey-fill { display: block; width: var(--progress,0%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent-strong), #34d399); box-shadow: 0 3px 10px rgba(5,150,105,.3); transition: width 300ms var(--ease); }
+    .journey-marker { position: absolute; top: 50%; left: var(--progress,0%); width: 18px; height: 18px; border-radius: 50%; transform: translate(-50%,-50%); background: #fff; border: 4px solid var(--accent); box-shadow: 0 3px 10px rgba(5,150,105,.35); transition: left 300ms var(--ease); }
+    .journey-milestones { display: flex; justify-content: space-between; color: var(--muted); font-size: .7rem; font-weight: 600; }
+    .progress-caption { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: .83rem; }
+    .progress-caption strong { color: var(--accent-strong); font-weight: 700; }
+
+    /* ============================================================
+       TARGET DETAIL
+       ============================================================ */
+    .target-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .target-head h5 { margin: 0; font-size: 1.08rem; font-weight: 800; line-height: 1.2; letter-spacing: -.02em; overflow-wrap: anywhere; }
+    .target-head p.subtle { margin-top: 3px; font-size: .8rem; }
+    .target-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+    .pill { display: inline-flex; align-items: center; min-height: 22px; border-radius: var(--radius-full); padding: 2px 8px; background: var(--accent-soft); color: var(--accent-strong); font-size: .7rem; font-weight: 700; white-space: nowrap; letter-spacing: .01em; }
+    .pill.warn { background: var(--amber-soft); color: var(--amber); }
+    .pill.complete { background: rgba(5,150,105,.1); color: var(--accent-strong); border: 1px solid rgba(5,150,105,.2); }
+    .pill.priority { background: var(--surface-3); color: var(--muted); border: 1px solid var(--border-mid); }
+    .target-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
+    .mini-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; min-width: 0; transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease); }
+    .mini-stat:hover { box-shadow: var(--shadow-xs); border-color: rgba(5,150,105,.18); }
+    .mini-stat span { display: block; color: var(--muted); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .mini-stat strong { display: block; font-size: .92rem; font-weight: 800; overflow-wrap: anywhere; letter-spacing: -.01em; }
+    .progress-line { height: 5px; border-radius: var(--radius-full); background: var(--surface-3); overflow: hidden; margin: 10px 0; }
+    .progress-line i { display: block; height: 100%; width: var(--progress,0%); background: linear-gradient(90deg, var(--accent-strong), var(--accent)); border-radius: inherit; transition: width 300ms var(--ease); }
+    .recovery { display: grid; gap: 3px; margin: 10px 0; padding: 11px 13px; border: 1px solid rgba(5,150,105,.15); border-left: 3px solid var(--accent); border-radius: var(--radius-sm); background: var(--accent-soft); }
+    .recovery.warn { border-left-color: var(--amber); background: var(--amber-soft); border-color: rgba(217,119,6,.15); }
+    .recovery.milestone { border-left-color: var(--accent); background: rgba(5,150,105,.06); }
+    .recovery.plan { border-left-color: var(--accent); background: var(--accent-soft); }
+    .recovery strong { font-size: .88rem; font-weight: 700; }
+    .recovery span { color: var(--muted); font-size: .82rem; line-height: 1.45; margin-top: 1px; }
+    .scenario-panel { display: grid; gap: 10px; margin: 10px 0; padding: 13px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); animation: detailsIn 200ms var(--ease); }
+    .scenario-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .scenario-head strong { display: block; font-size: .88rem; font-weight: 700; }
+    .scenario-head span { display: block; color: var(--muted); font-size: .78rem; line-height: 1.4; margin-top: 2px; }
+    .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px,1fr)); gap: 7px; }
+    .scenario-card { display: grid; gap: 5px; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease); }
+    .scenario-card:hover { border-color: rgba(5,150,105,.25); box-shadow: var(--shadow-xs); transform: translateY(-1px); }
+    .scenario-card strong { font-size: .88rem; overflow-wrap: anywhere; font-weight: 700; }
+    .scenario-card span, .scenario-result span { color: var(--muted); font-size: .76rem; line-height: 1.35; }
+    .scenario-status { display: inline-flex; align-items: center; min-height: 20px; padding: 2px 7px; border-radius: var(--radius-full); background: var(--accent-soft); color: var(--accent-strong); font-size: .7rem; font-weight: 700; width: fit-content; }
+    .scenario-status.late, .scenario-status.not-enough { background: var(--amber-soft); color: var(--amber); }
+    .scenario-status.complete { background: rgba(5,150,105,.1); color: var(--accent-strong); }
+    .scenario-custom { display: grid; grid-template-columns: minmax(0,1fr) minmax(130px,.7fr); gap: 10px; align-items: end; }
+    .scenario-custom label { margin: 0; }
+    .scenario-result { display: grid; gap: 4px; min-height: 42px; padding: 9px 11px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease); font-size: .82rem; }
+    .scenario-result.updated { border-color: rgba(5,150,105,.3); background: var(--accent-soft); }
+    .scenario-result strong { font-size: .86rem; font-weight: 700; }
+
+    /* ============================================================
+       DEPOSIT ROW
+       ============================================================ */
+    .deposit-row {
+      display: grid;
+      grid-template-columns: minmax(100px,1fr) auto auto auto auto;
+      gap: 8px;
+      align-items: end;
+      margin-top: 12px;
+    }
+    .deposit-row label { margin: 0; grid-column: 1 / -1; }
+    .deposit-row input { grid-column: 1; }
+    .transactions { margin-top: 12px; display: grid; gap: 4px; }
+    .transactions-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px solid var(--border); padding-top: 12px; margin-bottom: 4px; }
+    .transactions-head strong { font-size: .84rem; font-weight: 700; }
+    .transactions-actions { display: flex; gap: 6px; }
+    .transaction { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: .82rem; padding: 4px 0; min-width: 0; border-bottom: 1px solid var(--border); }
+    .transaction:last-child { border-bottom: 0; }
+    .transaction strong { font-weight: 700; color: var(--ink); white-space: nowrap; }
+
+    /* ============================================================
+       INVESTMENT LIST
+       ============================================================ */
+    .investment-list { display: grid; gap: 8px; margin-top: 12px; }
+    .investment-item { display: grid; grid-template-columns: minmax(0,1fr) auto auto auto; gap: 10px; align-items: center; padding: 11px 13px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease); }
+    .investment-item:hover { border-color: rgba(5,150,105,.2); box-shadow: var(--shadow-xs); }
+    .investment-item strong { display: block; overflow-wrap: anywhere; font-weight: 700; font-size: .88rem; }
+    .investment-item span { display: block; color: var(--muted); font-size: .76rem; margin-top: 2px; }
+    .investment-value { font-weight: 800; white-space: nowrap; font-size: .94rem; }
+
+    /* ============================================================
+       EMPTY STATE
+       ============================================================ */
+    .empty { min-height: 300px; display: grid; place-items: center; text-align: center; padding: 40px 28px; border: 2px dashed var(--border-mid); border-radius: var(--radius-lg); background: var(--surface-2); color: var(--muted); }
+    .empty svg { width: 110px; height: 80px; margin-bottom: 18px; opacity: .65; }
+    .empty h4 { font-size: 1.05rem; font-weight: 700; color: var(--ink); margin: 0 0 8px; }
+    .empty p { font-size: .86rem; line-height: 1.6; max-width: 380px; margin: 0 auto 6px; }
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+    .preset-btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; min-height: 38px;
+      background: var(--surface); border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm);
+      color: var(--ink); font-size: .84rem; font-weight: 700; cursor: pointer;
+      transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease);
+      box-shadow: var(--shadow-xs);
+    }
+    .preset-btn:hover { border-color: rgba(5,150,105,.35); box-shadow: var(--shadow-sm); transform: translateY(-1px); color: var(--accent-strong); }
+    .preset-btn .preset-icon { font-size: 1.1rem; }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast { position: fixed; right: 20px; bottom: 20px; background: #0f172a; color: #fff; border-radius: var(--radius-sm); padding: 11px 16px; box-shadow: 0 8px 32px rgba(15,23,42,.22); transform: translateY(16px); opacity: 0; pointer-events: none; transition: transform 200ms var(--ease), opacity 200ms var(--ease); max-width: min(340px,calc(100vw - 40px)); font-size: .86rem; font-weight: 600; z-index: 40; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ============================================================
+       MODALS — BASE
+       ============================================================ */
+    .modal {
+      position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center;
+      padding: 20px; background: rgba(15,23,42,.52); backdrop-filter: blur(4px);
+    }
+    .modal.show { display: flex; }
+
+    .modal-panel {
+      width: min(520px, 100%); max-height: min(680px, calc(100vh - 40px));
+      display: grid; grid-template-rows: auto minmax(0,1fr);
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl); overflow: hidden; animation: modalIn 180ms var(--ease);
+    }
+    .modal-panel.wide { width: min(640px, 100%); }
+    .modal-panel.narrow { width: min(440px, 100%); }
+
+    .modal-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; padding: 20px; border-bottom: 1px solid var(--border); }
+    .modal-head h4 { margin: 0; font-size: 1.02rem; font-weight: 700; }
+    .modal-head p { margin: 4px 0 0; color: var(--muted); font-size: .84rem; }
+
+    .modal-body { overflow: auto; padding: 20px; }
+    .modal-body label { color: var(--ink); }
+    .modal-body input, .modal-body select { background: var(--surface-2); border-color: var(--border-strong); color: var(--ink); }
+    .modal-body input:focus, .modal-body select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(5,150,105,.12); }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border); background: var(--surface-2); flex-wrap: wrap; }
+
+    /* ============================================================
+       CONFIRM MODAL (special narrow layout)
+       ============================================================ */
+    .confirm-panel { width: min(420px, 100%); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); animation: modalIn 160ms var(--ease); padding: 24px; }
+    .confirm-panel h4 { margin: 0 0 10px; font-size: 1rem; font-weight: 700; }
+    .confirm-panel p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
+    .confirm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+
+    /* ============================================================
+       HISTORY + HELP MODALS (preserve existing structure)
+       ============================================================ */
+    .history-modal { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(15,23,42,.52); backdrop-filter: blur(4px); }
+    .history-modal.show { display: flex; }
+    .history-panel { width: min(520px,100%); max-height: min(680px,calc(100vh - 40px)); display: grid; grid-template-rows: auto minmax(0,1fr); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); overflow: hidden; animation: modalIn 180ms var(--ease); }
+    .help-panel { width: min(720px,100%); }
+    .history-top { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; padding: 20px; border-bottom: 1px solid var(--border); }
+    .history-top h4 { margin: 0; font-size: 1.02rem; font-weight: 700; }
+    .history-top p { margin: 4px 0 0; color: var(--muted); font-size: .84rem; }
+    .history-list { overflow: auto; padding: 8px 20px 20px; display: grid; gap: 8px; }
+    .history-chart { margin: 12px 20px 4px; padding: 13px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
+    .history-chart svg { display: block; width: 100%; height: auto; min-height: 120px; }
+    .history-chart-note { margin-top: 8px; color: var(--muted); font-size: .76rem; line-height: 1.4; }
+    .history-row { display: grid; grid-template-columns: minmax(0,1fr) auto auto auto; gap: 12px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .history-row:last-child { border-bottom: 0; }
+    .history-row span { color: var(--muted); font-size: .84rem; }
+    .history-row strong { font-size: .94rem; font-weight: 700; }
+    .history-empty { color: var(--muted); padding: 20px 0; font-size: .86rem; }
+    .help-content { overflow: auto; padding: 20px; display: grid; gap: 20px; }
+    .help-section { padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+    .help-section:last-child { border-bottom: 0; padding-bottom: 0; }
+    .help-section h5 { margin: 0 0 8px; font-size: .94rem; font-weight: 700; }
+    .help-section p { margin: 0 0 9px; color: var(--muted); line-height: 1.6; font-size: .88rem; }
+    .help-section ol, .help-section ul { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.6; font-size: .88rem; }
+    .help-section li + li { margin-top: 6px; }
+    .mini-i { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; border: 1px solid currentColor; font-size: .7rem; font-weight: 900; line-height: 1; flex-shrink: 0; }
+
+    /* ============================================================
+       CELEBRATION MODAL
+       ============================================================ */
+    .celebration-modal { position: fixed; inset: 0; z-index: 30; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(15,23,42,.55); backdrop-filter: blur(5px); }
+    .celebration-modal.show { display: flex; }
+    .celebration-panel { width: min(480px,100%); position: relative; overflow: hidden; padding: 32px 28px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); animation: modalIn 200ms var(--ease); }
+    .celebration-burst { width: 80px; height: 80px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(from 10deg, var(--accent-strong), #34d399, #d1fae5, var(--accent-strong)); box-shadow: 0 14px 36px rgba(5,150,105,.28); }
+    .celebration-burst span { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); color: var(--accent-strong); font-size: .9rem; font-weight: 900; }
+    .celebration-panel h4 { font-size: clamp(1.5rem,4vw,2.1rem); line-height: 1.1; margin: 0 0 8px; letter-spacing: -.025em; }
+    .celebration-panel p { color: var(--muted); margin: 0 auto 18px; max-width: 340px; line-height: 1.5; font-size: .9rem; }
+    .celebration-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 18px 0; }
+    .celebration-stats div { padding: 13px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); }
+    .celebration-stats span { display: block; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+    .celebration-stats strong { display: block; font-size: 1.02rem; font-weight: 800; overflow-wrap: anywhere; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .site-footer { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; }
+    .footer-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .footer-link { min-height: auto; padding: 0; border: 0; background: transparent; color: var(--muted); box-shadow: none; font-size: .8rem; text-decoration: underline; text-underline-offset: 3px; border-radius: 3px; }
+    .footer-link:hover { color: var(--ink); transform: none; box-shadow: none; }
+    .site-footer strong { color: var(--ink); font-weight: 700; }
+
+    /* ============================================================
+       KEYFRAMES
+       ============================================================ */
+    @keyframes detailsIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    /* ============================================================
+       RESPONSIVE — TABLET
+       ============================================================ */
+    @media (max-width: 1100px) {
+      .app-shell { grid-template-columns: 1fr; }
+      aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.06); overflow: visible; }
+      .sidebar-toggle-btn { display: flex; }
+      /* Collapsed sidebar: hide body */
+      aside.sidebar-closed .sidebar-body { display: none; }
+      .workspace { grid-template-columns: 1fr; }
+      .summary-strip { grid-template-columns: repeat(4,minmax(0,1fr)); }
+    }
+
+    @media (max-width: 900px) {
+      .summary-strip { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ============================================================
+       RESPONSIVE — MOBILE
+       ============================================================ */
+    @media (max-width: 720px) {
+      main, .sidebar-inner { padding: 18px 16px; }
+      .toolbar { display: grid; align-items: start; gap: 14px; }
+      .actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 100%; }
+      .actions > * { width: 100%; }
+      .summary-strip { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .plan-guidance { grid-template-columns: 1fr; }
+      .plan-steps { justify-content: flex-start; }
+      .target-full { grid-template-columns: 1fr; }
+      .progress-viz { min-height: 180px; }
+      .target-grid { grid-template-columns: 1fr 1fr; }
+      .scenario-grid, .scenario-custom { grid-template-columns: 1fr; }
+      .deposit-row { grid-template-columns: 1fr 1fr auto auto auto; }
+      .deposit-row label { grid-column: 1 / -1; }
+      .deposit-row input { grid-column: 1 / 3; }
+      .field-row, .field-row.three { grid-template-columns: 1fr; }
+      .budget-chart { grid-template-columns: 1fr; }
+      .site-footer { display: grid; }
+      .targets-heading { gap: 8px; }
+    }
+
+    @media (max-width: 480px) {
+      main, .sidebar-inner { padding: 15px; }
+      .summary-strip, .actions { grid-template-columns: 1fr; }
+      .history-row { grid-template-columns: 1fr auto; gap: 6px; }
+      .target-grid { grid-template-columns: 1fr; }
+      .deposit-row { grid-template-columns: 1fr auto auto auto auto; }
+      .deposit-row input { grid-column: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ============================================================
+       SIDEBAR
+       ============================================================ -->
+  <aside id="sidebarEl">
+    <div class="sidebar-inner">
+      <div class="brand">
+        <div>
+          <span class="brand-kicker">Savings planner</span>
+          <h1>PacePot</h1>
+          <p class="subtle">Put money aside without making it a whole thing.</p>
+        </div>
+      </div>
+
+      <button class="sidebar-toggle-btn" id="sidebarToggle" type="button" aria-expanded="true" aria-controls="sidebarBody">
+        <span class="toggle-icon">
+          <span>Monthly budget</span>
+          <span class="sidebar-toggle-count" id="sidebarToggleCount"></span>
+        </span>
+        <span class="toggle-icon">
+          <span id="sidebarToggleLabel">Hide</span>
+          <span class="toggle-chevron"></span>
+        </span>
+      </button>
+
+      <div class="sidebar-body" id="sidebarBody">
+        <form id="budgetForm">
+          <div class="section-title"><h2>Monthly Budget</h2></div>
+          <label>
+            Salary
+            <input id="salary" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
+          </label>
+          <label>
+            Current account balance
+            <input id="accountBalance" type="number" min="0" step="0.01" inputmode="decimal" placeholder="1200">
+          </label>
+          <label>
+            Currency
+            <select id="currency">
+              <option value="GBP">GBP &mdash; Pound</option>
+              <option value="USD">USD &mdash; Dollar</option>
+              <option value="EUR">EUR &mdash; Euro</option>
+              <option value="CAD">CAD &mdash; Canadian dollar</option>
+              <option value="AUD">AUD &mdash; Australian dollar</option>
+            </select>
+          </label>
+          <div class="budget-add">
+            <div class="field-row">
+              <label>
+                Type
+                <select id="budgetType">
+                  <option value="income">Income</option>
+                  <option value="outgoing">Outgoing</option>
+                </select>
+              </label>
+              <label>
+                Value
+                <input id="budgetValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="450">
+              </label>
+            </div>
+            <label>
+              Name
+              <input id="budgetName" type="text" maxlength="40" placeholder="Rent, salary top-up, subscriptions">
+            </label>
+            <button type="button" id="addBudgetItem">Add item</button>
+          </div>
+          <div class="budget-list-panel" id="budgetListPanel">
+            <button class="budget-list-toggle" id="budgetListToggle" type="button" aria-expanded="true" aria-controls="budgetListShell">
+              <span class="budget-list-summary">
+                <strong>Income &amp; outgoings</strong>
+                <span class="budget-list-count" id="budgetListCount">0 items</span>
+              </span>
+            </button>
+            <div class="budget-list-shell" id="budgetListShell">
+              <div class="budget-list" id="budgetList"></div>
+            </div>
+          </div>
+          <div class="metric">
+            Estimated left each month
+            <strong id="availableAmount">&pound;0</strong>
+          </div>
+          <label style="margin-top:14px">
+            Planned monthly savings pot
+            <input id="savingsPot" type="number" min="0" step="0.01" inputmode="decimal" placeholder="300">
+          </label>
+          <div class="budget-chart" id="budgetChart">
+            <div class="pie" id="budgetPie" aria-label="Monthly money split chart"></div>
+            <div class="chart-legend">
+              <div class="legend-row"><span><i class="dot outgoing"></i>Outgoings</span><strong id="totalOutgoings">&pound;0</strong></div>
+              <div class="legend-row"><span><i class="dot planned"></i>Goals</span><strong id="plannedSavings">&pound;0</strong></div>
+              <div class="legend-row"><span><i class="dot leftover"></i>Left over</span><strong id="totalAvailable">&pound;0</strong></div>
+            </div>
+          </div>
+        </form>
+
+        <div class="section-title"><h2>Quick View</h2></div>
+        <p class="subtle" id="budgetAdvice">Add salary, income and outgoings to see what saving pace is realistic.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================================================
+       MAIN
+       ============================================================ -->
+  <main>
+    <div class="toolbar">
+      <div>
+        <h3>Build savings targets that fit real life.</h3>
+        <p class="motto">Small pots. Steady pace. Less wondering where it all went.</p>
+        <p class="seo-intro">PacePot is a free savings goal calculator for planning how to save for a holiday, car, house deposit, emergency fund, or any short-term target.</p>
+        <p class="privacy-note">No sign-up. Your data stays in this browser.</p>
+      </div>
+      <div class="actions">
+        <a class="support-link" href="https://buymeacoffee.com/pacepot" target="_blank" rel="noopener noreferrer" title="Support PacePot">Support PacePot</a>
+        <button class="ghost" id="helpBtn" type="button" title="Open help"><span class="mini-i" aria-hidden="true">i</span> Help</button>
+        <button class="ghost" id="importBtn" type="button" title="Import a backup">Import</button>
+        <button class="ghost" id="backupBtn" type="button" title="Download a backup">Backup</button>
+        <button class="ghost danger" id="resetBtn" type="button" title="Clear all saved data">Clear</button>
+      </div>
+    </div>
+    <input id="importFile" type="file" accept="application/json,.json" hidden>
+
+    <div class="finance-alert" id="financeAlert" role="status" aria-live="polite"></div>
+
+    <section class="plan-guidance" aria-label="Next best step">
+      <div>
+        <strong id="nextStepTitle">Start with your monthly money</strong>
+        <span id="nextStepText">Add your salary, regular outgoings and a realistic savings pot so targets are based on money you can actually use.</span>
+      </div>
+      <div class="plan-steps" aria-label="Planner setup progress">
+        <span class="step-chip" id="stepBudget">Budget</span>
+        <span class="step-chip" id="stepPot">Savings pot</span>
+        <span class="step-chip" id="stepTarget">Target</span>
+      </div>
+    </section>
+
+    <section class="summary-strip" aria-label="Savings summary">
+      <div class="summary"><div class="label">Total income</div><div class="value" id="topIncome">&pound;0</div></div>
+      <div class="summary"><div class="label">Total outgoing</div><div class="value" id="topOutgoing">&pound;0</div></div>
+      <div class="summary"><div class="label">Safe to spend</div><div class="value" id="safeToSpend">&pound;0</div></div>
+      <div class="summary"><div class="label">Account cushion</div><div class="value" id="accountCushion">&pound;0</div></div>
+      <div class="summary"><div class="label">Saved so far</div><div class="value" id="savedTotal">&pound;0</div></div>
+      <div class="summary"><div class="label">Still needed</div><div class="value" id="remainingTotal">&pound;0</div></div>
+      <div class="summary"><div class="label">Active targets</div><div class="value" id="targetCount">0</div></div>
+      <div class="summary"><div class="label">Monthly pace needed</div><div class="value" id="paceTotal">&pound;0</div></div>
+      <div class="summary" id="netWorthCard" hidden><div class="label">Tracked net worth</div><div class="value" id="netWorthTotal">&pound;0</div></div>
+    </section>
+
+    <section class="allocation-panel" aria-label="Suggested allocation">
+      <h4>Suggested allocation</h4>
+      <p class="subtle" id="allocationIntro">Add targets and a savings pot to see a suggested split.</p>
+      <div class="allocation-list" id="allocationList"></div>
+      <div class="allocation-actions">
+        <button type="button" id="applyAllocationBtn">Apply suggested allocation</button>
+      </div>
+    </section>
+
+    <div class="workspace">
+      <div class="setup-column">
+        <section class="panel">
+          <h4>Add a savings target</h4>
+          <form id="targetForm">
+            <label>
+              What are you saving for?
+              <input id="targetName" type="text" maxlength="60" placeholder="Holiday, emergency fund, new laptop">
+            </label>
+            <div class="field-row three">
+              <label>
+                Amount needed
+                <input id="targetAmount" type="number" min="1" step="0.01" inputmode="decimal" placeholder="900">
+              </label>
+              <label>
+                Already saved
+                <input id="targetSaved" type="number" min="0" step="0.01" inputmode="decimal" placeholder="100">
+              </label>
+              <label>
+                Track pace by
+                <select id="targetCadence">
+                  <option value="day">Day</option>
+                  <option value="week">Week</option>
+                  <option value="month" selected>Month</option>
+                </select>
+              </label>
+              <label>
+                Priority
+                <select id="targetPriority">
+                  <option value="high">High</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Target date
+              <input id="targetDate" type="date">
+            </label>
+            <div class="field-row">
+              <label>
+                Planned contribution
+                <input id="targetRecurringAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="50">
+              </label>
+              <label>
+                Repeats
+                <select id="targetRecurringCadence">
+                  <option value="">No repeat plan</option>
+                  <option value="week">Weekly</option>
+                  <option value="month">Monthly</option>
+                </select>
+              </label>
+            </div>
+            <button type="submit">Add target</button>
+          </form>
+        </section>
+
+        <details class="panel" id="investmentPanel">
+          <summary>
+            <span>Investments &amp; long-term money</span>
+            <span class="details-cue"></span>
+          </summary>
+          <div class="details-body">
+            <p class="subtle">Optional. Track investment values without mixing them into monthly safe-to-spend money.</p>
+            <form id="investmentForm">
+              <label>
+                Account name
+                <input id="investmentName" type="text" maxlength="50" placeholder="Stocks &amp; Shares ISA, pension, crypto">
+              </label>
+              <div class="field-row three investment-fields">
+                <label>
+                  Current value
+                  <input id="investmentValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
+                </label>
+                <label>
+                  Type
+                  <select id="investmentKind">
+                    <option value="Stocks &amp; Shares ISA">Stocks &amp; Shares ISA</option>
+                    <option value="Trading account">Trading account</option>
+                    <option value="Pension">Pension</option>
+                    <option value="Crypto wallet">Crypto wallet</option>
+                    <option value="Premium Bonds">Premium Bonds</option>
+                    <option value="Other investment">Other investment</option>
+                  </select>
+                </label>
+                <label>
+                  Access
+                  <select id="investmentAccess">
+                    <option value="long-term">Long-term only</option>
+                    <option value="accessible">Accessible in emergency</option>
+                  </select>
+                </label>
+              </div>
+              <label>
+                Note
+                <input id="investmentNote" type="text" maxlength="80" placeholder="Retirement, house deposit, emergency only">
+              </label>
+              <button type="submit">Add investment</button>
+            </form>
+            <div class="investment-list" id="investmentList"></div>
+          </div>
+        </details>
+      </div>
+
+      <section class="targets-zone">
+        <div class="targets-heading">
+          <h4>Your targets</h4>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div class="target-filter" role="group" aria-label="Filter targets">
+              <button class="filter-btn active" id="filterAll" type="button">All</button>
+              <button class="filter-btn" id="filterActive" type="button">Active</button>
+              <button class="filter-btn" id="filterDone" type="button">Done</button>
+            </div>
+            <div class="target-bulk-actions" id="targetBulkActions" hidden>
+              <button class="ghost small-btn" id="expandTargetsBtn" type="button">Expand all</button>
+              <button class="ghost small-btn" id="collapseTargetsBtn" type="button">Collapse all</button>
+            </div>
+          </div>
+        </div>
+        <div class="targets" id="targets"></div>
+      </section>
+    </div>
+
+    <footer class="site-footer">
+      <div>
+        <strong>PacePot v3.0</strong> &mdash; savings targets that fit real life.
+        <span>Created by Maks Wittenbeck, 2026.</span>
+      </div>
+      <div class="footer-links" aria-label="PacePot information links">
+        <button class="footer-link" id="privacyBtn" type="button">Privacy</button>
+        <span aria-hidden="true">&middot;</span>
+        <button class="footer-link" id="termsBtn" type="button">Terms</button>
+        <span aria-hidden="true">&middot;</span>
+        <button class="footer-link" id="contactBtn" type="button">Contact</button>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<!-- ============================================================
+     CONFIRM MODAL
+     ============================================================ -->
+<div class="modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmHeading">
+  <div class="confirm-panel">
+    <h4 id="confirmHeading">Are you sure?</h4>
+    <p id="confirmMessage"></p>
+    <div class="confirm-actions">
+      <button class="ghost" id="confirmCancel" type="button">Cancel</button>
+      <button class="danger" id="confirmOk" type="button">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     EDIT TARGET MODAL
+     ============================================================ -->
+<div class="modal" id="targetEditModal" role="dialog" aria-modal="true" aria-labelledby="targetEditTitle">
+  <div class="modal-panel wide">
+    <div class="modal-head">
+      <div>
+        <h4 id="targetEditTitle">Edit target</h4>
+        <p>Update the details for this savings goal.</p>
+      </div>
+      <button class="ghost icon-btn" id="targetEditClose" type="button" aria-label="Close edit target">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="targetEditForm" novalidate>
+        <label>
+          What are you saving for?
+          <input id="editTargetName" type="text" maxlength="60" required>
+        </label>
+        <div class="field-row">
+          <label>
+            Amount needed
+            <input id="editTargetAmount" type="number" min="1" step="0.01" inputmode="decimal" required>
+          </label>
+          <label>
+            Target date
+            <input id="editTargetDate" type="date" required>
+          </label>
+        </div>
+        <div class="field-row">
+          <label>
+            Track pace by
+            <select id="editTargetCadence">
+              <option value="day">Day</option>
+              <option value="week">Week</option>
+              <option value="month">Month</option>
+            </select>
+          </label>
+          <label>
+            Priority
+            <select id="editTargetPriority">
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+        </div>
+        <div class="field-row">
+          <label>
+            Planned contribution amount
+            <input id="editTargetRecurringAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Leave blank for none">
+          </label>
+          <label>
+            Repeats
+            <select id="editTargetRecurringCadence">
+              <option value="">No repeat plan</option>
+              <option value="week">Weekly</option>
+              <option value="month">Monthly</option>
+            </select>
+          </label>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="ghost" id="targetEditCancel" type="button">Cancel</button>
+      <button type="button" id="targetEditSave">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     EDIT BUDGET ITEM MODAL
+     ============================================================ -->
+<div class="modal" id="budgetEditModal" role="dialog" aria-modal="true" aria-labelledby="budgetEditTitle">
+  <div class="modal-panel narrow">
+    <div class="modal-head">
+      <div><h4 id="budgetEditTitle">Edit budget item</h4></div>
+      <button class="ghost icon-btn" id="budgetEditClose" type="button" aria-label="Close edit budget item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="budgetEditForm" novalidate>
+        <label>
+          Name
+          <input id="editBudgetName" type="text" maxlength="40" required>
+        </label>
+        <div class="field-row">
+          <label>
+            Monthly value
+            <input id="editBudgetValue" type="number" min="0" step="0.01" inputmode="decimal" required>
+          </label>
+          <label>
+            Type
+            <select id="editBudgetType">
+              <option value="income">Income</option>
+              <option value="outgoing">Outgoing</option>
+            </select>
+          </label>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="ghost" id="budgetEditCancel" type="button">Cancel</button>
+      <button type="button" id="budgetEditSave">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     EDIT INVESTMENT MODAL
+     ============================================================ -->
+<div class="modal" id="investEditModal" role="dialog" aria-modal="true" aria-labelledby="investEditTitle">
+  <div class="modal-panel narrow">
+    <div class="modal-head">
+      <div><h4 id="investEditTitle">Edit investment</h4></div>
+      <button class="ghost icon-btn" id="investEditClose" type="button" aria-label="Close edit investment">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="investEditForm" novalidate>
+        <label>
+          Account name
+          <input id="editInvestName" type="text" maxlength="50" required>
+        </label>
+        <label>
+          Current value
+          <input id="editInvestValue" type="number" min="0" step="0.01" inputmode="decimal" required>
+        </label>
+        <label>
+          Access
+          <select id="editInvestAccess">
+            <option value="long-term">Long-term only</option>
+            <option value="accessible">Accessible in emergency</option>
+          </select>
+        </label>
+        <label>
+          Note
+          <input id="editInvestNote" type="text" maxlength="80" placeholder="Optional note">
+        </label>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="ghost" id="investEditCancel" type="button">Cancel</button>
+      <button type="button" id="investEditSave">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     EDIT DEPOSIT MODAL
+     ============================================================ -->
+<div class="modal" id="depositEditModal" role="dialog" aria-modal="true" aria-labelledby="depositEditTitle">
+  <div class="modal-panel narrow">
+    <div class="modal-head">
+      <div><h4 id="depositEditTitle">Edit saving entry</h4></div>
+      <button class="ghost icon-btn" id="depositEditClose" type="button" aria-label="Close edit saving entry">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="depositEditForm" novalidate>
+        <label>
+          Amount saved
+          <input id="editDepositAmount" type="number" min="0" step="0.01" inputmode="decimal" required>
+        </label>
+        <label>
+          Date
+          <input id="editDepositDate" type="date" required>
+        </label>
+        <label>
+          Label
+          <input id="editDepositNote" type="text" maxlength="60" placeholder="Saved">
+        </label>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="ghost" id="depositEditCancel" type="button">Cancel</button>
+      <button type="button" id="depositEditSave">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     HISTORY MODAL
+     ============================================================ -->
+<div class="history-modal" id="historyModal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+  <div class="history-panel">
+    <div class="history-top">
+      <div>
+        <h4 id="historyTitle">Saving history</h4>
+        <p class="subtle" id="historySummary"></p>
+      </div>
+      <button class="ghost icon-btn" id="historyClose" type="button" title="Close history" aria-label="Close saving history">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="history-chart" id="historyChart"></div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     HELP MODAL
+     ============================================================ -->
+<div class="history-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="history-panel help-panel">
+    <div class="history-top">
+      <div>
+        <h4 id="helpTitle">How this tracker works</h4>
+        <p class="subtle">Use this guide when you want the numbers to make sense before making decisions.</p>
+      </div>
+      <button class="ghost icon-btn" id="helpClose" type="button" title="Close help" aria-label="Close help">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="help-content">
+      <section class="help-section">
+        <h5>General help</h5>
+        <p>This tracker is built around a simple monthly plan: money coming in, money already committed, money you choose to save, and money left over. It does not assume every spare pound should go into savings.</p>
+        <ul>
+          <li><strong>Total income</strong> is salary plus any extra income items such as side work.</li>
+          <li><strong>Total outgoing</strong> is rent, debt, bills, subscriptions, and any other regular outgoing you add.</li>
+          <li><strong>Planned monthly savings pot</strong> is the amount you actually want to commit to goals this month.</li>
+          <li><strong>Safe to spend</strong> is income minus outgoings minus your planned savings pot.</li>
+          <li><strong>Account cushion</strong> estimates what your current account may have left after this month's plan.</li>
+          <li><strong>Investments</strong> are optional and manually updated. They count toward tracked net worth but do not change safe-to-spend money.</li>
+        </ul>
+      </section>
+      <section class="help-section">
+        <h5>Step by step</h5>
+        <ol>
+          <li>Add your salary and, if useful, your current account balance.</li>
+          <li>Add income and outgoing items. Use names like rent, debt, side hustle, subscriptions, or transport.</li>
+          <li>Look at estimated money left each month, then choose a planned monthly savings pot that still leaves breathing room.</li>
+          <li>Create a target with an amount, deadline, pace type, and priority.</li>
+          <li>Optionally add a planned weekly or monthly contribution if you already know your regular saving amount.</li>
+          <li>Use suggested allocation to decide how to split your savings pot across goals.</li>
+          <li>Whenever you save money, add a saved amount to the target. Progress, history, recovery, and totals update automatically.</li>
+          <li>Use the edit icon (pencil) on any target, budget item, investment, or saving entry to update it with a proper form &mdash; no more pop-up prompts.</li>
+        </ol>
+      </section>
+      <section class="help-section">
+        <h5>Example</h5>
+        <p>Someone earns &pound;2,500 per month and adds &pound;1,450 of outgoings. The app shows &pound;1,050 left. They may not want to save all of that, so they set a planned monthly savings pot of &pound;300. Suggested allocation only splits that &pound;300 across goals, leaving &pound;750 as safe-to-spend money.</p>
+        <p>If they have a &pound;900 holiday target due in three months, the tracker can show the monthly pace needed, whether the target is on track, and how much extra is needed if they fall behind.</p>
+      </section>
+      <section class="help-section">
+        <h5>Investments</h5>
+        <p>The investments section is collapsed by default because not everyone needs it. Use it for accounts such as a Stocks &amp; Shares ISA, pension, crypto wallet, trading account, Premium Bonds, or other long-term money.</p>
+        <p>Investment values are manual. Marking something as accessible helps you understand emergency money, but investments are not included in monthly safe-to-spend calculations unless you decide outside the app to use them.</p>
+      </section>
+      <section class="help-section">
+        <h5>Backup and import</h5>
+        <p>Your data stays in this browser. Use Backup to download a JSON copy, and Import to restore it later or move it to another browser. Import replaces the current planner data after confirmation.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PRIVACY MODAL
+     ============================================================ -->
+<div class="history-modal" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+  <div class="history-panel help-panel">
+    <div class="history-top">
+      <div>
+        <h4 id="privacyTitle">Privacy</h4>
+        <p class="subtle">Plain English: PacePot is designed to work without accounts or a database.</p>
+      </div>
+      <button class="ghost icon-btn" id="privacyClose" type="button" title="Close privacy" aria-label="Close privacy">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="help-content">
+      <section class="help-section">
+        <h5>What PacePot stores</h5>
+        <p>PacePot saves planner information such as salary, budget items, savings targets, saving entries, and optional investment values in your browser using local storage. Your planner data stays on the device and browser you use. PacePot does not require a login, account, or password.</p>
+      </section>
+      <section class="help-section">
+        <h5>What PacePot does not do</h5>
+        <ul>
+          <li>It does not send your planner data to a PacePot server.</li>
+          <li>It does not sell your planner data.</li>
+          <li>It does not ask for bank logins, card details, or account passwords.</li>
+        </ul>
+      </section>
+      <section class="help-section">
+        <h5>Analytics</h5>
+        <p>PacePot uses Google Analytics (GA4) to count page views and generic events such as goal created or contribution added. No financial amounts, goal names, dates, or other personal details are tracked.</p>
+      </section>
+      <section class="help-section">
+        <h5>Backups and browser storage</h5>
+        <p>If you clear browser data, change device, or use a private browsing session, your saved planner data may be removed. Use Backup to download a copy if you want to keep it safe.</p>
+      </section>
+      <section class="help-section">
+        <h5>External links</h5>
+        <p>The Support PacePot button opens Buy Me a Coffee in a new tab. That service has its own privacy and payment process.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TERMS MODAL
+     ============================================================ -->
+<div class="history-modal" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+  <div class="history-panel help-panel">
+    <div class="history-top">
+      <div>
+        <h4 id="termsTitle">Terms of use</h4>
+        <p class="subtle">A short set of terms for using PacePot sensibly.</p>
+      </div>
+      <button class="ghost icon-btn" id="termsClose" type="button" title="Close terms" aria-label="Close terms">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="help-content">
+      <section class="help-section">
+        <h5>Planning tool only</h5>
+        <p>PacePot is a savings planning tool. It is not financial advice, investment advice, legal advice, or tax advice.</p>
+      </section>
+      <section class="help-section">
+        <h5>Your responsibility</h5>
+        <p>You are responsible for checking your own numbers and making your own money decisions. PacePot calculations are designed to help planning, but they should not replace professional advice where needed.</p>
+      </section>
+      <section class="help-section">
+        <h5>Availability and accuracy</h5>
+        <p>PacePot is provided free and as-is. The app may change over time, and no guarantee is made that it will always be available, error-free, or suitable for every financial situation.</p>
+      </section>
+      <section class="help-section">
+        <h5>Responsible use</h5>
+        <p>Do not use PacePot to store passwords, bank login details, card numbers, or highly sensitive private information.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CONTACT MODAL
+     ============================================================ -->
+<div class="history-modal" id="contactModal" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+  <div class="history-panel help-panel">
+    <div class="history-top">
+      <div>
+        <h4 id="contactTitle">Contact and feedback</h4>
+        <p class="subtle">Ideas, bugs, rough edges, or feature requests are welcome.</p>
+      </div>
+      <button class="ghost icon-btn" id="contactClose" type="button" title="Close contact" aria-label="Close contact">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="help-content">
+      <section class="help-section">
+        <h5>Send feedback</h5>
+        <p>Email <a href="mailto:mwittenbeckwork04@gmail.com">mwittenbeckwork04@gmail.com</a> with feedback, bug reports, or ideas for PacePot.</p>
+        <p>Please avoid sending private financial details, bank information, passwords, or anything you would not want shared by email.</p>
+      </section>
+      <section class="help-section">
+        <h5>Helpful details to include</h5>
+        <ul>
+          <li>What you were trying to do.</li>
+          <li>What happened instead.</li>
+          <li>The device and browser you were using.</li>
+          <li>Any feature idea that would make PacePot easier to use.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CELEBRATION MODAL
+     ============================================================ -->
+<div class="celebration-modal" id="celebrationModal" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle">
+  <div class="celebration-panel">
+    <div class="celebration-burst" aria-hidden="true"><span>100%</span></div>
+    <h4 id="celebrationTitle">Goal complete</h4>
+    <p id="celebrationText">You fully funded this target.</p>
+    <div class="celebration-stats">
+      <div><span>Target</span><strong id="celebrationTarget">&pound;0</strong></div>
+      <div><span>Saved</span><strong id="celebrationSaved">&pound;0</strong></div>
+    </div>
+    <button type="button" id="celebrationClose">Keep going</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+    const storeKey = "shortTermSavingsPlanner.v1";
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const state = loadState();
+
+    const els = {
+      salary: document.querySelector("#salary"),
+      accountBalance: document.querySelector("#accountBalance"),
+      currency: document.querySelector("#currency"),
+      savingsPot: document.querySelector("#savingsPot"),
+      budgetType: document.querySelector("#budgetType"),
+      budgetName: document.querySelector("#budgetName"),
+      budgetValue: document.querySelector("#budgetValue"),
+      budgetForm: document.querySelector("#budgetForm"),
+      addBudgetItem: document.querySelector("#addBudgetItem"),
+      budgetListPanel: document.querySelector("#budgetListPanel"),
+      budgetListToggle: document.querySelector("#budgetListToggle"),
+      budgetListCount: document.querySelector("#budgetListCount"),
+      budgetList: document.querySelector("#budgetList"),
+      budgetPie: document.querySelector("#budgetPie"),
+      totalOutgoings: document.querySelector("#totalOutgoings"),
+      totalAvailable: document.querySelector("#totalAvailable"),
+      plannedSavings: document.querySelector("#plannedSavings"),
+      availableAmount: document.querySelector("#availableAmount"),
+      budgetAdvice: document.querySelector("#budgetAdvice"),
+      financeAlert: document.querySelector("#financeAlert"),
+      nextStepTitle: document.querySelector("#nextStepTitle"),
+      nextStepText: document.querySelector("#nextStepText"),
+      stepBudget: document.querySelector("#stepBudget"),
+      stepPot: document.querySelector("#stepPot"),
+      stepTarget: document.querySelector("#stepTarget"),
+      topIncome: document.querySelector("#topIncome"),
+      topOutgoing: document.querySelector("#topOutgoing"),
+      safeToSpend: document.querySelector("#safeToSpend"),
+      accountCushion: document.querySelector("#accountCushion"),
+      savedTotal: document.querySelector("#savedTotal"),
+      remainingTotal: document.querySelector("#remainingTotal"),
+      targetCount: document.querySelector("#targetCount"),
+      paceTotal: document.querySelector("#paceTotal"),
+      allocationIntro: document.querySelector("#allocationIntro"),
+      allocationList: document.querySelector("#allocationList"),
+      applyAllocationBtn: document.querySelector("#applyAllocationBtn"),
+      targetForm: document.querySelector("#targetForm"),
+      targetName: document.querySelector("#targetName"),
+      targetAmount: document.querySelector("#targetAmount"),
+      targetSaved: document.querySelector("#targetSaved"),
+      targetCadence: document.querySelector("#targetCadence"),
+      targetPriority: document.querySelector("#targetPriority"),
+      targetDate: document.querySelector("#targetDate"),
+      targetRecurringAmount: document.querySelector("#targetRecurringAmount"),
+      targetRecurringCadence: document.querySelector("#targetRecurringCadence"),
+      targets: document.querySelector("#targets"),
+      targetBulkActions: document.querySelector("#targetBulkActions"),
+      expandTargetsBtn: document.querySelector("#expandTargetsBtn"),
+      collapseTargetsBtn: document.querySelector("#collapseTargetsBtn"),
+      investmentForm: document.querySelector("#investmentForm"),
+      investmentName: document.querySelector("#investmentName"),
+      investmentValue: document.querySelector("#investmentValue"),
+      investmentKind: document.querySelector("#investmentKind"),
+      investmentAccess: document.querySelector("#investmentAccess"),
+      investmentNote: document.querySelector("#investmentNote"),
+      investmentList: document.querySelector("#investmentList"),
+      netWorthCard: document.querySelector("#netWorthCard"),
+      netWorthTotal: document.querySelector("#netWorthTotal"),
+      helpBtn: document.querySelector("#helpBtn"),
+      helpModal: document.querySelector("#helpModal"),
+      helpClose: document.querySelector("#helpClose"),
+      privacyBtn: document.querySelector("#privacyBtn"),
+      privacyModal: document.querySelector("#privacyModal"),
+      privacyClose: document.querySelector("#privacyClose"),
+      termsBtn: document.querySelector("#termsBtn"),
+      termsModal: document.querySelector("#termsModal"),
+      termsClose: document.querySelector("#termsClose"),
+      contactBtn: document.querySelector("#contactBtn"),
+      contactModal: document.querySelector("#contactModal"),
+      contactClose: document.querySelector("#contactClose"),
+      importBtn: document.querySelector("#importBtn"),
+      importFile: document.querySelector("#importFile"),
+      backupBtn: document.querySelector("#backupBtn"),
+      resetBtn: document.querySelector("#resetBtn"),
+      historyModal: document.querySelector("#historyModal"),
+      historyTitle: document.querySelector("#historyTitle"),
+      historySummary: document.querySelector("#historySummary"),
+      historyChart: document.querySelector("#historyChart"),
+      historyList: document.querySelector("#historyList"),
+      historyClose: document.querySelector("#historyClose"),
+      celebrationModal: document.querySelector("#celebrationModal"),
+      celebrationTitle: document.querySelector("#celebrationTitle"),
+      celebrationText: document.querySelector("#celebrationText"),
+      celebrationTarget: document.querySelector("#celebrationTarget"),
+      celebrationSaved: document.querySelector("#celebrationSaved"),
+      celebrationClose: document.querySelector("#celebrationClose"),
+      toast: document.querySelector("#toast"),
+      confirmModal: document.querySelector("#confirmModal"),
+      confirmHeading: document.querySelector("#confirmHeading"),
+      confirmMessage: document.querySelector("#confirmMessage"),
+      confirmCancel: document.querySelector("#confirmCancel"),
+      confirmOk: document.querySelector("#confirmOk"),
+      targetEditModal: document.querySelector("#targetEditModal"),
+      targetEditClose: document.querySelector("#targetEditClose"),
+      targetEditCancel: document.querySelector("#targetEditCancel"),
+      targetEditSave: document.querySelector("#targetEditSave"),
+      editTargetName: document.querySelector("#editTargetName"),
+      editTargetAmount: document.querySelector("#editTargetAmount"),
+      editTargetDate: document.querySelector("#editTargetDate"),
+      editTargetCadence: document.querySelector("#editTargetCadence"),
+      editTargetPriority: document.querySelector("#editTargetPriority"),
+      editTargetRecurringAmount: document.querySelector("#editTargetRecurringAmount"),
+      editTargetRecurringCadence: document.querySelector("#editTargetRecurringCadence"),
+      budgetEditModal: document.querySelector("#budgetEditModal"),
+      budgetEditClose: document.querySelector("#budgetEditClose"),
+      budgetEditCancel: document.querySelector("#budgetEditCancel"),
+      budgetEditSave: document.querySelector("#budgetEditSave"),
+      editBudgetName: document.querySelector("#editBudgetName"),
+      editBudgetValue: document.querySelector("#editBudgetValue"),
+      editBudgetType: document.querySelector("#editBudgetType"),
+      investEditModal: document.querySelector("#investEditModal"),
+      investEditClose: document.querySelector("#investEditClose"),
+      investEditCancel: document.querySelector("#investEditCancel"),
+      investEditSave: document.querySelector("#investEditSave"),
+      editInvestName: document.querySelector("#editInvestName"),
+      editInvestValue: document.querySelector("#editInvestValue"),
+      editInvestAccess: document.querySelector("#editInvestAccess"),
+      editInvestNote: document.querySelector("#editInvestNote"),
+      depositEditModal: document.querySelector("#depositEditModal"),
+      depositEditClose: document.querySelector("#depositEditClose"),
+      depositEditCancel: document.querySelector("#depositEditCancel"),
+      depositEditSave: document.querySelector("#depositEditSave"),
+      editDepositAmount: document.querySelector("#editDepositAmount"),
+      editDepositDate: document.querySelector("#editDepositDate"),
+      editDepositNote: document.querySelector("#editDepositNote"),
+      filterAll: document.querySelector("#filterAll"),
+      filterActive: document.querySelector("#filterActive"),
+      filterDone: document.querySelector("#filterDone"),
+      sidebarEl: document.querySelector("#sidebarEl"),
+      sidebarToggle: document.querySelector("#sidebarToggle"),
+      sidebarBody: document.querySelector("#sidebarBody"),
+      sidebarToggleCount: document.querySelector("#sidebarToggleCount"),
+      sidebarToggleLabel: document.querySelector("#sidebarToggleLabel")
+    };
+
+    els.salary.value = state.salary || "";
+    els.accountBalance.value = state.accountBalance || "";
+    els.savingsPot.value = state.savingsPot || "";
+    els.currency.value = state.currency || "GBP";
+    els.targetDate.min = isoDate(today);
+
+    let filterState = "all";
+    let editingTargetId = "";
+    let editingBudgetItemId = "";
+    let editingInvestmentId = "";
+    let editingDepositData = { targetId: "", depositId: "" };
+    let confirmCallback = null;
+
+    ["input", "change"].forEach((eventName) => {
+      els.salary.addEventListener(eventName, updateBudget);
+      els.accountBalance.addEventListener(eventName, updateBudget);
+      els.savingsPot.addEventListener(eventName, updateBudget);
+      els.currency.addEventListener(eventName, updateBudget);
+    });
+
+    els.addBudgetItem.addEventListener("click", addBudgetItem);
+    els.budgetListToggle.addEventListener("click", () => {
+      state.budgetListCollapsed = !state.budgetListCollapsed;
+      saveAndRender();
+    });
+    els.budgetForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (document.activeElement === els.budgetName || document.activeElement === els.budgetValue) {
+        addBudgetItem();
+      }
+    });
+    els.budgetList.addEventListener("click", (event) => {
+      const action = event.target.closest("[data-budget-action]");
+      if (!action) return;
+      const item = state.budgetItems.find((entry) => entry.id === action.dataset.id);
+      if (!item) return;
+      if (action.dataset.budgetAction === "edit") {
+        editBudgetItem(item);
+      } else {
+        customConfirm(
+          `Remove "${item.name}"?`,
+          "This will remove the item from your monthly budget.",
+          "Remove",
+          () => {
+            state.budgetItems = state.budgetItems.filter((entry) => entry.id !== action.dataset.id);
+            saveAndRender("Budget item removed.");
+          }
+        );
+      }
+    });
+
+    els.targetForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = els.targetName.value.trim();
+      const amount = toMoney(els.targetAmount.value);
+      const saved = Math.min(toMoney(els.targetSaved.value), amount);
+      const cadence = els.targetCadence.value;
+      const priority = els.targetPriority.value;
+      const dueDate = els.targetDate.value;
+      const recurringAmount = toMoney(els.targetRecurringAmount.value);
+      const recurringCadence = els.targetRecurringCadence.value;
+
+      if (!name || amount <= 0 || !dueDate) {
+        showToast("Add a name, amount and target date.");
+        return;
+      }
+
+      if (recurringAmount > 0 && !["week", "month"].includes(recurringCadence)) {
+        showToast("Choose weekly or monthly for the planned contribution.");
+        return;
+      }
+
+      const newTarget = {
+        id: makeId(),
+        name,
+        amount,
+        cadence,
+        priority,
+        recurringAmount,
+        recurringCadence: recurringAmount > 0 ? recurringCadence : "",
+        collapsed: false,
+        createdAt: isoDate(today),
+        dueDate,
+        deposits: saved > 0 ? [{ id: makeId(), amount: saved, date: isoDate(today), note: "Starting amount" }] : []
+      };
+      state.targets.unshift(newTarget);
+
+      els.targetForm.reset();
+      els.targetDate.min = isoDate(today);
+      trackAppEvent("goal_created");
+      saveAndRender("Target added.");
+      celebrateIfCompleted(newTarget, false);
+    });
+
+    els.investmentForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      addInvestment();
+    });
+
+    els.investmentList.addEventListener("click", (event) => {
+      const action = event.target.closest("[data-investment-action]");
+      if (!action) return;
+      const investment = state.investments.find((item) => item.id === action.dataset.id);
+      if (!investment) return;
+      if (action.dataset.investmentAction === "edit") {
+        editInvestment(investment);
+      } else {
+        customConfirm(
+          `Remove "${investment.name}"?`,
+          "This will remove this investment from your tracked totals.",
+          "Remove",
+          () => {
+            state.investments = state.investments.filter((item) => item.id !== action.dataset.id);
+            saveAndRender("Investment removed.");
+          }
+        );
+      }
+    });
+
+    els.targets.addEventListener("click", (event) => {
+      const preset = event.target.closest("[data-preset]");
+      if (preset) {
+        addPreset(preset.dataset.preset);
+        return;
+      }
+
+      const action = event.target.closest("[data-action]");
+      if (!action) return;
+
+      const id = action.dataset.id;
+      const target = state.targets.find((item) => item.id === id);
+      if (!target) return;
+
+      if (action.dataset.action === "toggle-target") {
+        target.collapsed = !target.collapsed;
+        updateTargetCollapseDom(id, target.collapsed);
+        persistState();
+        return;
+      }
+
+      if (action.dataset.action === "delete") {
+        customConfirm(
+          `Delete "${target.name}"?`,
+          "This will remove this target and all its saving history.",
+          "Delete",
+          () => {
+            state.targets = state.targets.filter((item) => item.id !== id);
+            saveAndRender("Target removed.");
+          }
+        );
+      }
+
+      if (action.dataset.action === "edit-target") {
+        editTarget(target);
+      }
+
+      if (action.dataset.action === "deposit") {
+        const input = document.querySelector(`[data-deposit-input="${id}"]`);
+        const amount = toMoney(input.value);
+        if (amount <= 0) {
+          showToast("Enter an amount to add.");
+          return;
+        }
+        const wasComplete = isComplete(target);
+        target.deposits.unshift({ id: makeId(), amount, date: isoDate(today), note: "Saved" });
+        input.value = "";
+        trackAppEvent("contribution_added");
+        saveAndRender("Saving entry added.");
+        celebrateIfCompleted(target, wasComplete);
+      }
+
+      if (action.dataset.action === "planned") {
+        addPlannedContribution(target);
+      }
+
+      if (action.dataset.action === "history") {
+        openHistory(target);
+      }
+
+    });
+
+    els.targets.addEventListener("input", (event) => {
+      const input = event.target.closest("[data-scenario-input]");
+      if (!input) return;
+      const target = state.targets.find((item) => item.id === input.dataset.scenarioInput);
+      if (!target) return;
+      const result = scenarioResult(target, input.value);
+      const output = document.querySelector(`[data-scenario-result="${CSS.escape(target.id)}"]`);
+      if (!output) return;
+      output.innerHTML = `
+        <strong>${result.status}: ${result.finish}</strong>
+        <span>${result.detail}</span>
+      `;
+      output.classList.add("updated");
+      window.setTimeout(() => output.classList.remove("updated"), 220);
+    });
+
+    els.expandTargetsBtn.addEventListener("click", () => {
+      state.targets.forEach((target) => {
+        target.collapsed = false;
+      });
+      document.querySelectorAll(".target-card").forEach((card) => {
+        updateTargetCollapseDom(card.dataset.id, false);
+      });
+      persistState();
+    });
+
+    els.collapseTargetsBtn.addEventListener("click", () => {
+      state.targets.forEach((target) => {
+        target.collapsed = true;
+      });
+      document.querySelectorAll(".target-card").forEach((card) => {
+        updateTargetCollapseDom(card.dataset.id, true);
+      });
+      persistState();
+    });
+
+    els.historyClose.addEventListener("click", closeHistory);
+    els.historyModal.addEventListener("click", (event) => {
+      if (event.target === els.historyModal) closeHistory();
+    });
+    els.helpBtn.addEventListener("click", openHelp);
+    els.helpClose.addEventListener("click", closeHelp);
+    els.helpModal.addEventListener("click", (event) => {
+      if (event.target === els.helpModal) closeHelp();
+    });
+    els.privacyBtn.addEventListener("click", () => openInfoModal(els.privacyModal, els.privacyClose));
+    els.privacyClose.addEventListener("click", () => closeInfoModal(els.privacyModal));
+    els.privacyModal.addEventListener("click", (event) => {
+      if (event.target === els.privacyModal) closeInfoModal(els.privacyModal);
+    });
+    els.termsBtn.addEventListener("click", () => openInfoModal(els.termsModal, els.termsClose));
+    els.termsClose.addEventListener("click", () => closeInfoModal(els.termsModal));
+    els.termsModal.addEventListener("click", (event) => {
+      if (event.target === els.termsModal) closeInfoModal(els.termsModal);
+    });
+    els.contactBtn.addEventListener("click", () => openInfoModal(els.contactModal, els.contactClose));
+    els.contactClose.addEventListener("click", () => closeInfoModal(els.contactModal));
+    els.contactModal.addEventListener("click", (event) => {
+      if (event.target === els.contactModal) closeInfoModal(els.contactModal);
+    });
+    els.celebrationClose.addEventListener("click", closeCelebration);
+    els.celebrationModal.addEventListener("click", (event) => {
+      if (event.target === els.celebrationModal) closeCelebration();
+    });
+    els.historyList.addEventListener("click", (event) => {
+      const action = event.target.closest("[data-history-action]");
+      if (!action) return;
+      const target = state.targets.find((item) => item.id === action.dataset.targetId);
+      if (!target) return;
+      if (action.dataset.historyAction === "edit") editDeposit(target, action.dataset.depositId);
+      if (action.dataset.historyAction === "delete") deleteDeposit(target, action.dataset.depositId);
+    });
+
+    els.resetBtn.addEventListener("click", () => {
+      if (!state.targets.length && !state.salary && !state.budgetItems.length && !state.investments.length) return;
+      customConfirm(
+        "Clear all planner data?",
+        "This will permanently remove your budget, targets and saving history.",
+        "Clear all",
+        () => {
+          state.salary = "";
+          state.accountBalance = "";
+          state.budgetItems = [];
+          state.budgetListCollapsed = false;
+          state.investments = [];
+          state.savingsPot = "";
+          state.currency = "GBP";
+          state.targets = [];
+          els.salary.value = "";
+          els.accountBalance.value = "";
+          els.savingsPot.value = "";
+          els.currency.value = "GBP";
+          saveAndRender("All planner data cleared.");
+        }
+      );
+    });
+
+    els.importBtn.addEventListener("click", () => els.importFile.click());
+    els.importFile.addEventListener("change", importBackup);
+    els.backupBtn.addEventListener("click", exportBackup);
+    els.applyAllocationBtn.addEventListener("click", applySuggestedAllocation);
+
+    // Confirm modal
+    els.confirmCancel.addEventListener("click", () => {
+      closeModal(els.confirmModal);
+      confirmCallback = null;
+    });
+    els.confirmOk.addEventListener("click", () => {
+      closeModal(els.confirmModal);
+      if (typeof confirmCallback === "function") {
+        const cb = confirmCallback;
+        confirmCallback = null;
+        cb();
+      }
+    });
+    els.confirmModal.addEventListener("click", (event) => {
+      if (event.target === els.confirmModal) {
+        closeModal(els.confirmModal);
+        confirmCallback = null;
+      }
+    });
+
+    // Target edit modal
+    els.targetEditClose.addEventListener("click", () => closeModal(els.targetEditModal));
+    els.targetEditCancel.addEventListener("click", () => closeModal(els.targetEditModal));
+    els.targetEditModal.addEventListener("click", (event) => {
+      if (event.target === els.targetEditModal) closeModal(els.targetEditModal);
+    });
+    els.targetEditSave.addEventListener("click", () => {
+      const target = state.targets.find((item) => item.id === editingTargetId);
+      if (!target) return;
+      const wasComplete = isComplete(target);
+      const name = els.editTargetName.value.trim();
+      const amount = toMoney(els.editTargetAmount.value);
+      const dueDate = els.editTargetDate.value;
+      const cadence = els.editTargetCadence.value;
+      const priority = els.editTargetPriority.value;
+      const recurringAmount = toMoney(els.editTargetRecurringAmount.value);
+      const recurringCadence = els.editTargetRecurringCadence.value;
+
+      if (!name || amount <= 0 || !dueDate) {
+        showToast("Check the name, amount and date.");
+        return;
+      }
+      if (recurringAmount > 0 && !["week", "month"].includes(recurringCadence)) {
+        showToast("Use week or month for the recurring contribution.");
+        return;
+      }
+
+      target.name = name;
+      target.amount = amount;
+      target.dueDate = dueDate;
+      target.cadence = cadence;
+      target.priority = priority;
+      target.recurringAmount = recurringAmount;
+      target.recurringCadence = recurringAmount > 0 ? recurringCadence : "";
+      closeModal(els.targetEditModal);
+      trackAppEvent("goal_updated");
+      saveAndRender("Target updated.");
+      celebrateIfCompleted(target, wasComplete);
+    });
+    els.targetEditModal.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && document.activeElement !== els.targetEditSave) els.targetEditSave.click();
+    });
+
+    // Budget edit modal
+    els.budgetEditClose.addEventListener("click", () => closeModal(els.budgetEditModal));
+    els.budgetEditCancel.addEventListener("click", () => closeModal(els.budgetEditModal));
+    els.budgetEditModal.addEventListener("click", (event) => {
+      if (event.target === els.budgetEditModal) closeModal(els.budgetEditModal);
+    });
+    els.budgetEditSave.addEventListener("click", () => {
+      const item = state.budgetItems.find((entry) => entry.id === editingBudgetItemId);
+      if (!item) return;
+      const name = els.editBudgetName.value.trim();
+      const value = toMoney(els.editBudgetValue.value);
+      const type = els.editBudgetType.value;
+
+      if (!name || value <= 0) {
+        showToast("Add a name and value for this budget item.");
+        return;
+      }
+
+      item.name = name;
+      item.value = value;
+      item.type = type;
+      closeModal(els.budgetEditModal);
+      saveAndRender("Budget item updated.");
+    });
+
+    // Investment edit modal
+    els.investEditClose.addEventListener("click", () => closeModal(els.investEditModal));
+    els.investEditCancel.addEventListener("click", () => closeModal(els.investEditModal));
+    els.investEditModal.addEventListener("click", (event) => {
+      if (event.target === els.investEditModal) closeModal(els.investEditModal);
+    });
+    els.investEditSave.addEventListener("click", () => {
+      const investment = state.investments.find((item) => item.id === editingInvestmentId);
+      if (!investment) return;
+      const name = els.editInvestName.value.trim();
+      const value = toMoney(els.editInvestValue.value);
+      const access = els.editInvestAccess.value;
+      const note = els.editInvestNote.value.trim();
+
+      if (!name || value <= 0) {
+        showToast("Use a valid name and value.");
+        return;
+      }
+
+      investment.name = name;
+      investment.value = value;
+      investment.access = access;
+      investment.note = note;
+      investment.updatedAt = isoDate(today);
+      closeModal(els.investEditModal);
+      saveAndRender("Investment updated.");
+    });
+
+    // Deposit edit modal
+    els.depositEditClose.addEventListener("click", () => closeModal(els.depositEditModal));
+    els.depositEditCancel.addEventListener("click", () => closeModal(els.depositEditModal));
+    els.depositEditModal.addEventListener("click", (event) => {
+      if (event.target === els.depositEditModal) closeModal(els.depositEditModal);
+    });
+    els.depositEditSave.addEventListener("click", () => {
+      const target = state.targets.find((item) => item.id === editingDepositData.targetId);
+      if (!target) return;
+      const deposit = target.deposits.find((entry) => entry.id === editingDepositData.depositId);
+      if (!deposit) return;
+      const wasComplete = isComplete(target);
+      const amount = toMoney(els.editDepositAmount.value);
+      const date = els.editDepositDate.value;
+      const note = els.editDepositNote.value.trim();
+
+      if (amount <= 0 || !date) {
+        showToast("Use a valid amount and date.");
+        return;
+      }
+
+      deposit.amount = amount;
+      deposit.date = date;
+      deposit.note = note || "Saved";
+      closeModal(els.depositEditModal);
+      const activeTarget = state.targets.find((item) => item.id === editingDepositData.targetId);
+      saveAndRender("Saving entry updated.");
+      if (activeTarget) openHistory(activeTarget);
+      celebrateIfCompleted(deposit, wasComplete);
+    });
+
+    // Filter buttons
+    els.filterAll.addEventListener("click", () => setFilter("all"));
+    els.filterActive.addEventListener("click", () => setFilter("active"));
+    els.filterDone.addEventListener("click", () => setFilter("done"));
+
+    // Mobile sidebar toggle
+    if (els.sidebarToggle) {
+      els.sidebarToggle.addEventListener("click", () => {
+        const closed = els.sidebarEl.classList.toggle("sidebar-closed");
+        els.sidebarToggle.setAttribute("aria-expanded", String(!closed));
+        if (els.sidebarToggleLabel) els.sidebarToggleLabel.textContent = closed ? "Show" : "Hide";
+      });
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeHistory();
+        closeHelp();
+        closeInfoModal(els.privacyModal);
+        closeInfoModal(els.termsModal);
+        closeInfoModal(els.contactModal);
+        closeCelebration();
+        closeModal(els.confirmModal);
+        closeModal(els.targetEditModal);
+        closeModal(els.budgetEditModal);
+        closeModal(els.investEditModal);
+        closeModal(els.depositEditModal);
+        if (event.target === els.confirmModal) confirmCallback = null;
+      }
+    });
+
+    function addBudgetItem() {
+      const name = els.budgetName.value.trim();
+      const value = toMoney(els.budgetValue.value);
+      const type = els.budgetType.value === "outgoing" ? "outgoing" : "income";
+
+      if (!name || value <= 0) {
+        showToast("Add a name and value for this budget item.");
+        return;
+      }
+
+      state.budgetItems.push({
+        id: makeId(),
+        type,
+        name,
+        value
+      });
+      state.budgetListCollapsed = false;
+      els.budgetName.value = "";
+      els.budgetValue.value = "";
+      saveAndRender("Budget item added.");
+    }
+
+    function addInvestment() {
+      const name = els.investmentName.value.trim();
+      const value = toMoney(els.investmentValue.value);
+      if (!name || value <= 0) {
+        showToast("Add an investment name and value.");
+        return;
+      }
+
+      state.investments.push({
+        id: makeId(),
+        name,
+        value,
+        kind: els.investmentKind.value,
+        access: els.investmentAccess.value,
+        note: els.investmentNote.value.trim(),
+        updatedAt: isoDate(today)
+      });
+
+      els.investmentForm.reset();
+      saveAndRender("Investment added.");
+    }
+
+    function editInvestment(investment) {
+      editingInvestmentId = investment.id;
+      els.editInvestName.value = investment.name;
+      els.editInvestValue.value = investment.value;
+      els.editInvestAccess.value = investment.access || "long-term";
+      els.editInvestNote.value = investment.note || "";
+      openModal(els.investEditModal);
+      els.editInvestName.focus();
+    }
+
+    function editBudgetItem(item) {
+      editingBudgetItemId = item.id;
+      els.editBudgetName.value = item.name;
+      els.editBudgetValue.value = item.value;
+      els.editBudgetType.value = item.type;
+      openModal(els.budgetEditModal);
+      els.editBudgetName.focus();
+    }
+
+    function editTarget(target) {
+      editingTargetId = target.id;
+      els.editTargetName.value = target.name;
+      els.editTargetAmount.value = target.amount;
+      els.editTargetDate.value = target.dueDate;
+      els.editTargetCadence.value = target.cadence || "month";
+      els.editTargetPriority.value = target.priority || "medium";
+      els.editTargetRecurringAmount.value = target.recurringAmount || "";
+      els.editTargetRecurringCadence.value = target.recurringCadence || "";
+      openModal(els.targetEditModal);
+      els.editTargetName.focus();
+    }
+
+    function editDeposit(target, depositId) {
+      const deposit = target.deposits.find((entry) => entry.id === depositId);
+      if (!deposit) return;
+      editingDepositData = { targetId: target.id, depositId };
+      els.editDepositAmount.value = deposit.amount;
+      els.editDepositDate.value = deposit.date;
+      els.editDepositNote.value = deposit.note || "Saved";
+      openModal(els.depositEditModal);
+      els.editDepositAmount.focus();
+    }
+
+    function addPlannedContribution(target) {
+      const amount = toMoney(target.recurringAmount);
+      if (amount <= 0 || !["week", "month"].includes(target.recurringCadence)) {
+        showToast("This target does not have a planned contribution.");
+        return;
+      }
+
+      const wasComplete = isComplete(target);
+      target.deposits.unshift({
+        id: makeId(),
+        amount,
+        date: isoDate(today),
+        note: `Planned ${target.recurringCadence === "week" ? "weekly" : "monthly"} contribution`
+      });
+      trackAppEvent("contribution_added");
+      saveAndRender("Planned contribution added.");
+      celebrateIfCompleted(target, wasComplete);
+    }
+
+    function deleteDeposit(target, depositId) {
+      customConfirm(
+        "Delete this saving entry?",
+        "This will remove the entry from the target's history.",
+        "Delete",
+        () => {
+          target.deposits = target.deposits.filter((entry) => entry.id !== depositId);
+          saveAndRender("Saving entry deleted.");
+          openHistory(target);
+        }
+      );
+    }
+
+    function exportBackup() {
+      const backup = JSON.stringify({ ...state, exportedAt: new Date().toISOString() }, null, 2);
+      const blob = new Blob([backup], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `saving-targets-backup-${isoDate(today)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast("Backup downloaded.");
+    }
+
+    function importBackup(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          const restored = normalizePlannerData(parsed);
+          customConfirm(
+            "Import this backup?",
+            "This will replace the current planner data in this browser.",
+            "Import",
+            () => {
+              state.salary = restored.salary;
+              state.accountBalance = restored.accountBalance;
+              state.savingsPot = restored.savingsPot;
+              state.currency = restored.currency;
+              state.budgetItems = restored.budgetItems;
+              state.investments = restored.investments;
+              state.targets = restored.targets;
+              els.salary.value = state.salary || "";
+              els.accountBalance.value = state.accountBalance || "";
+              els.savingsPot.value = state.savingsPot || "";
+              els.currency.value = state.currency;
+              closeHistory();
+              saveAndRender("Backup imported.");
+            }
+          );
+        } catch {
+          showToast("That backup file could not be imported.");
+        } finally {
+          els.importFile.value = "";
+        }
+      };
+      reader.onerror = () => {
+        showToast("That backup file could not be read.");
+        els.importFile.value = "";
+      };
+      reader.readAsText(file);
+    }
+
+    function updateBudget() {
+      state.salary = toMoney(els.salary.value);
+      state.accountBalance = toMoney(els.accountBalance.value);
+      state.savingsPot = toMoney(els.savingsPot.value);
+      state.currency = els.currency.value;
+      trackAppEvent("main_calculator_used");
+      saveAndRender();
+    }
+
+    function setFilter(filter) {
+      filterState = filter;
+      els.filterAll.classList.toggle("active", filter === "all");
+      els.filterActive.classList.toggle("active", filter === "active");
+      els.filterDone.classList.toggle("active", filter === "done");
+      render();
+    }
+
+    function getFilteredTargets() {
+      const ordered = orderedTargets();
+      if (filterState === "active") return ordered.filter((t) => !isComplete(t));
+      if (filterState === "done") return ordered.filter((t) => isComplete(t));
+      return ordered;
+    }
+
+    function addPreset(key) {
+      const presets = {
+        holiday: { name: "Holiday", amount: 1500, months: 12 },
+        emergency: { name: "Emergency fund", amount: 3000, months: 6 },
+        car: { name: "New car", amount: 5000, months: 18 },
+        wedding: { name: "Wedding", amount: 10000, months: 24 }
+      };
+      const preset = presets[key];
+      if (!preset) return;
+      const dueDate = isoDate(addMonths(today, preset.months));
+      const newTarget = {
+        id: makeId(),
+        name: preset.name,
+        amount: preset.amount,
+        cadence: "month",
+        priority: "medium",
+        recurringAmount: 0,
+        recurringCadence: "",
+        collapsed: false,
+        createdAt: isoDate(today),
+        dueDate,
+        deposits: []
+      };
+      state.targets.unshift(newTarget);
+      trackAppEvent("goal_created");
+      saveAndRender("Target added.");
+      els.targetName.value = preset.name;
+      els.targetAmount.value = preset.amount;
+      els.targetDate.value = dueDate;
+      els.targetName.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function customConfirm(title, message, okLabel, callback) {
+      els.confirmHeading.textContent = title;
+      els.confirmMessage.textContent = message;
+      els.confirmOk.textContent = okLabel || "Confirm";
+      confirmCallback = callback;
+      openModal(els.confirmModal);
+      els.confirmOk.focus();
+    }
+
+    function openModal(modal) {
+      modal.classList.add("show");
+    }
+
+    function closeModal(modal) {
+      modal.classList.remove("show");
+    }
+
+    function render() {
+      const budget = budgetTotals();
+      const available = budget.available;
+      const savedTotal = state.targets.reduce((sum, target) => sum + savedFor(target), 0);
+      const remainingTotal = state.targets.reduce((sum, target) => sum + remainingFor(target), 0);
+      const paceTotal = state.targets.reduce((sum, target) => sum + monthlyNeed(target), 0);
+      const investmentTotal = investmentsTotal();
+
+      renderBudget(budget);
+      renderInvestments(savedTotal, investmentTotal);
+      renderAllocation(budget);
+      renderNextStep(budget, paceTotal);
+      els.availableAmount.textContent = money(available);
+      els.topIncome.textContent = money(budget.resources);
+      els.topOutgoing.textContent = money(budget.outgoings);
+      els.safeToSpend.textContent = money(budget.safeToSpend);
+      els.accountCushion.textContent = money(budget.accountCushion);
+      els.savedTotal.textContent = money(savedTotal);
+      els.remainingTotal.textContent = money(remainingTotal);
+      els.targetCount.textContent = state.targets.length;
+      els.paceTotal.textContent = money(paceTotal);
+      els.netWorthCard.hidden = state.investments.length === 0;
+      els.netWorthTotal.textContent = money(Number(state.accountBalance || 0) + savedTotal + investmentTotal);
+
+      if (!state.salary && !state.budgetItems.length) {
+        els.budgetAdvice.textContent = "Add salary, income and outgoings to see what saving pace is realistic.";
+      } else if (Number(state.savingsPot || 0) > available) {
+        els.budgetAdvice.textContent = `Your planned savings pot is above the ${money(available)} left after outgoings, so the app caps suggestions at ${money(available)}.`;
+      } else if (!state.savingsPot) {
+        els.budgetAdvice.textContent = `You have ${money(available)} left after outgoings. Choose how much of that you actually want to commit to goals.`;
+      } else if (paceTotal <= budget.savingsPot) {
+        els.budgetAdvice.textContent = `Your target pace fits inside your planned savings pot of ${money(budget.savingsPot)}.`;
+      } else {
+        els.budgetAdvice.textContent = `Your targets need ${money(paceTotal)} each month, which is ${money(paceTotal - budget.savingsPot)} above your planned savings pot.`;
+      }
+
+      renderFinanceAlert(budget);
+      els.targetBulkActions.hidden = state.targets.length < 2;
+
+      // Update sidebar toggle count
+      if (els.sidebarToggleCount) {
+        const itemCount = state.budgetItems.length;
+        els.sidebarToggleCount.textContent = itemCount ? `${itemCount} item${itemCount === 1 ? "" : "s"}` : "";
+      }
+
+      // Render filtered targets
+      const visible = getFilteredTargets();
+      if (!state.targets.length) {
+        els.targets.innerHTML = emptyTemplate();
+      } else if (!visible.length) {
+        const label = filterState === "active" ? "active" : "completed";
+        els.targets.innerHTML = `<div class="empty" style="min-height:160px"><div><h4>No ${label} targets</h4><p>Switch to "All" to see everything, or add a new target above.</p></div></div>`;
+      } else {
+        els.targets.innerHTML = visible.map(targetTemplate).join("");
+      }
+    }
+
+    function orderedTargets() {
+      return [...state.targets].sort((a, b) => {
+        const completeA = isComplete(a) ? 1 : 0;
+        const completeB = isComplete(b) ? 1 : 0;
+        return completeA - completeB
+          || priorityWeight(b.priority) - priorityWeight(a.priority)
+          || daysUntil(a.dueDate) - daysUntil(b.dueDate);
+      });
+    }
+
+    function renderNextStep(budget, paceTotal) {
+      const hasBudget = budget.resources > 0 || budget.outgoings > 0;
+      const hasPot = Number(state.savingsPot || 0) > 0;
+      const hasTarget = state.targets.length > 0;
+
+      els.stepBudget.classList.toggle("done", hasBudget);
+      els.stepPot.classList.toggle("done", hasPot);
+      els.stepTarget.classList.toggle("done", hasTarget);
+
+      if (!hasBudget) {
+        els.nextStepTitle.textContent = "Start with your monthly money";
+        els.nextStepText.textContent = "Add salary, income and regular outgoings so the rest of the planner is based on realistic numbers.";
+      } else if (!hasPot) {
+        els.nextStepTitle.textContent = "Choose a savings pot";
+        els.nextStepText.textContent = `You have ${money(budget.available)} left after outgoings. Pick the part you actually want to commit to goals while leaving breathing room.`;
+      } else if (!hasTarget) {
+        els.nextStepTitle.textContent = "Create your first target";
+        els.nextStepText.textContent = "Add what you are saving for, the amount, and the date. The tracker will turn it into a daily, weekly or monthly pace.";
+      } else if (budget.overspend > 0 || budget.outgoings > budget.resources) {
+        els.nextStepTitle.textContent = "Bring the plan back inside income";
+        els.nextStepText.textContent = "Reduce planned savings, reduce outgoings, or move deadlines until the warning disappears.";
+      } else if (paceTotal > budget.savingsPot) {
+        els.nextStepTitle.textContent = "Targets need more than your savings pot";
+        els.nextStepText.textContent = `Your goals need ${money(paceTotal)} per month. Adjust priorities, dates, or the savings pot to make it comfortable.`;
+      } else {
+        els.nextStepTitle.textContent = "Plan looks balanced";
+        els.nextStepText.textContent = "Keep adding saved amounts when you move money aside. Your progress, history and recovery figures will stay updated.";
+      }
+    }
+
+    function budgetTotals() {
+      const extraIncome = state.budgetItems
+        .filter((item) => item.type === "income")
+        .reduce((sum, item) => sum + Number(item.value || 0), 0);
+      const outgoings = state.budgetItems
+        .filter((item) => item.type === "outgoing")
+        .reduce((sum, item) => sum + Number(item.value || 0), 0);
+      const resources = Number(state.salary || 0) + extraIncome;
+      const available = Math.max(0, resources - outgoings);
+      const savingsPot = Math.min(available, Number(state.savingsPot || 0));
+      const requestedSavingsPot = Number(state.savingsPot || 0);
+      const safeToSpend = Math.max(0, resources - outgoings - savingsPot);
+      const overspend = Math.max(0, outgoings + requestedSavingsPot - resources);
+      const accountCushion = Math.max(0, Number(state.accountBalance || 0) + resources - outgoings - savingsPot);
+      return {
+        extraIncome,
+        outgoings,
+        resources,
+        available,
+        savingsPot,
+        requestedSavingsPot,
+        safeToSpend,
+        overspend,
+        accountCushion,
+        buffer: Math.max(0, available - savingsPot)
+      };
+    }
+
+    function renderFinanceAlert(budget) {
+      const messages = [];
+      if (budget.outgoings > budget.resources) {
+        messages.push(`Your outgoings are ${money(budget.outgoings - budget.resources)} higher than your monthly income.`);
+      } else if (budget.overspend > 0) {
+        messages.push(`Your outgoings plus planned goal savings are ${money(budget.overspend)} higher than your monthly income.`);
+      }
+
+      if (state.accountBalance && budget.accountCushion <= 0) {
+        messages.push("Your current account balance would be fully used by this month's plan.");
+      }
+
+      if (!messages.length) {
+        els.financeAlert.classList.remove("show");
+        els.financeAlert.innerHTML = "";
+        return;
+      }
+
+      els.financeAlert.innerHTML = `<strong>Plan needs attention</strong><span>${messages.join(" ")}</span>`;
+      els.financeAlert.classList.add("show");
+    }
+
+    function renderBudget(budget) {
+      const itemCount = state.budgetItems.length;
+      els.budgetListPanel.classList.toggle("collapsed", Boolean(state.budgetListCollapsed));
+      els.budgetListToggle.setAttribute("aria-expanded", String(!state.budgetListCollapsed));
+      els.budgetListCount.textContent = itemCount
+        ? `${itemCount} item${itemCount === 1 ? "" : "s"} · +${money(budget.extraIncome)} / -${money(budget.outgoings)}`
+        : "0 items";
+      els.budgetList.innerHTML = state.budgetItems.length ? state.budgetItems.map((item) => `
+        <div class="budget-item ${item.type}">
+          <div>
+            <strong>${escapeHtml(item.name)}</strong>
+            <span>${item.type === "income" ? "Income" : "Outgoing"}</span>
+          </div>
+          <div class="amount">${item.type === "income" ? "+" : "-"}${money(item.value)}</div>
+          <button class="ghost icon-btn" type="button" data-budget-action="edit" data-id="${item.id}" title="Edit ${escapeHtml(item.name)}" aria-label="Edit ${escapeHtml(item.name)}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="m5 16-.8 3.8L8 19l10.5-10.5-3-3L5 16Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="ghost icon-btn" type="button" data-budget-action="delete" data-id="${item.id}" title="Remove ${escapeHtml(item.name)}" aria-label="Remove ${escapeHtml(item.name)}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 7h16M9 7V5h6v2m-8 3 .7 9h8.6l.7-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      `).join("") : `<p class="subtle">Add named income or outgoing items to build your monthly picture.</p>`;
+
+      const outgoingSlice = budget.resources > 0 ? Math.min(100, (budget.outgoings / budget.resources) * 100) : 0;
+      const plannedSlice = budget.resources > 0 ? Math.min(100, outgoingSlice + ((budget.savingsPot / budget.resources) * 100)) : 0;
+      els.budgetPie.style.setProperty("--outgoing-slice", `${outgoingSlice}%`);
+      els.budgetPie.style.setProperty("--planned-slice", `${plannedSlice}%`);
+      els.totalOutgoings.textContent = money(budget.outgoings);
+      els.totalAvailable.textContent = money(budget.buffer);
+      els.plannedSavings.textContent = money(budget.savingsPot);
+    }
+
+    function investmentsTotal() {
+      return state.investments.reduce((sum, item) => sum + Number(item.value || 0), 0);
+    }
+
+    function renderInvestments(savedTotal, investmentTotal) {
+      if (!state.investments.length) {
+        els.investmentList.innerHTML = `<p class="subtle">No investments added. This section stays optional and does not affect monthly safe-to-spend money.</p>`;
+        return;
+      }
+
+      const accessibleTotal = state.investments
+        .filter((item) => item.access === "accessible")
+        .reduce((sum, item) => sum + Number(item.value || 0), 0);
+
+      els.investmentList.innerHTML = `
+        <div class="mini-stat">
+          <span>Investments total</span>
+          <strong>${money(investmentTotal)}</strong>
+        </div>
+        <div class="mini-stat">
+          <span>Accessible in emergency</span>
+          <strong>${money(accessibleTotal)}</strong>
+        </div>
+        <div class="mini-stat">
+          <span>Tracked net worth</span>
+          <strong>${money(Number(state.accountBalance || 0) + savedTotal + investmentTotal)}</strong>
+        </div>
+        ${state.investments.map((item) => `
+          <div class="investment-item">
+            <div>
+              <strong>${escapeHtml(item.name)}</strong>
+              <span>${escapeHtml(item.kind || "Investment")} - ${item.access === "accessible" ? "Accessible" : "Long-term"}${item.note ? ` - ${escapeHtml(item.note)}` : ""}</span>
+              <span>Updated ${formatDate(item.updatedAt || isoDate(today))}</span>
+            </div>
+            <div class="investment-value">${money(item.value)}</div>
+            <button class="ghost icon-btn" type="button" data-investment-action="edit" data-id="${item.id}" title="Edit ${escapeHtml(item.name)}" aria-label="Edit ${escapeHtml(item.name)}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m5 16-.8 3.8L8 19l10.5-10.5-3-3L5 16Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="ghost icon-btn" type="button" data-investment-action="delete" data-id="${item.id}" title="Remove ${escapeHtml(item.name)}" aria-label="Remove ${escapeHtml(item.name)}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 7h16M9 7V5h6v2m-8 3 .7 9h8.6l.7-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        `).join("")}
+      `;
+    }
+
+    function renderAllocation(budget) {
+      const suggestions = suggestedAllocations(budget);
+
+      if (!suggestions.length) {
+        els.allocationIntro.textContent = "Set a monthly savings pot and add targets to see a suggested split.";
+        els.allocationList.innerHTML = "";
+        els.applyAllocationBtn.hidden = true;
+        return;
+      }
+
+      els.allocationIntro.textContent = `Splitting ${money(budget.savingsPot)} planned for goals, while leaving ${money(budget.safeToSpend)} safe to spend.`;
+      els.applyAllocationBtn.hidden = false;
+      els.allocationList.innerHTML = suggestions.map(({ target, amount }) => `
+          <div class="allocation-row">
+            <div>
+              <strong>${escapeHtml(target.name)}</strong>
+              <span>${priorityLabel(target.priority)} - ${timeLeftLabel(target.dueDate)}</span>
+            </div>
+            <strong>${money(amount)}</strong>
+          </div>
+      `).join("");
+    }
+
+    function suggestedAllocations(budget = budgetTotals()) {
+      const activeTargets = state.targets
+        .filter((target) => remainingFor(target) > 0)
+        .sort((a, b) => priorityWeight(b.priority) - priorityWeight(a.priority) || daysUntil(a.dueDate) - daysUntil(b.dueDate));
+
+      if (!activeTargets.length || budget.savingsPot <= 0) return [];
+
+      const totalWeight = activeTargets.reduce((sum, target) => sum + priorityWeight(target.priority), 0);
+      return activeTargets
+        .map((target) => ({
+          target,
+          amount: Math.min(remainingFor(target), budget.savingsPot * (priorityWeight(target.priority) / totalWeight))
+        }))
+        .filter((item) => item.amount > 0);
+    }
+
+    function applySuggestedAllocation() {
+      const suggestions = suggestedAllocations();
+      if (!suggestions.length) {
+        showToast("There is no suggested allocation to apply.");
+        return;
+      }
+
+      const total = suggestions.reduce((sum, item) => sum + item.amount, 0);
+      customConfirm(
+        "Apply suggested allocation?",
+        `This will add ${money(total)} across ${suggestions.length} target${suggestions.length === 1 ? "" : "s"} as saved today.`,
+        "Apply",
+        () => {
+          const completed = [];
+          suggestions.forEach(({ target, amount }) => {
+            const wasComplete = isComplete(target);
+            target.deposits.unshift({
+              id: makeId(),
+              amount: Math.round(amount * 100) / 100,
+              date: isoDate(today),
+              note: "Suggested allocation"
+            });
+            if (!wasComplete && isComplete(target)) completed.push(target);
+          });
+
+          saveAndRender("Suggested allocation applied.");
+          if (completed.length) openCelebration(completed[0]);
+        }
+      );
+    }
+
+    const cadenceLabels = {
+      day: { short: "daily", unit: "day", plural: "days" },
+      week: { short: "weekly", unit: "week", plural: "weeks" },
+      month: { short: "monthly", unit: "month", plural: "months" }
+    };
+
+    const priorityLabels = {
+      high: "High priority",
+      medium: "Medium priority",
+      low: "Low priority"
+    };
+
+    function priorityLabel(priority) {
+      return priorityLabels[priority] || priorityLabels.medium;
+    }
+
+    function priorityWeight(priority) {
+      return { high: 4, medium: 2, low: 1 }[priority] || 2;
+    }
+
+    function targetStatusLabel(target, recovery, affordable) {
+      if (isComplete(target) || recovery.status === "complete") {
+        return { label: "Complete", tone: "complete" };
+      }
+      if (recovery.status === "behind" || !affordable) {
+        return { label: "Behind", tone: "warn" };
+      }
+      return { label: "On Track", tone: "" };
+    }
+
+    function chevronIcon() {
+      return `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `;
+    }
+
+    function recurringLabel(target) {
+      const amount = toMoney(target.recurringAmount);
+      const cadence = target.recurringCadence;
+      if (amount <= 0 || !["week", "month"].includes(cadence)) return "";
+      return `${money(amount)} ${cadence === "week" ? "weekly" : "monthly"}`;
+    }
+
+    function recurringMonthlyValue(target) {
+      const amount = toMoney(target.recurringAmount);
+      if (amount <= 0) return 0;
+      if (target.recurringCadence === "week") return amount * 52 / 12;
+      if (target.recurringCadence === "month") return amount;
+      return 0;
+    }
+
+    function recurringGuidanceTemplate(target, monthlyNeeded) {
+      const plannedMonthly = recurringMonthlyValue(target);
+      if (plannedMonthly <= 0 || remainingFor(target) <= 0) return "";
+
+      const difference = plannedMonthly - monthlyNeeded;
+      if (difference >= 0) {
+        return `
+          <div class="recovery plan">
+            <strong>Repeat plan covers this pace.</strong>
+            <span>Your ${recurringLabel(target)} plan is about ${money(plannedMonthly)} per month, which covers the ${money(monthlyNeeded)} monthly pace needed.</span>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="recovery warn">
+          <strong>Repeat plan is ${money(Math.abs(difference))} short per month.</strong>
+          <span>Your ${recurringLabel(target)} plan is about ${money(plannedMonthly)} per month. Add a little extra or move the deadline to stay comfortable.</span>
+        </div>
+      `;
+    }
+
+    function scenarioPanelTemplate(target, monthlyNeeded) {
+      const remaining = remainingFor(target);
+      if (remaining <= 0) {
+        return `
+          <div class="scenario-panel" aria-label="What-if saving scenarios">
+            <div class="scenario-head">
+              <div>
+                <strong>What-if monthly savings</strong>
+                <span>Goal complete. No further savings are needed for this target.</span>
+              </div>
+            </div>
+            <div class="scenario-card">
+              <strong>Goal complete</strong>
+              <span>No further savings needed.</span>
+              <span class="scenario-status complete">Complete</span>
+            </div>
+          </div>
+        `;
+      }
+
+      const base = Math.max(1, monthlyNeeded || remaining);
+      const scenarios = [
+        { label: "Lower pace", amount: Math.max(1, Math.round(base * 0.75)) },
+        { label: "Required pace", amount: Math.max(1, Math.ceil(base)) },
+        { label: "Higher pace", amount: Math.max(1, Math.round(base * 1.25)) }
+      ];
+
+      return `
+        <div class="scenario-panel" aria-label="What-if saving scenarios">
+          <div class="scenario-head">
+            <div>
+              <strong>What-if monthly savings</strong>
+              <span>Compare monthly amounts and see whether this goal finishes early, on time or late.</span>
+            </div>
+          </div>
+          <div class="scenario-grid">
+            ${scenarios.map(({ label, amount }) => scenarioCardTemplate(label, amount, target)).join("")}
+          </div>
+          <div class="scenario-custom">
+            <label>
+              How much could you save per month?
+              <input data-scenario-input="${target.id}" type="number" min="0" step="0.01" inputmode="decimal" placeholder="${Math.ceil(base)}">
+            </label>
+            <div class="scenario-result" data-scenario-result="${target.id}" aria-live="polite">
+              <strong>Try a custom amount</strong>
+              <span>Enter a monthly saving amount to estimate the finish date.</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function scenarioCardTemplate(label, amount, target) {
+      const result = scenarioResult(target, amount);
+      return `
+        <div class="scenario-card">
+          <strong>Save ${money(amount)}/mo</strong>
+          <span>${label}</span>
+          <span>Finish: ${result.finish}</span>
+          <span>${result.detail}</span>
+          <span class="scenario-status ${result.tone}">${result.status}</span>
+        </div>
+      `;
+    }
+
+    function scenarioResult(target, monthlyAmount) {
+      const amount = toMoney(monthlyAmount);
+      const remaining = remainingFor(target);
+      if (remaining <= 0) {
+        return { finish: "Goal complete", detail: "No further savings needed.", status: "Complete", tone: "complete", months: 0 };
+      }
+      if (amount <= 0) {
+        return { finish: "Not enough", detail: "Add a monthly amount to estimate a finish date.", status: "Not Enough", tone: "not-enough", months: 0 };
+      }
+
+      const monthsNeeded = Math.max(1, Math.ceil(remaining / amount));
+      const finishDate = addMonths(today, monthsNeeded);
+      const deadlineMonths = monthsUntil(target.dueDate);
+      const difference = monthsNeeded - deadlineMonths;
+      const status = difference < 0 ? "Early" : difference === 0 ? "On Track" : "Late";
+      const tone = difference > 0 ? "late" : "";
+      const detail = difference === 0
+        ? "Meets the current deadline."
+        : `${Math.abs(difference)} month${Math.abs(difference) === 1 ? "" : "s"} ${difference < 0 ? "early" : "late"}.`;
+
+      return {
+        finish: formatMonthYear(finishDate),
+        detail: `${monthsNeeded} month${monthsNeeded === 1 ? "" : "s"}. ${detail}`,
+        status,
+        tone,
+        months: monthsNeeded
+      };
+    }
+
+    function milestoneMessage(progress) {
+      if (progress >= 100) return { title: "100% complete", body: "This target is fully funded." };
+      if (progress >= 75) return { title: "75% milestone", body: "You are close enough now that the finish line feels real." };
+      if (progress >= 50) return { title: "50% milestone", body: "Halfway there. This goal has real momentum now." };
+      if (progress >= 25) return { title: "25% milestone", body: "A quarter of the goal is already handled." };
+      return null;
+    }
+
+    function targetTemplate(target) {
+      const saved = savedFor(target);
+      const remaining = remainingFor(target);
+      const complete = remaining <= 0;
+      const progress = Math.min(100, Math.round((saved / target.amount) * 100));
+      const monthly = monthlyNeed(target);
+      const cadence = cadenceLabels[target.cadence] ? target.cadence : "month";
+      const cadenceLabel = cadenceLabels[cadence];
+      const pace = cadenceNeed(target, cadence);
+      const recovery = recoveryPlan(target, cadence);
+      const milestone = milestoneMessage(progress);
+      const affordable = monthly <= budgetTotals().savingsPot;
+      const recent = target.deposits.slice(0, 3);
+      const recurring = recurringLabel(target);
+      const recurringGuidance = recurringGuidanceTemplate(target, monthly);
+      const collapsed = Boolean(target.collapsed);
+      const status = targetStatusLabel(target, recovery, affordable);
+
+      return `
+        <article class="target-card ${collapsed ? "is-collapsed" : ""}" data-id="${target.id}" style="--progress: ${progress}%">
+          <div class="target-collapse-summary">
+            <div class="target-summary-main">
+              <div class="target-summary-title">
+                <h5>${escapeHtml(target.name)}</h5>
+                <span class="pill priority">${priorityLabel(target.priority)}</span>
+                <span class="pill ${status.tone}">${status.label}</span>
+              </div>
+              <div class="target-summary-progress" aria-hidden="true">
+                <div class="target-summary-track"><i></i></div>
+              </div>
+              <div class="target-summary-meta">
+                <span><strong>${progress}%</strong> saved</span>
+                <span>${money(saved)} saved</span>
+                <span>${money(remaining)} left</span>
+                <span>Due ${formatDate(target.dueDate)} - ${timeLeftLabel(target.dueDate)}</span>
+              </div>
+            </div>
+            <div class="target-summary-actions">
+              <button class="ghost target-toggle" type="button" data-action="toggle-target" data-toggle-role="summary" data-id="${target.id}" aria-expanded="false" aria-controls="target-body-${target.id}" aria-label="Expand ${escapeHtml(target.name)}">
+                ${chevronIcon()}
+              </button>
+            </div>
+          </div>
+          <div class="target-full" id="target-body-${target.id}">
+          <div class="progress-viz" aria-label="${progress}% saved toward ${escapeHtml(target.name)}">
+            <div>
+              <div class="progress-kicker">Goal progress</div>
+              <div class="progress-score">
+                <strong>${progress}</strong>
+                <span>%</span>
+              </div>
+            </div>
+            <div class="journey" aria-hidden="true">
+              <div class="journey-track">
+                <i class="journey-fill"></i>
+                <b class="journey-marker"></b>
+              </div>
+              <div class="journey-milestones">
+                <span>Start</span>
+                <span>Halfway</span>
+                <span>Goal</span>
+              </div>
+            </div>
+            <div class="progress-caption">
+              <span><strong>${money(saved)}</strong> saved</span>
+              <span>${money(remaining)} left</span>
+            </div>
+          </div>
+          <div>
+            <div class="target-head">
+              <div>
+                <h5>${escapeHtml(target.name)}</h5>
+                <p class="subtle">Due ${formatDate(target.dueDate)} - ${timeLeftLabel(target.dueDate)}</p>
+              </div>
+              <div class="target-badges">
+                <span class="pill priority">${priorityLabel(target.priority)}</span>
+                <span class="pill ${status.tone}">${status.label}</span>
+                <button class="ghost target-toggle" type="button" data-action="toggle-target" data-toggle-role="full" data-id="${target.id}" aria-expanded="true" aria-controls="target-body-${target.id}" aria-label="Collapse ${escapeHtml(target.name)}">
+                  ${chevronIcon()}
+                </button>
+              </div>
+            </div>
+            <div class="target-grid">
+              <div class="mini-stat"><span>Saved</span><strong>${money(saved)}</strong></div>
+              <div class="mini-stat"><span>Remaining</span><strong>${money(remaining)}</strong></div>
+              <div class="mini-stat"><span>Needed ${cadenceLabel.short}</span><strong>${money(pace)}</strong></div>
+              ${recurring ? `<div class="mini-stat"><span>Planned repeat</span><strong>${recurring}</strong></div>` : ""}
+            </div>
+            ${recoveryTemplate(recovery, cadenceLabel)}
+            ${recurringGuidance}
+            ${milestone ? `<div class="recovery milestone"><strong>${milestone.title}</strong><span>${milestone.body}</span></div>` : ""}
+            <div class="progress-line" aria-hidden="true"><i></i></div>
+            ${scenarioPanelTemplate(target, monthly)}
+            <div class="deposit-row">
+              <label>
+                Add saved amount
+                <input data-deposit-input="${target.id}" type="number" min="0" step="0.01" inputmode="decimal" placeholder="${complete ? "Complete" : "50"}" ${complete ? "disabled" : ""}>
+              </label>
+              <button type="button" data-action="deposit" data-id="${target.id}" ${complete ? "disabled" : ""}>${complete ? "Done" : "Add"}</button>
+              ${recurring && !complete ? `<button class="ghost" type="button" data-action="planned" data-id="${target.id}">Add planned</button>` : ""}
+              <button class="ghost icon-btn" type="button" data-action="edit-target" data-id="${target.id}" title="Edit target" aria-label="Edit ${escapeHtml(target.name)}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="m5 16-.8 3.8L8 19l10.5-10.5-3-3L5 16Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button class="ghost icon-btn" type="button" data-action="delete" data-id="${target.id}" title="Delete target" aria-label="Delete ${escapeHtml(target.name)}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 7h16M9 7V5h6v2m-8 3 .7 9h8.6l.7-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="transactions">
+              <div class="transactions-head">
+                <strong>Recent saving entries</strong>
+                <div class="transactions-actions">
+                  <button class="ghost small-btn" type="button" data-action="history" data-id="${target.id}">History</button>
+                </div>
+              </div>
+              ${recent.length ? recent.map((deposit) => `
+                <div class="transaction">
+                  <span>${escapeHtml(deposit.note)} - ${formatDate(deposit.date)}</span>
+                  <strong>${money(deposit.amount)}</strong>
+                </div>
+              `).join("") : `<div class="transaction"><span>No saving entries yet</span><strong>${money(0)}</strong></div>`}
+            </div>
+          </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function emptyTemplate() {
+      return `
+        <div class="empty">
+          <div>
+            <svg viewBox="0 0 220 150" fill="none" aria-hidden="true">
+              <rect x="22" y="34" width="176" height="86" rx="8" fill="#e7eef8" stroke="#cdd9e8" stroke-width="3"/>
+              <path d="M50 101h42M50 78h78M50 56h35" stroke="#2866b1" stroke-width="8" stroke-linecap="round"/>
+              <circle cx="158" cy="79" r="23" fill="#1f8a62"/>
+              <path d="M148 79h20M158 69v20" stroke="white" stroke-width="7" stroke-linecap="round"/>
+            </svg>
+            <h4>No targets yet</h4>
+            <p>Create your first savings target to see monthly pace, progress and saving entries here.</p>
+            <p>Or start with a quick-start template:</p>
+            <div class="presets">
+              <button class="preset-btn" type="button" data-preset="holiday"><span class="preset-icon">&#9992;&#65039;</span> Holiday</button>
+              <button class="preset-btn" type="button" data-preset="emergency"><span class="preset-icon">&#128737;&#65039;</span> Emergency fund</button>
+              <button class="preset-btn" type="button" data-preset="car"><span class="preset-icon">&#128663;</span> New car</button>
+              <button class="preset-btn" type="button" data-preset="wedding"><span class="preset-icon">&#128141;</span> Wedding</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    let activeHistoryTargetId = "";
+
+    function openHistory(target) {
+      activeHistoryTargetId = target.id;
+      const deposits = [...target.deposits].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+      els.historyTitle.textContent = `${target.name} history`;
+      els.historySummary.textContent = `${money(savedFor(target))} saved across ${deposits.length} entr${deposits.length === 1 ? "y" : "ies"}.`;
+      els.historyChart.innerHTML = historyChartTemplate(target);
+      els.historyList.innerHTML = deposits.length ? deposits.map((deposit) => `
+        <div class="history-row">
+          <div>
+            <strong>${money(deposit.amount)}</strong>
+            <span>${escapeHtml(deposit.note || "Saved")}</span>
+          </div>
+          <span>${formatDate(deposit.date)}</span>
+          <button class="ghost small-btn" type="button" data-history-action="edit" data-target-id="${target.id}" data-deposit-id="${deposit.id}">Edit</button>
+          <button class="ghost small-btn danger" type="button" data-history-action="delete" data-target-id="${target.id}" data-deposit-id="${deposit.id}">Delete</button>
+        </div>
+      `).join("") : `<div class="history-empty">No saving entries have been added yet.</div>`;
+      els.historyModal.classList.add("show");
+      els.historyClose.focus();
+    }
+
+    function historyChartTemplate(target) {
+      const deposits = [...target.deposits]
+        .filter((deposit) => !Number.isNaN(parseDate(deposit.date).getTime()))
+        .sort((a, b) => parseDate(a.date) - parseDate(b.date));
+
+      if (!deposits.length) {
+        return `<div class="history-chart-note">No graph yet. Add a saving entry and PacePot will show progress over time here.</div>`;
+      }
+
+      let running = 0;
+      const points = deposits.map((deposit) => {
+        running += Number(deposit.amount || 0);
+        return { date: parseDate(deposit.date), total: running };
+      });
+
+      if (points.length === 1) {
+        points.unshift({ date: startDateFor(target), total: 0 });
+      }
+
+      const minTime = Math.min(...points.map((point) => point.date.getTime()));
+      const maxTime = Math.max(...points.map((point) => point.date.getTime()));
+      const maxTotal = Math.max(Number(target.amount || 0), ...points.map((point) => point.total), 1);
+      const width = 520;
+      const height = 174;
+      const pad = 22;
+      const innerW = width - pad * 2;
+      const innerH = height - 52;
+      const xFor = (time) => pad + ((time - minTime) / Math.max(1, maxTime - minTime)) * innerW;
+      const yFor = (value) => height - pad - (value / maxTotal) * innerH;
+      const path = points.map((point, index) => `${index ? "L" : "M"} ${xFor(point.date.getTime()).toFixed(1)} ${yFor(point.total).toFixed(1)}`).join(" ");
+      const area = `${path} L ${xFor(points[points.length - 1].date.getTime()).toFixed(1)} ${height - pad} L ${xFor(points[0].date.getTime()).toFixed(1)} ${height - pad} Z`;
+      const targetY = yFor(target.amount).toFixed(1);
+      const last = points[points.length - 1];
+      const first = points[0];
+
+      return `
+        <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Cumulative saving history graph">
+          <line x1="${pad}" y1="${targetY}" x2="${width - pad}" y2="${targetY}" stroke="var(--line)" stroke-dasharray="5 6" stroke-width="2"/>
+          <text x="${width - pad}" y="${Math.max(14, Number(targetY) - 6)}" text-anchor="end" font-size="12" font-weight="800" fill="var(--muted)">Target ${money(target.amount)}</text>
+          <path d="${area}" fill="var(--green-soft)"/>
+          <path d="${path}" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          ${points.map((point) => `<circle cx="${xFor(point.date.getTime()).toFixed(1)}" cy="${yFor(point.total).toFixed(1)}" r="4.5" fill="var(--panel)" stroke="var(--green)" stroke-width="3"/>`).join("")}
+          <circle cx="${xFor(last.date.getTime()).toFixed(1)}" cy="${yFor(last.total).toFixed(1)}" r="7" fill="var(--green)" stroke="var(--panel)" stroke-width="4"/>
+          <text x="${pad}" y="${height - 7}" font-size="12" font-weight="800" fill="var(--muted)">${formatShortDate(isoDate(first.date))}</text>
+          <text x="${width - pad}" y="${height - 7}" text-anchor="end" font-size="12" font-weight="800" fill="var(--muted)">${formatShortDate(isoDate(last.date))}</text>
+        </svg>
+        <div class="history-chart-note">Graph shows cumulative savings over time. Dotted line is the target amount.</div>
+      `;
+    }
+
+    function closeHistory() {
+      els.historyModal.classList.remove("show");
+      activeHistoryTargetId = "";
+    }
+
+    function openHelp() {
+      els.helpModal.classList.add("show");
+      els.helpClose.focus();
+    }
+
+    function closeHelp() {
+      els.helpModal.classList.remove("show");
+    }
+
+    function openInfoModal(modal, closeButton) {
+      modal.classList.add("show");
+      closeButton.focus();
+    }
+
+    function closeInfoModal(modal) {
+      modal.classList.remove("show");
+    }
+
+    function isComplete(target) {
+      return savedFor(target) >= Number(target.amount || 0) && Number(target.amount || 0) > 0;
+    }
+
+    function celebrateIfCompleted(target, wasComplete) {
+      if (!wasComplete && isComplete(target)) {
+        openCelebration(target);
+      }
+    }
+
+    function openCelebration(target) {
+      els.celebrationTitle.textContent = `${target.name} is fully funded`;
+      els.celebrationText.textContent = "You reached 100%. That target is no longer a plan, it is done.";
+      els.celebrationTarget.textContent = money(target.amount);
+      els.celebrationSaved.textContent = money(savedFor(target));
+      els.celebrationModal.classList.add("show");
+      els.celebrationClose.focus();
+    }
+
+    function closeCelebration() {
+      els.celebrationModal.classList.remove("show");
+    }
+
+    function savedFor(target) {
+      return target.deposits.reduce((sum, deposit) => sum + Number(deposit.amount || 0), 0);
+    }
+
+    function remainingFor(target) {
+      return Math.max(0, target.amount - savedFor(target));
+    }
+
+    function monthlyNeed(target) {
+      if (remainingFor(target) <= 0) return 0;
+      return remainingFor(target) / Math.max(1, monthsUntil(target.dueDate));
+    }
+
+    function cadenceNeed(target, cadence) {
+      if (remainingFor(target) <= 0) return 0;
+      return remainingFor(target) / periodsUntil(target.dueDate, cadence);
+    }
+
+    function recoveryPlan(target, cadence) {
+      const saved = savedFor(target);
+      const remaining = remainingFor(target);
+      if (remaining <= 0) {
+        return { status: "complete", behind: 0, extra: 0 };
+      }
+
+      const start = startDateFor(target);
+      const due = parseDate(target.dueDate);
+      const totalDays = Math.max(1, daysBetween(start, due));
+      const elapsedDays = Math.min(totalDays, Math.max(0, daysBetween(start, today)));
+      const expectedByNow = target.amount * (elapsedDays / totalDays);
+      const behind = Math.max(0, expectedByNow - saved);
+      const extra = behind / periodsUntil(target.dueDate, cadence);
+
+      return {
+        status: behind > 0 ? "behind" : "on-track",
+        behind,
+        extra
+      };
+    }
+
+    function recoveryTemplate(recovery, cadenceLabel) {
+      if (recovery.status === "complete") {
+        return `
+          <div class="recovery">
+            <strong>Target reached</strong>
+            <span>The goal is complete. You can keep it as a finished target or clear it when ready.</span>
+          </div>
+        `;
+      }
+
+      if (recovery.status === "behind") {
+        return `
+          <div class="recovery warn">
+            <strong>You are ${money(recovery.behind)} behind.</strong>
+            <span>Adding ${money(recovery.extra)} extra per ${cadenceLabel.unit} will get you back on track.</span>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="recovery">
+          <strong>You are on track.</strong>
+          <span>Keep saving at this pace and the goal stays achievable.</span>
+        </div>
+      `;
+    }
+
+    function monthsUntil(dateValue) {
+      const due = new Date(`${dateValue}T00:00:00`);
+      if (Number.isNaN(due.getTime()) || due <= today) return 1;
+      const days = Math.ceil((due - today) / 86400000);
+      return Math.max(1, Math.ceil(days / 30.44));
+    }
+
+    function periodsUntil(dateValue, cadence) {
+      const days = daysUntil(dateValue);
+      if (cadence === "day") return days;
+      if (cadence === "week") return Math.max(1, Math.ceil(days / 7));
+      return Math.max(1, Math.ceil(days / 30.44));
+    }
+
+    function daysUntil(dateValue) {
+      const due = parseDate(dateValue);
+      if (Number.isNaN(due.getTime()) || due <= today) return 1;
+      return Math.max(1, Math.ceil((due - today) / 86400000));
+    }
+
+    function timeLeftLabel(dateValue) {
+      const days = daysUntil(dateValue);
+      const weeks = Math.ceil(days / 7);
+      const months = Math.ceil(days / 30.44);
+      if (days < 14) return `${days} day${days === 1 ? "" : "s"} left`;
+      if (days < 62) return `${weeks} week${weeks === 1 ? "" : "s"} left`;
+      return `${months} month${months === 1 ? "" : "s"} left`;
+    }
+
+    function startDateFor(target) {
+      if (target.createdAt) return parseDate(target.createdAt);
+      const firstDeposit = target.deposits?.length ? target.deposits[target.deposits.length - 1].date : null;
+      return firstDeposit ? parseDate(firstDeposit) : today;
+    }
+
+    function parseDate(value) {
+      return new Date(`${value}T00:00:00`);
+    }
+
+    function addMonths(date, months) {
+      const result = new Date(date);
+      result.setMonth(result.getMonth() + Math.max(0, Number(months) || 0));
+      return result;
+    }
+
+    function daysBetween(start, end) {
+      return Math.ceil((end - start) / 86400000);
+    }
+
+    function toMoney(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? Math.max(0, Math.round(number * 100) / 100) : 0;
+    }
+
+    function money(value) {
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: state.currency || "GBP",
+        maximumFractionDigits: value % 1 ? 2 : 0
+      }).format(value || 0);
+    }
+
+    function formatDate(value) {
+      const date = parseDate(value);
+      if (Number.isNaN(date.getTime())) return "No date";
+      return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" }).format(date);
+    }
+
+    function formatShortDate(value) {
+      const date = parseDate(value);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(date);
+    }
+
+    function formatMonthYear(date) {
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "Unknown";
+      return new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(date);
+    }
+
+    function isoDate(date) {
+      return date.toISOString().slice(0, 10);
+    }
+
+    function makeId() {
+      return globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : String(Date.now() + Math.random());
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function saveAndRender(message) {
+      persistState();
+      render();
+      if (message) showToast(message);
+    }
+
+    function trackAppEvent(name) {
+      if (typeof window.trackPacePotEvent === "function") {
+        window.trackPacePotEvent(name);
+      }
+    }
+
+    function persistState() {
+      localStorage.setItem(storeKey, JSON.stringify(state));
+    }
+
+    function updateTargetCollapseDom(id, collapsed) {
+      const card = document.querySelector(`.target-card[data-id="${CSS.escape(id)}"]`);
+      if (!card) return;
+      card.classList.toggle("is-collapsed", collapsed);
+      card.querySelectorAll(".target-toggle").forEach((button) => {
+        button.setAttribute("aria-expanded", String(!collapsed));
+        const target = state.targets.find((item) => item.id === id);
+        const name = target ? target.name : "target";
+        const actionLabel = button.dataset.toggleRole === "summary" ? "Expand" : "Collapse";
+        button.setAttribute("aria-label", `${actionLabel} ${name}`);
+      });
+    }
+
+    function loadState() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(storeKey));
+        return normalizePlannerData(parsed);
+      } catch {
+        return { salary: 0, accountBalance: 0, savingsPot: 0, budgetListCollapsed: false, budgetItems: [], investments: [], currency: "GBP", targets: [] };
+      }
+    }
+
+    function normalizePlannerData(parsed) {
+      if (!parsed || typeof parsed !== "object") {
+        throw new Error("Invalid planner data");
+      }
+
+      const budgetItems = Array.isArray(parsed?.budgetItems) ? parsed.budgetItems.map(normalizeBudgetItem).filter(Boolean) : [];
+      if (!budgetItems.length && Number(parsed?.outgoings || 0) > 0) {
+        budgetItems.push({
+          id: "migrated-outgoings",
+          type: "outgoing",
+          name: "Regular outgoings",
+          value: Number(parsed.outgoings)
+        });
+      }
+
+      return {
+        salary: toMoney(parsed?.salary),
+        accountBalance: toMoney(parsed?.accountBalance),
+        savingsPot: toMoney(parsed?.savingsPot),
+        budgetListCollapsed: Boolean(parsed?.budgetListCollapsed),
+        budgetItems,
+        investments: Array.isArray(parsed?.investments) ? parsed.investments.map(normalizeInvestment).filter(Boolean) : [],
+        currency: ["GBP", "USD", "EUR", "CAD", "AUD"].includes(parsed?.currency) ? parsed.currency : "GBP",
+        targets: Array.isArray(parsed?.targets) ? parsed.targets.map(normalizeTarget).filter(Boolean) : []
+      };
+    }
+
+    function normalizeInvestment(item) {
+      const name = String(item?.name || "").trim();
+      const value = toMoney(item?.value);
+      if (!name || value <= 0) return null;
+      return {
+        id: item.id || makeId(),
+        name,
+        value,
+        kind: item.kind || "Other investment",
+        access: item.access === "accessible" ? "accessible" : "long-term",
+        note: item.note || "",
+        updatedAt: item.updatedAt || isoDate(today)
+      };
+    }
+
+    function normalizeBudgetItem(item) {
+      const name = String(item?.name || "").trim();
+      const value = toMoney(item?.value);
+      if (!name || value <= 0) return null;
+      return {
+        id: item.id || makeId(),
+        type: item.type === "outgoing" ? "outgoing" : "income",
+        name,
+        value
+      };
+    }
+
+    function normalizeTarget(target) {
+      const deposits = Array.isArray(target.deposits) ? target.deposits : [];
+      const name = String(target?.name || "").trim();
+      const amount = toMoney(target?.amount);
+      if (!name || amount <= 0) return null;
+
+      return {
+        ...target,
+        id: target.id || makeId(),
+        name,
+        amount,
+        cadence: ["day", "week", "month"].includes(target.cadence) ? target.cadence : "month",
+        priority: ["high", "medium", "low"].includes(target.priority) ? target.priority : "medium",
+        recurringAmount: toMoney(target.recurringAmount),
+        recurringCadence: ["week", "month"].includes(target.recurringCadence) && toMoney(target.recurringAmount) > 0 ? target.recurringCadence : "",
+        collapsed: Boolean(target.collapsed),
+        dueDate: validDateValue(target.dueDate) || isoDate(today),
+        createdAt: validDateValue(target.createdAt) || validDateValue(deposits[deposits.length - 1]?.date) || isoDate(today),
+        deposits: deposits.map((deposit) => ({
+          id: deposit.id || makeId(),
+          amount: toMoney(deposit.amount),
+          date: validDateValue(deposit.date) || isoDate(today),
+          note: deposit.note || "Saved"
+        })).filter((deposit) => deposit.amount > 0)
+      };
+    }
+
+    function validDateValue(value) {
+      if (!value) return "";
+      const date = parseDate(value);
+      return Number.isNaN(date.getTime()) ? "" : String(value).slice(0, 10);
+    }
+
+    let toastTimer;
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2200);
+    }
+
+    render();
+  </script>
+</body>
+</html>
