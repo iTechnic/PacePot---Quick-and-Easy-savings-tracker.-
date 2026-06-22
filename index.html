@@ -137,6 +137,7 @@
       height: 100vh;
       overflow-y: auto;
       overflow-x: hidden;
+      scrollbar-gutter: stable;
       scrollbar-width: thin;
       scrollbar-color: rgba(255,255,255,.1) transparent;
       --ink: #f1f5f9;
@@ -961,7 +962,7 @@
           <form id="targetForm">
             <label>
               What are you saving for?
-              <input id="targetName" type="text" maxlength="60" placeholder="Holiday, emergency fund, new laptop">
+              <input id="targetName" type="text" maxlength="60" placeholder="e.g. Holiday fund">
             </label>
             <div class="field-row three">
               <label>
@@ -1021,7 +1022,7 @@
             <form id="investmentForm">
               <label>
                 Account name
-                <input id="investmentName" type="text" maxlength="50" placeholder="Stocks &amp; Shares ISA, pension, crypto">
+                <input id="investmentName" type="text" maxlength="50" placeholder="e.g. Stocks &amp; Shares ISA">
               </label>
               <div class="field-row three investment-fields">
                 <label>
@@ -1049,7 +1050,7 @@
               </div>
               <label>
                 Note
-                <input id="investmentNote" type="text" maxlength="80" placeholder="Retirement, house deposit, emergency only">
+                <input id="investmentNote" type="text" maxlength="80" placeholder="e.g. Retirement">
               </label>
               <button type="submit">Add investment</button>
             </form>
