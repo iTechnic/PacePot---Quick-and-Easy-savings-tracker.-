@@ -194,6 +194,14 @@ ul {
   font-size: .9rem;
 }
 
+/* ---- calculators hub ---- */
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; }
+.tool-card { display: flex; flex-direction: column; gap: 6px; padding: 16px; border: 1.5px solid color-mix(in srgb, var(--line) 70%, transparent); border-radius: 7px; background: var(--panel-soft); text-decoration: none; color: var(--ink); transition: border-color .15s, background .15s; }
+.tool-card:hover { border-color: var(--accent); background: var(--accent-soft); }
+.tool-card strong { font-size: 1rem; }
+.tool-card p { color: var(--muted); font-size: .88rem; margin: 0; line-height: 1.45; flex: 1; }
+.tool-card span { color: var(--accent-strong); font-size: .82rem; font-weight: 800; }
+
 /* ---- in-page calculator ---- */
 .calc { margin-bottom: 18px; }
 .calc-inputs { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 16px; }
