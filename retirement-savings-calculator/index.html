@@ -44,6 +44,16 @@
     <header class="topbar"><a class="brand" href="/">PacePot</a><nav class="nav"><a href="/">Open app</a><a href="/blog">Guides</a><a href="/holiday-savings-calculator">Holiday</a><a href="/car-savings-calculator">Car</a><a href="/emergency-fund-calculator">Emergency</a><a href="/house-deposit-savings-calculator">House</a><a href="/wedding-savings-calculator">Wedding</a></nav></header>
     <main>
       <section class="hero"><span class="kicker">Retirement planning</span><h1>Retirement Savings Calculator UK</h1><p class="intro">Most people know they need more in the pot. Fewer know what the monthly number actually is. This retirement savings calculator takes your target, subtracts what you have already saved, and divides the gap across the years until you stop working.</p><a class="button" href="/">Open the free PacePot calculator</a></section>
+      <section class="section calc">
+        <h2>How much to save each month?</h2>
+        <div class="calc-inputs">
+          <label>Target pot size<div class="calc-iw"><span>£</span><input id="c-target" type="number" min="0" step="1000" placeholder="150000" oninput="calcRetirement()"></div></label>
+          <label>Already saved<div class="calc-iw"><span>£</span><input id="c-saved" type="number" min="0" step="1000" placeholder="0" oninput="calcRetirement()"></div></label>
+          <label>Years until retirement<div class="calc-iw bare"><input id="c-years" type="number" min="1" max="50" step="1" placeholder="25" oninput="calcRetirement()"></div></label>
+        </div>
+        <div class="calc-result" id="c-res"><span class="calc-sub">Enter your pot target and years above.</span></div>
+        <p class="calc-note">No investment growth assumed. For a projection including returns and inflation, use the <a href="https://moneyhelper.org.uk">MoneyHelper</a> pension calculator.</p>
+      </section>
       <div class="grid">
         <section class="section"><h2>How it works</h2><p>Set your retirement pot size as a savings target, add what you have already saved or invested, and choose a target date. PacePot works out the monthly pace and lets you log contributions as you go.</p><ul><li>Set a pot target based on what you expect to spend in retirement.</li><li>Track pension, ISA, or other savings separately.</li><li>Adjust the monthly pace as your income or goals change.</li></ul></section>
         <section class="section"><h2>Practical examples</h2><div class="examples"><div class="example"><strong>&pound;150,000 pot in 20 years, nothing saved</strong><p>About &pound;625 per month from zero, not counting any investment growth.</p></div><div class="example"><strong>&pound;200,000 target with &pound;40,000 saved</strong><p>&pound;160,000 left over 25 years is about &pound;533 per month.</p></div><div class="example"><strong>Pension and ISA together</strong><p>Create one goal for each pot and track both alongside each other.</p></div></div></section>
@@ -53,5 +63,18 @@
     </main>
     <footer class="footer">PacePot v3.0 - savings targets that fit real life.</footer>
   </div>
+  <script>
+    function calcRetirement() {
+      var target = parseFloat(document.getElementById('c-target').value) || 0;
+      var saved  = parseFloat(document.getElementById('c-saved').value)  || 0;
+      var years  = parseFloat(document.getElementById('c-years').value)  || 0;
+      var el = document.getElementById('c-res');
+      if (!target || !years) { el.innerHTML = '<span class="calc-sub">Enter your pot target and years above.</span>'; return; }
+      var remaining = Math.max(0, target - saved);
+      if (remaining === 0) { el.innerHTML = '<div class="calc-num">Already there</div><div class="calc-sub">Your savings already meet the target.</div>'; return; }
+      var monthly = Math.ceil(remaining / (years * 12));
+      el.innerHTML = '<div class="calc-num">£' + monthly.toLocaleString('en-GB') + ' / month</div><div class="calc-sub">to reach £' + target.toLocaleString('en-GB') + ' in ' + years + ' year' + (years === 1 ? '' : 's') + '</div>';
+    }
+  </script>
 </body>
 </html>

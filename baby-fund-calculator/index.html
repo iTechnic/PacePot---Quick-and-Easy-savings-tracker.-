@@ -44,6 +44,15 @@
     <header class="topbar"><a class="brand" href="/">PacePot</a><nav class="nav"><a href="/">Open app</a><a href="/blog">Guides</a><a href="/holiday-savings-calculator">Holiday</a><a href="/car-savings-calculator">Car</a><a href="/emergency-fund-calculator">Emergency</a><a href="/house-deposit-savings-calculator">House</a><a href="/wedding-savings-calculator">Wedding</a></nav></header>
     <main>
       <section class="hero"><span class="kicker">Baby savings</span><h1>Baby Fund Calculator UK</h1><p class="intro">Pram, cot, car seat, clothes, mat leave top-up. First-year costs stack up faster than most people expect. This baby fund calculator works out how much to put aside each month so the money is ready when you need it.</p><a class="button" href="/">Open the free PacePot calculator</a></section>
+      <section class="section calc">
+        <h2>How much to save each month?</h2>
+        <div class="calc-inputs">
+          <label>Target amount<div class="calc-iw"><span>£</span><input id="c-target" type="number" min="0" step="100" placeholder="3000" oninput="calcBaby()"></div></label>
+          <label>Already saved<div class="calc-iw"><span>£</span><input id="c-saved" type="number" min="0" step="100" placeholder="0" oninput="calcBaby()"></div></label>
+          <label>Months until due<div class="calc-iw bare"><input id="c-months" type="number" min="1" max="24" step="1" placeholder="9" oninput="calcBaby()"></div></label>
+        </div>
+        <div class="calc-result" id="c-res"><span class="calc-sub">Enter your target and months until due above.</span></div>
+      </section>
       <div class="grid">
         <section class="section"><h2>How it works</h2><p>Enter your baby fund target, how much you have already saved, and the date you want the money ready (your due date or a few weeks before). PacePot shows the monthly pace and tracks every contribution.</p><ul><li>Set one overall baby fund target.</li><li>Or split into separate goals: kit, mat leave buffer, nursery costs.</li><li>Log amounts as you save and see your progress update.</li></ul></section>
         <section class="section"><h2>Practical examples</h2><div class="examples"><div class="example"><strong>&pound;3,000 baby fund in 9 months</strong><p>From zero, that is about &pound;333 per month.</p></div><div class="example"><strong>&pound;5,000 target with &pound;1,200 saved</strong><p>&pound;3,800 left over 8 months is about &pound;475 per month.</p></div><div class="example"><strong>Mat leave income gap</strong><p>Create a separate target for any month where your income drops, so it does not eat into the kit fund.</p></div></div></section>
@@ -53,5 +62,18 @@
     </main>
     <footer class="footer">PacePot v3.0 - savings targets that fit real life.</footer>
   </div>
+  <script>
+    function calcBaby() {
+      var target = parseFloat(document.getElementById('c-target').value) || 0;
+      var saved  = parseFloat(document.getElementById('c-saved').value)  || 0;
+      var months = parseFloat(document.getElementById('c-months').value) || 0;
+      var el = document.getElementById('c-res');
+      if (!target || !months) { el.innerHTML = '<span class="calc-sub">Enter your target and months until due above.</span>'; return; }
+      var remaining = Math.max(0, target - saved);
+      if (remaining === 0) { el.innerHTML = '<div class="calc-num">Already there</div><div class="calc-sub">Your savings already cover the target.</div>'; return; }
+      var monthly = Math.ceil(remaining / months);
+      el.innerHTML = '<div class="calc-num">£' + monthly.toLocaleString('en-GB') + ' / month</div><div class="calc-sub">to save £' + remaining.toLocaleString('en-GB') + ' in ' + months + ' month' + (months === 1 ? '' : 's') + '</div>';
+    }
+  </script>
 </body>
 </html>
