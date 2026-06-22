@@ -820,9 +820,9 @@
     .ob-btn-back { background: transparent; color: var(--muted); font-size: .84rem; font-weight: 700; border: 0; cursor: pointer; padding: 4px 0; text-align: left; font-family: inherit; transition: color var(--motion-fast); }
     .ob-btn-back:hover { color: var(--ink); }
     .ob-categories { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
-    .ob-cat { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); background: var(--surface-2); cursor: pointer; font-size: .78rem; font-weight: 700; color: var(--ink); transition: all var(--motion-fast) var(--ease); font-family: inherit; text-align: center; line-height: 1.3; }
+    .ob-cat { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 14px 6px; min-height: 80px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); background: var(--surface-2); cursor: pointer; font-size: .78rem; font-weight: 700; color: var(--ink); transition: all var(--motion-fast) var(--ease); font-family: inherit; text-align: center; line-height: 1.3; }
     .ob-cat:hover, .ob-cat:focus-visible { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); transform: translateY(-2px); box-shadow: var(--shadow-sm); outline: none; }
-    .ob-cat-icon { font-size: 1.55rem; line-height: 1; display: block; }
+    .ob-cat-icon { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .ob-fields { display: flex; flex-direction: column; gap: 14px; }
     .ob-label { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
     .ob-label input { width: 100%; height: 46px; padding: 0 14px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); font-size: .98rem; color: var(--ink); background: var(--surface-2); font-family: inherit; transition: border-color var(--motion-fast); }
@@ -878,14 +878,14 @@
         <p class="ob-sub">Pick your first goal. You can add more once you're in.</p>
       </div>
       <div class="ob-categories" id="ob-cats">
-        <button class="ob-cat" type="button" data-name="Holiday fund"><span class="ob-cat-icon">&#x2708;&#xFE0F;</span>Holiday</button>
-        <button class="ob-cat" type="button" data-name="Car fund"><span class="ob-cat-icon">&#x1F697;</span>Car</button>
-        <button class="ob-cat" type="button" data-name="Emergency fund"><span class="ob-cat-icon">&#x1F6E1;&#xFE0F;</span>Emergency</button>
-        <button class="ob-cat" type="button" data-name="House deposit"><span class="ob-cat-icon">&#x1F3E0;</span>House deposit</button>
-        <button class="ob-cat" type="button" data-name="Wedding fund"><span class="ob-cat-icon">&#x1F48D;</span>Wedding</button>
-        <button class="ob-cat" type="button" data-name="Debt payoff"><span class="ob-cat-icon">&#x1F4B3;</span>Debt payoff</button>
-        <button class="ob-cat" type="button" data-name="Retirement pot"><span class="ob-cat-icon">&#x1F31E;</span>Retirement</button>
-        <button class="ob-cat" type="button" data-name="Baby fund"><span class="ob-cat-icon">&#x1F476;</span>Baby fund</button>
+        <button class="ob-cat" type="button" data-name="Holiday fund"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span>Holiday</button>
+        <button class="ob-cat" type="button" data-name="Car fund"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V9l2.9-6h12.2l2.9 6v6a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg></span>Car</button>
+        <button class="ob-cat" type="button" data-name="Emergency fund"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Emergency</button>
+        <button class="ob-cat" type="button" data-name="House deposit"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>House deposit</button>
+        <button class="ob-cat" type="button" data-name="Wedding fund"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9z"/><line x1="2" y1="9" x2="22" y2="9"/></svg></span>Wedding</button>
+        <button class="ob-cat" type="button" data-name="Debt payoff"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>Debt payoff</button>
+        <button class="ob-cat" type="button" data-name="Retirement pot"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>Retirement</button>
+        <button class="ob-cat" type="button" data-name="Baby fund"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>Baby fund</button>
       </div>
       <button class="ob-btn-back" id="ob-back-1" type="button">&larr; Back</button>
     </div>
@@ -3540,7 +3540,7 @@
       els.toast.textContent = message;
       els.toast.classList.add("show");
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2200);
+      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 3000);
     }
 
     initOnboarding();
