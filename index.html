@@ -4340,7 +4340,7 @@
       var STEPS = [
         { id:  'budgetDrawerOpen',
           title: 'Start with your budget',
-          body:  'Tell PacePot what you earn and spend each month — it makes your saving pace realistic.',
+          body:  'Tell PacePot what you earn and spend each month. It makes your saving pace realistic.',
           pos: 'below', drawer: null },
         { id:  'salary',
           title: 'Your take-home pay',
@@ -4348,7 +4348,7 @@
           pos: 'below', drawer: 'open' },
         { sel:  '.budget-add',
           title: 'Add your outgoings',
-          body:  'Rent, bills, subscriptions — anything that leaves each month. The fuller the picture, the better.',
+          body:  'Rent, bills, subscriptions, anything that leaves each month. The fuller the picture, the better.',
           pos: 'below', drawer: null },
         { id:   'savingsPot',
           title: 'Your savings pot',
@@ -4360,7 +4360,7 @@
           pos: 'below', drawer: 'close' },
         { sel:  'section.panel',
           title: 'Add more savings goals',
-          body:  "Your first goal is already set. Add more anytime — holidays, emergencies, a car, anything you're saving toward.",
+          body:  "Your first goal is already set. Add more anytime: holidays, emergencies, a car, anything you're saving toward.",
           pos: 'above', drawer: null },
         { sel:  '.targets-zone',
           title: 'Your goals live here',
@@ -4439,6 +4439,7 @@
 
         if (top + TH > H - 10) top = r.top - PAD - 10 - TH;
         if (top < 10) top = r.bottom + PAD + 10;
+        top = Math.max(10, Math.min(top, H - TH - 10));
 
         D.tp.style.top  = top + 'px';
         D.tp.style.left = left + 'px';
@@ -4469,7 +4470,7 @@
           var el = getEl(step);
           if (!el) { goTo(n + 1); return; }
 
-          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
           setTimeout(function () {
             var r = el.getBoundingClientRect();
@@ -4480,7 +4481,7 @@
             if (D.nx) D.nx.textContent = step.last ? 'Done' : 'Next →';
             if (D.tp) D.tp.classList.add('on');
             setTimeout(function () { posTip(r, step.pos); }, 10);
-          }, 320);
+          }, 450);
         }
 
         if (step.drawer === 'open' && drawer) {
