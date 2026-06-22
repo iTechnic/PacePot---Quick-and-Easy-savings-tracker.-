@@ -120,7 +120,7 @@
     /* ============================================================
        APP SHELL
        ============================================================ */
-    body { min-height: 100vh; background: var(--bg); color: var(--ink); line-height: 1.5; }
+    body { min-height: 100vh; background: linear-gradient(155deg, #e8eef8 0%, #edf3fa 40%, #e9eef7 100%); color: var(--ink); line-height: 1.5; }
 
     .app-shell {
       display: grid;
@@ -132,7 +132,7 @@
        SIDEBAR - DARK
        ============================================================ */
     aside {
-      background: linear-gradient(160deg, #08121f 0%, #0c1a30 45%, #0a1628 100%);
+      background: linear-gradient(170deg, #06101d 0%, #0b1929 35%, #0e2038 65%, #091626 100%);
       border-right: 1px solid rgba(255,255,255,.04);
       padding: 0;
       position: sticky;
@@ -194,15 +194,15 @@
     }
     .brand::before {
       content: "";
-      width: 38px; height: 38px;
+      width: 46px; height: 46px;
       flex: 0 0 auto;
-      border-radius: 10px;
+      border-radius: 13px;
       background:
         radial-gradient(circle at 50% 33%, rgba(255,255,255,.92) 0 18%, transparent 19%),
-        linear-gradient(135deg, #10b981, #059669);
-      box-shadow: 0 8px 20px rgba(16,185,129,.35), inset 0 1px 0 rgba(255,255,255,.2);
+        linear-gradient(135deg, #34d399, #059669 60%, #047857);
+      box-shadow: 0 8px 26px rgba(16,185,129,.42), inset 0 1px 0 rgba(255,255,255,.25);
     }
-    h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.2; margin: 0; }
+    h1 { font-size: 1.3rem; font-weight: 900; letter-spacing: -.025em; line-height: 1.2; margin: 0; }
     .brand-kicker { display: block; font-size: .64rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; opacity: .9; }
     .subtle { color: var(--muted); font-size: .84rem; line-height: 1.5; margin: 3px 0 0; }
 
@@ -326,8 +326,8 @@
     /* ============================================================
        METRIC / QUICK VIEW
        ============================================================ */
-    .metric { display: grid; gap: 4px; padding: 16px; background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.2); border-radius: var(--radius-sm); margin-top: 14px; color: var(--muted); font-size: .8rem; }
-    .metric strong { font-size: 2rem; line-height: 1; color: var(--accent-strong); font-weight: 900; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+    .metric { display: grid; gap: 5px; padding: 18px 16px; background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.22); border-radius: var(--radius-sm); margin-top: 14px; color: var(--muted); font-size: .82rem; }
+    .metric strong { font-size: 2.3rem; line-height: 1; color: var(--accent-strong); font-weight: 900; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
 
     /* ============================================================
        BUDGET PIE CHART
@@ -359,9 +359,9 @@
     /* ============================================================
        TOOLBAR
        ============================================================ */
-    .toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 32px; }
-    .toolbar h3 { font-size: clamp(1.6rem, 2.5vw, 2.3rem); font-weight: 900; letter-spacing: -.03em; line-height: 1.1; margin: 0; color: var(--ink); }
-    .motto { margin: 6px 0 0; color: var(--muted); font-size: .92rem; font-weight: 500; line-height: 1.55; }
+    .toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 36px; }
+    .toolbar h3 { font-size: clamp(2rem, 3.2vw, 3rem); font-weight: 900; letter-spacing: -.04em; line-height: 1.05; margin: 0; color: var(--ink); }
+    .motto { margin: 8px 0 0; color: var(--muted); font-size: .94rem; font-weight: 500; line-height: 1.6; max-width: 480px; }
     .seo-intro { max-width: 640px; margin: 6px 0 0; color: var(--faint); font-size: .85rem; line-height: 1.5; }
     .privacy-note {
       display: inline-flex; align-items: center; gap: 7px; margin-top: 10px;
@@ -435,33 +435,43 @@
     /* ============================================================
        SUMMARY STRIP
        ============================================================ */
-    .summary-strip { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 24px; }
-    .summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow-xs); min-height: 86px; position: relative; overflow: hidden; transition: transform var(--motion) var(--ease), box-shadow var(--motion) var(--ease), border-color var(--motion) var(--ease); }
-    .summary:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: rgba(13,27,46,.12); }
+    .summary-strip { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 28px; }
+    .summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow-xs); min-height: 92px; position: relative; overflow: hidden; transition: transform var(--motion) var(--ease), box-shadow var(--motion) var(--ease), border-color var(--motion) var(--ease); }
+    .summary:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: rgba(13,27,46,.14); }
     .summary::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(180deg, var(--accent), rgba(5,150,105,.15)); opacity: .5; border-radius: var(--radius) 0 0 var(--radius); }
-    .summary .label { color: var(--muted); font-size: .68rem; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .08em; }
-    .summary .value { font-size: clamp(1.1rem, 1.6vw, 1.42rem); font-weight: 900; line-height: 1.1; overflow-wrap: anywhere; letter-spacing: -.025em; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .summary .label { color: var(--muted); font-size: .67rem; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .09em; }
+    .summary .value { font-size: clamp(1.15rem, 1.7vw, 1.5rem); font-weight: 900; line-height: 1.05; overflow-wrap: anywhere; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
     /* Hero metrics: Safe to spend (3rd) and Monthly pace (8th) */
     .summary-strip .summary:nth-child(3),
     .summary-strip .summary:nth-child(8) {
-      border-color: rgba(5,150,105,.14);
-      background: linear-gradient(145deg, rgba(5,150,105,.05) 0%, var(--surface) 55%);
+      border-color: rgba(5,150,105,.2);
+      border-width: 1.5px;
+      background: linear-gradient(140deg, #dff5ed 0%, #edfaf4 30%, #f9fffd 70%, #fff 100%);
+      padding: 24px 22px;
+      min-height: 118px;
     }
     .summary-strip .summary:nth-child(3)::before,
     .summary-strip .summary:nth-child(8)::before {
-      background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+      background: linear-gradient(180deg, #10b981, #059669);
       opacity: 1;
-      width: 3px;
+      width: 4px;
+    }
+    .summary-strip .summary:nth-child(3) .label,
+    .summary-strip .summary:nth-child(8) .label {
+      color: var(--accent-strong);
+      font-size: .66rem;
     }
     .summary-strip .summary:nth-child(3) .value,
     .summary-strip .summary:nth-child(8) .value {
       color: var(--accent-strong);
-      font-size: clamp(1.2rem, 1.9vw, 1.6rem);
+      font-size: clamp(1.75rem, 2.8vw, 2.4rem);
+      letter-spacing: -.04em;
     }
     .summary-strip .summary:nth-child(3):hover,
     .summary-strip .summary:nth-child(8):hover {
-      border-color: rgba(5,150,105,.22);
-      box-shadow: 0 4px 20px rgba(5,150,105,.1), 0 2px 8px rgba(5,150,105,.06);
+      border-color: rgba(5,150,105,.3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(5,150,105,.14), 0 2px 8px rgba(5,150,105,.07);
     }
 
     /* ============================================================
@@ -567,7 +577,7 @@
     .progress-viz > * { position: relative; z-index: 1; }
     .progress-kicker { color: var(--accent-strong); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
     .progress-score { display: flex; align-items: flex-end; gap: 4px; margin-top: 6px; }
-    .progress-score strong { font-size: clamp(2.8rem, 5.5vw, 4.2rem); line-height: .88; letter-spacing: -.04em; color: var(--accent-strong); font-weight: 900; font-variant-numeric: tabular-nums; }
+    .progress-score strong { font-size: clamp(3.2rem, 6vw, 5rem); line-height: .85; letter-spacing: -.05em; color: var(--accent-strong); font-weight: 900; font-variant-numeric: tabular-nums; }
     .progress-score span { color: var(--muted); font-weight: 700; padding-bottom: 6px; font-size: 1rem; }
     .journey { display: grid; gap: 10px; }
     .journey-track { position: relative; height: 8px; border-radius: var(--radius-full); background: rgba(5,150,105,.1); box-shadow: inset 0 1px 2px rgba(5,150,105,.08); }
