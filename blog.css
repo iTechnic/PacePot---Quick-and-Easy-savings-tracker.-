@@ -1,0 +1,217 @@
+/* ============================================================
+   PacePot blog styles — extends seo-page.css, does not override it.
+   Load order: <link seo-page.css> then <link blog.css>
+   ============================================================ */
+
+/* Blog hub: post grid */
+.post-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.post-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 24px rgba(15, 23, 32, .07);
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(15, 23, 32, .1);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.post-card .post-tag {
+  align-self: flex-start;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.post-card h3 {
+  margin: 2px 0 0;
+  font-size: 1.12rem;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.post-card p {
+  margin: 0;
+  font-size: .92rem;
+}
+
+.post-card .post-card-cta {
+  margin-top: auto;
+  padding-top: 6px;
+  font-weight: 800;
+  font-size: .9rem;
+  color: var(--accent-strong);
+}
+
+/* Single article layout */
+.article {
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 24px rgba(15, 23, 32, .07);
+  padding: clamp(22px, 4vw, 44px);
+  margin-bottom: 18px;
+}
+
+.article-body {
+  max-width: 720px;
+}
+
+.article-body .lead {
+  font-size: 1.1rem;
+  color: var(--ink);
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+
+.article-body h2 {
+  margin: 30px 0 10px;
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+.article-body h3 {
+  margin: 22px 0 6px;
+  font-size: 1.08rem;
+}
+
+.article-body p {
+  margin: 0 0 14px;
+  font-size: 1rem;
+}
+
+.article-body ul,
+.article-body ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+
+.article-body li {
+  margin-bottom: 6px;
+}
+
+.article-body strong {
+  color: var(--ink);
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: .86rem;
+  font-weight: 700;
+}
+
+.post-meta span::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--silver);
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.post-meta span:first-child::before {
+  display: none;
+}
+
+/* In-article callout that links to a calculator (conversion driver) */
+.tool-callout {
+  display: grid;
+  gap: 6px;
+  margin: 22px 0;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+}
+
+.tool-callout strong {
+  font-size: 1.02rem;
+  color: var(--ink);
+}
+
+.tool-callout p {
+  margin: 0;
+  font-size: .94rem;
+}
+
+.tool-callout .button {
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+/* Simple data table for cost/figures */
+.post-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 16px;
+  font-size: .95rem;
+}
+
+.post-table th,
+.post-table td {
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.post-table th {
+  color: var(--ink);
+  font-weight: 800;
+  background: var(--panel-soft);
+}
+
+.post-table td {
+  color: var(--muted);
+}
+
+/* "Read next" cross-links at the foot of an article */
+.read-next {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  font-weight: 800;
+}
+
+.breadcrumb {
+  margin-bottom: 14px;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.breadcrumb a {
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .post-list { grid-template-columns: 1fr; }
+  .article { padding: 18px; }
+}
