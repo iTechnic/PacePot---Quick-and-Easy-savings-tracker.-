@@ -123,9 +123,8 @@
     body { min-height: 100vh; background: linear-gradient(155deg, #e8eef8 0%, #edf3fa 40%, #e9eef7 100%); color: var(--ink); line-height: 1.5; }
 
     .app-shell {
-      display: grid;
-      grid-template-columns: 348px minmax(0, 1fr);
-      min-height: 100vh;
+      display: block;
+      min-height: 100dvh;
     }
 
     /* ============================================================
@@ -133,16 +132,21 @@
        ============================================================ */
     aside {
       background: linear-gradient(170deg, #06101d 0%, #0b1929 35%, #0e2038 65%, #091626 100%);
-      border-right: 1px solid rgba(255,255,255,.04);
+      border-left: 1px solid rgba(255,255,255,.06);
       padding: 0;
-      position: sticky;
+      position: fixed;
+      right: 0;
       top: 0;
-      height: 100vh;
+      height: 100dvh;
+      width: 360px;
+      z-index: 100;
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-gutter: stable;
       scrollbar-width: thin;
       scrollbar-color: rgba(255,255,255,.1) transparent;
+      transform: translateX(0);
+      transition: transform 240ms cubic-bezier(0.16,1,0.3,1);
       --ink: #e8f0f8;
       --muted: #7a95ac;
       --faint: #4e6477;
@@ -178,8 +182,9 @@
     }
     aside::-webkit-scrollbar { width: 3px; }
     aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+    aside.sidebar-closed { transform: translateX(calc(100% + 10px)); }
 
-    .sidebar-inner { padding: 28px 22px 38px; }
+    .sidebar-inner { padding: 0 0 38px; }
 
     /* ============================================================
        BRAND
@@ -248,6 +253,7 @@
 
     /* The collapsible body of the sidebar */
     .sidebar-body {
+      padding: 12px 22px 0;
       transition: max-height 280ms var(--ease), opacity 200ms var(--ease);
     }
 
@@ -354,7 +360,7 @@
     /* ============================================================
        MAIN AREA
        ============================================================ */
-    main { padding: 36px 34px 52px; overflow: hidden; }
+    main { max-width: 1080px; margin: 0 auto; padding: 48px 32px 60px; }
 
     /* ============================================================
        TOOLBAR
@@ -373,7 +379,7 @@
     /* ============================================================
        ACTIONS
        ============================================================ */
-    .actions { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; }
+    .actions { display: none; }
 
     /* ============================================================
        BUTTONS
@@ -773,6 +779,145 @@
     .site-footer strong { color: var(--ink); font-weight: 700; }
 
     /* ============================================================
+       APP HEADER
+       ============================================================ */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 28px;
+      height: 60px;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 8px rgba(13,27,46,.05);
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .brand-mark-icon {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background:
+        radial-gradient(circle at 50% 33%, rgba(255,255,255,.92) 0 18%, transparent 19%),
+        linear-gradient(135deg, #34d399, #059669 60%, #047857);
+      box-shadow: 0 4px 14px rgba(16,185,129,.32);
+      flex-shrink: 0;
+    }
+    .brand-name-text {
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: -.03em;
+      color: var(--ink);
+    }
+    .app-nav {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+    }
+    .app-nav a {
+      padding: 6px 13px;
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      font-size: .87rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+    }
+    .app-nav a:hover { color: var(--ink); background: var(--surface-2); }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .budget-open-btn {
+      min-height: 36px;
+      padding: 7px 15px;
+      background: var(--ink);
+      color: #fff;
+      border: 0;
+      border-radius: var(--radius-sm);
+      font-size: .84rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(13,27,46,.14);
+      transition: background var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
+    }
+    .budget-open-btn:hover { background: #1e293b; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(13,27,46,.2); }
+
+    /* ============================================================
+       DRAWER BACKDROP
+       ============================================================ */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      background: rgba(10,18,32,.42);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 240ms cubic-bezier(0.16,1,0.3,1);
+    }
+    body:has(aside:not(.sidebar-closed)) .drawer-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ============================================================
+       DRAWER HEADER (inside aside)
+       ============================================================ */
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 20px 22px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .drawer-kicker {
+      display: block;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+    .drawer-count {
+      display: block;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .drawer-close-btn {
+      width: 36px; height: 36px; min-height: 36px;
+      padding: 0;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: none;
+      transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
+    }
+    .drawer-close-btn:hover { background: rgba(255,255,255,.16); color: #fff; transform: none; box-shadow: none; }
+
+    /* ============================================================
        KEYFRAMES
        ============================================================ */
     @keyframes detailsIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
@@ -782,13 +927,9 @@
        RESPONSIVE - TABLET
        ============================================================ */
     @media (max-width: 1100px) {
-      .app-shell { grid-template-columns: 1fr; }
-      aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.06); overflow: visible; }
-      .sidebar-toggle-btn { display: flex; }
-      /* Collapsed sidebar: hide body */
-      aside.sidebar-closed .sidebar-body { display: none; }
       .workspace { grid-template-columns: 1fr; }
       .summary-strip { grid-template-columns: repeat(4,minmax(0,1fr)); }
+      .app-nav { display: none; }
     }
 
     @media (max-width: 900px) {
@@ -799,10 +940,8 @@
        RESPONSIVE - MOBILE
        ============================================================ */
     @media (max-width: 720px) {
-      main, .sidebar-inner { padding: 20px 18px; }
+      main { padding: 24px 18px 48px; }
       .toolbar { display: grid; align-items: start; gap: 14px; }
-      .actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 100%; }
-      .actions > * { width: 100%; }
       .summary-strip { grid-template-columns: 1fr 1fr; gap: 10px; }
       .plan-guidance { grid-template-columns: 1fr; }
       .plan-steps { justify-content: flex-start; }
@@ -817,15 +956,19 @@
       .budget-chart { grid-template-columns: 1fr; }
       .site-footer { display: grid; }
       .targets-heading { gap: 8px; }
+      .app-header { padding: 0 18px; height: 54px; gap: 10px; }
+      aside { width: 100vw; max-width: 360px; }
     }
 
     @media (max-width: 480px) {
-      main, .sidebar-inner { padding: 16px; }
-      .summary-strip, .actions { grid-template-columns: 1fr; }
+      main { padding: 16px 16px 48px; }
+      .summary-strip { grid-template-columns: 1fr; }
       .history-row { grid-template-columns: 1fr auto; gap: 6px; }
       .target-grid { grid-template-columns: 1fr; }
       .deposit-row { grid-template-columns: 1fr auto auto auto auto; }
       .deposit-row input { grid-column: 1; }
+      .header-actions .support-link, .header-actions .ghost:not(.budget-open-btn) { display: none; }
+      .budget-open-btn { font-size: .8rem; padding: 6px 11px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -967,31 +1110,44 @@
   </div>
 </div>
 
+<header class="app-header">
+  <div class="app-brand">
+    <div class="brand-mark-icon" aria-hidden="true"></div>
+    <span class="brand-name-text">PacePot</span>
+  </div>
+  <nav class="app-nav" aria-label="Main navigation">
+    <a href="/calculators">Calculators</a>
+    <a href="/blog">Guides</a>
+  </nav>
+  <div class="header-actions">
+    <button id="budgetDrawerOpen" class="budget-open-btn" type="button">Monthly budget</button>
+    <a class="support-link" href="https://buymeacoffee.com/pacepot" target="_blank" rel="noopener noreferrer" title="Support PacePot">Support PacePot</a>
+    <button class="ghost icon-btn" id="helpBtn" type="button" title="Open help"><span class="mini-i" aria-hidden="true">i</span></button>
+    <button class="ghost small-btn" id="importBtn" type="button" title="Import a backup">Import</button>
+    <button class="ghost small-btn" id="backupBtn" type="button" title="Download a backup">Backup</button>
+    <button class="ghost small-btn danger" id="resetBtn" type="button" title="Clear all saved data">Clear</button>
+  </div>
+</header>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+
 <div class="app-shell">
 
   <!-- ============================================================
-       SIDEBAR
+       SIDEBAR (right-side drawer)
        ============================================================ -->
-  <aside id="sidebarEl">
+  <aside id="sidebarEl" class="sidebar-closed">
     <div class="sidebar-inner">
-      <div class="brand">
+      <div class="drawer-header">
         <div>
-          <span class="brand-kicker">Savings planner</span>
-          <h1>PacePot</h1>
-          <p class="subtle">Put money aside without making it a whole thing.</p>
+          <span class="drawer-kicker">Monthly budget</span>
+          <span class="drawer-count" id="sidebarToggleCount"></span>
         </div>
+        <button class="drawer-close-btn" id="sidebarToggle" type="button" aria-expanded="false" aria-controls="sidebarBody" aria-label="Close budget drawer">
+          <span id="sidebarToggleLabel" hidden>Hide</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </button>
       </div>
-
-      <button class="sidebar-toggle-btn" id="sidebarToggle" type="button" aria-expanded="true" aria-controls="sidebarBody">
-        <span class="toggle-icon">
-          <span>Monthly budget</span>
-          <span class="sidebar-toggle-count" id="sidebarToggleCount"></span>
-        </span>
-        <span class="toggle-icon">
-          <span id="sidebarToggleLabel">Hide</span>
-          <span class="toggle-chevron"></span>
-        </span>
-      </button>
 
       <div class="sidebar-body" id="sidebarBody">
         <form id="budgetForm">
@@ -1079,13 +1235,6 @@
         <p class="motto">Small pots. Steady pace. Less wondering where it all went.</p>
         <p class="seo-intro">PacePot is a free savings goal calculator for planning how to save for a holiday, car, house deposit, emergency fund, or any short-term target.</p>
         <p class="privacy-note">No sign-up. Your data stays in this browser.</p>
-      </div>
-      <div class="actions">
-        <a class="support-link" href="https://buymeacoffee.com/pacepot" target="_blank" rel="noopener noreferrer" title="Support PacePot">Support PacePot</a>
-        <button class="ghost" id="helpBtn" type="button" title="Open help"><span class="mini-i" aria-hidden="true">i</span> Help</button>
-        <button class="ghost" id="importBtn" type="button" title="Import a backup">Import</button>
-        <button class="ghost" id="backupBtn" type="button" title="Download a backup">Backup</button>
-        <button class="ghost danger" id="resetBtn" type="button" title="Clear all saved data">Clear</button>
       </div>
     </div>
     <input id="importFile" type="file" accept="application/json,.json" hidden>
@@ -3657,6 +3806,30 @@
         el.innerHTML = '<div class="ob-result-num">' + sym + monthly.toLocaleString('en-GB') + ' / month</div><div class="ob-result-sub">to reach ' + sym + amount.toLocaleString('en-GB') + ' by ' + ds + '</div>';
       }
     }
+  </script>
+  <script>
+    (function () {
+      var drawer = document.getElementById('sidebarEl');
+      var openBtn = document.getElementById('budgetDrawerOpen');
+      var backdrop = document.getElementById('drawerBackdrop');
+      function openDrawer() {
+        if (!drawer) return;
+        drawer.classList.remove('sidebar-closed');
+        var t = document.getElementById('sidebarToggle');
+        if (t) t.setAttribute('aria-expanded', 'true');
+      }
+      function closeDrawer() {
+        if (!drawer) return;
+        drawer.classList.add('sidebar-closed');
+        var t = document.getElementById('sidebarToggle');
+        if (t) t.setAttribute('aria-expanded', 'false');
+      }
+      if (openBtn) openBtn.addEventListener('click', openDrawer);
+      if (backdrop) backdrop.addEventListener('click', closeDrawer);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && drawer && !drawer.classList.contains('sidebar-closed')) closeDrawer();
+      });
+    })();
   </script>
 </body>
 </html>
