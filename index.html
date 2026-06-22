@@ -795,9 +795,142 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; }
     }
+
+    /* ============================================================
+       ONBOARDING OVERLAY
+       ============================================================ */
+    #onboarding { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--bg); overflow-y: auto; }
+    .ob-panel { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); width: 100%; max-width: 520px; padding: clamp(28px,6vw,52px); }
+    .ob-step { display: none; flex-direction: column; gap: 20px; }
+    .ob-step.ob-active { display: flex; animation: ob-in .22s var(--ease) both; }
+    @keyframes ob-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .ob-progress { display: flex; gap: 5px; align-items: center; }
+    .ob-dot { height: 5px; width: 5px; border-radius: var(--radius-full); background: var(--border-strong); transition: all var(--motion) var(--ease); flex-shrink: 0; }
+    .ob-dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
+    .ob-mark { width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; background: radial-gradient(circle at 50% 33%, rgba(255,255,255,.9) 0 18%, transparent 19%), linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 18px rgba(5,150,105,.3); }
+    .ob-headline { font-size: clamp(1.4rem,3.5vw,1.85rem); font-weight: 900; letter-spacing: -.03em; line-height: 1.1; color: var(--ink); text-transform: none; }
+    .ob-sub { color: var(--muted); font-size: .93rem; line-height: 1.6; margin-top: -8px; }
+    .ob-trust { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+    .ob-trust span { font-size: .78rem; font-weight: 600; color: var(--muted); padding: 4px 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-full); }
+    .ob-btn { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: var(--radius-sm); font-size: .95rem; font-weight: 800; cursor: pointer; transition: all var(--motion-fast) var(--ease); border: 0; width: 100%; font-family: inherit; }
+    .ob-btn-primary { background: var(--ink); color: #fff; box-shadow: 0 4px 14px rgba(15,23,42,.18); }
+    .ob-btn-primary:hover { background: #1e293b; transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+    .ob-btn-skip { background: transparent; color: var(--muted); font-size: .84rem; font-weight: 600; border: 0; cursor: pointer; width: 100%; text-align: center; padding: 6px; font-family: inherit; transition: color var(--motion-fast); }
+    .ob-btn-skip:hover { color: var(--ink); }
+    .ob-btn-back { background: transparent; color: var(--muted); font-size: .84rem; font-weight: 700; border: 0; cursor: pointer; padding: 4px 0; text-align: left; font-family: inherit; transition: color var(--motion-fast); }
+    .ob-btn-back:hover { color: var(--ink); }
+    .ob-categories { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+    .ob-cat { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); background: var(--surface-2); cursor: pointer; font-size: .78rem; font-weight: 700; color: var(--ink); transition: all var(--motion-fast) var(--ease); font-family: inherit; text-align: center; line-height: 1.3; }
+    .ob-cat:hover, .ob-cat:focus-visible { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); transform: translateY(-2px); box-shadow: var(--shadow-sm); outline: none; }
+    .ob-cat-icon { font-size: 1.55rem; line-height: 1; display: block; }
+    .ob-fields { display: flex; flex-direction: column; gap: 14px; }
+    .ob-label { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .ob-label input { width: 100%; height: 46px; padding: 0 14px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); font-size: .98rem; color: var(--ink); background: var(--surface-2); font-family: inherit; transition: border-color var(--motion-fast); }
+    .ob-label input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(5,150,105,.1); }
+    .ob-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ob-iw { position: relative; }
+    .ob-iw > span { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--silver); font-size: .95rem; font-weight: 700; pointer-events: none; }
+    .ob-iw input { padding-left: 28px !important; }
+    .ob-result-box { padding: 15px 17px; border-radius: var(--radius-sm); background: var(--accent-soft); border: 1px solid rgba(5,150,105,.2); min-height: 58px; display: flex; flex-direction: column; justify-content: center; }
+    .ob-result-num { font-size: 1.7rem; font-weight: 900; color: var(--accent-strong); line-height: 1.1; }
+    .ob-result-sub { font-size: .85rem; color: var(--muted); margin-top: 3px; }
+    .ob-placeholder { color: var(--silver); font-size: .88rem; }
+    @media (max-width: 480px) { .ob-categories { grid-template-columns: repeat(2, 1fr); } .ob-row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
+<!-- ============================================================
+     ONBOARDING
+     ============================================================ -->
+<div id="onboarding" role="dialog" aria-modal="true" aria-label="Welcome to PacePot">
+  <div class="ob-panel">
+
+    <!-- Step 1: Welcome -->
+    <div class="ob-step ob-active" id="ob-s1">
+      <div class="ob-progress" aria-hidden="true">
+        <div class="ob-dot active"></div>
+        <div class="ob-dot"></div>
+        <div class="ob-dot"></div>
+      </div>
+      <div class="ob-mark" aria-hidden="true"></div>
+      <div>
+        <h2 class="ob-headline">What will you save for first?</h2>
+        <p class="ob-sub">PacePot turns any savings goal into a monthly figure. No login, no bank connection. Your data stays in your browser.</p>
+      </div>
+      <div class="ob-trust" aria-label="Key features">
+        <span>Free forever</span>
+        <span>No sign-up needed</span>
+        <span>Stays on your device</span>
+      </div>
+      <button class="ob-btn ob-btn-primary" id="ob-next-1" type="button">Get started &rarr;</button>
+      <button class="ob-btn-skip" id="ob-skip" type="button">Already set up? Go straight to the app</button>
+    </div>
+
+    <!-- Step 2: Category -->
+    <div class="ob-step" id="ob-s2">
+      <div class="ob-progress" aria-hidden="true">
+        <div class="ob-dot"></div>
+        <div class="ob-dot active"></div>
+        <div class="ob-dot"></div>
+      </div>
+      <div>
+        <h2 class="ob-headline">What are you saving for?</h2>
+        <p class="ob-sub">Pick your first goal. You can add more once you're in.</p>
+      </div>
+      <div class="ob-categories" id="ob-cats">
+        <button class="ob-cat" type="button" data-name="Holiday fund"><span class="ob-cat-icon">&#x2708;&#xFE0F;</span>Holiday</button>
+        <button class="ob-cat" type="button" data-name="Car fund"><span class="ob-cat-icon">&#x1F697;</span>Car</button>
+        <button class="ob-cat" type="button" data-name="Emergency fund"><span class="ob-cat-icon">&#x1F6E1;&#xFE0F;</span>Emergency</button>
+        <button class="ob-cat" type="button" data-name="House deposit"><span class="ob-cat-icon">&#x1F3E0;</span>House deposit</button>
+        <button class="ob-cat" type="button" data-name="Wedding fund"><span class="ob-cat-icon">&#x1F48D;</span>Wedding</button>
+        <button class="ob-cat" type="button" data-name="Debt payoff"><span class="ob-cat-icon">&#x1F4B3;</span>Debt payoff</button>
+        <button class="ob-cat" type="button" data-name="Retirement pot"><span class="ob-cat-icon">&#x1F31E;</span>Retirement</button>
+        <button class="ob-cat" type="button" data-name="Baby fund"><span class="ob-cat-icon">&#x1F476;</span>Baby fund</button>
+      </div>
+      <button class="ob-btn-back" id="ob-back-1" type="button">&larr; Back</button>
+    </div>
+
+    <!-- Step 3: Setup -->
+    <div class="ob-step" id="ob-s3">
+      <div class="ob-progress" aria-hidden="true">
+        <div class="ob-dot"></div>
+        <div class="ob-dot"></div>
+        <div class="ob-dot active"></div>
+      </div>
+      <div>
+        <h2 class="ob-headline">Set your target</h2>
+        <p class="ob-sub">Two numbers and a date. That's it.</p>
+      </div>
+      <div class="ob-fields">
+        <label class="ob-label">
+          Goal name
+          <input id="ob-name" type="text" maxlength="60" placeholder="e.g. Holiday fund" autocomplete="off">
+        </label>
+        <div class="ob-row">
+          <label class="ob-label">
+            Target amount
+            <div class="ob-iw"><span aria-hidden="true">&pound;</span><input id="ob-amount" type="number" min="1" step="1" placeholder="3000" inputmode="decimal"></div>
+          </label>
+          <label class="ob-label">
+            Already saved
+            <div class="ob-iw"><span aria-hidden="true">&pound;</span><input id="ob-saved-amt" type="number" min="0" step="1" placeholder="0" inputmode="decimal"></div>
+          </label>
+        </div>
+        <label class="ob-label">
+          Target date
+          <input id="ob-date" type="date">
+        </label>
+        <div class="ob-result-box" id="ob-result" aria-live="polite">
+          <span class="ob-placeholder">Enter an amount and date to see your monthly pace.</span>
+        </div>
+      </div>
+      <button class="ob-btn ob-btn-primary" id="ob-finish" type="button">Start tracking &rarr;</button>
+      <button class="ob-btn-back" id="ob-back-2" type="button">&larr; Back</button>
+    </div>
+
+  </div>
+</div>
+
 <div class="app-shell">
 
   <!-- ============================================================
@@ -1508,6 +1641,9 @@
     today.setHours(0, 0, 0, 0);
 
     const state = loadState();
+    if (state.targets.length || state.salary || state.savingsPot || state.accountBalance) {
+      var _ob = document.getElementById('onboarding'); if (_ob) _ob.hidden = true;
+    }
 
     const els = {
       salary: document.querySelector("#salary"),
@@ -3407,7 +3543,84 @@
       toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2200);
     }
 
+    initOnboarding();
     render();
+
+    function initOnboarding() {
+      var ob = document.getElementById('onboarding');
+      if (!ob || ob.hidden) return;
+      var isNew = !state.targets.length && !state.salary && !state.savingsPot && !state.accountBalance;
+      if (!isNew) { ob.hidden = true; return; }
+
+      var shell = document.querySelector('.app-shell');
+      shell.setAttribute('aria-hidden', 'true');
+      shell.style.visibility = 'hidden';
+
+      function goTo(n) {
+        document.querySelectorAll('.ob-step').forEach(function(s) { s.classList.remove('ob-active'); });
+        document.getElementById('ob-s' + n).classList.add('ob-active');
+      }
+
+      function dismiss() {
+        ob.hidden = true;
+        shell.removeAttribute('aria-hidden');
+        shell.style.visibility = '';
+      }
+
+      document.getElementById('ob-next-1').addEventListener('click', function() { goTo(2); });
+      document.getElementById('ob-skip').addEventListener('click', dismiss);
+
+      document.getElementById('ob-cats').addEventListener('click', function(e) {
+        var cat = e.target.closest('.ob-cat');
+        if (!cat) return;
+        document.getElementById('ob-name').value = cat.dataset.name;
+        document.getElementById('ob-date').min = isoDate(today);
+        obUpdate();
+        goTo(3);
+      });
+
+      document.getElementById('ob-back-1').addEventListener('click', function() { goTo(1); });
+      document.getElementById('ob-back-2').addEventListener('click', function() { goTo(2); });
+
+      document.getElementById('ob-amount').addEventListener('input', obUpdate);
+      document.getElementById('ob-saved-amt').addEventListener('input', obUpdate);
+      document.getElementById('ob-date').addEventListener('input', obUpdate);
+
+      document.getElementById('ob-finish').addEventListener('click', function() {
+        var name = document.getElementById('ob-name').value.trim();
+        var amount = parseFloat(document.getElementById('ob-amount').value) || 0;
+        var savedAmt = parseFloat(document.getElementById('ob-saved-amt').value) || 0;
+        var dueDate = document.getElementById('ob-date').value;
+        if (!name || amount <= 0 || !dueDate) { showToast('Add a name, amount and target date.'); return; }
+        state.targets.unshift({
+          id: makeId(), name: name, amount: amount, cadence: 'month', priority: 'high',
+          recurringAmount: 0, recurringCadence: '', collapsed: false, createdAt: isoDate(today),
+          dueDate: dueDate,
+          deposits: savedAmt > 0 ? [{ id: makeId(), amount: Math.min(savedAmt, amount), date: isoDate(today), note: 'Starting amount' }] : []
+        });
+        trackAppEvent('goal_created');
+        saveAndRender();
+        dismiss();
+        showToast('Goal added. Welcome to PacePot.');
+      });
+
+      function obUpdate() {
+        var amount = parseFloat(document.getElementById('ob-amount').value) || 0;
+        var saved = parseFloat(document.getElementById('ob-saved-amt').value) || 0;
+        var date = document.getElementById('ob-date').value;
+        var el = document.getElementById('ob-result');
+        if (!amount || !date) { el.innerHTML = '<span class="ob-placeholder">Enter an amount and date to see your monthly pace.</span>'; return; }
+        var ms = new Date(date + 'T00:00:00') - today;
+        if (ms <= 0) { el.innerHTML = '<span class="ob-placeholder">Choose a future date.</span>'; return; }
+        var remaining = Math.max(0, amount - saved);
+        if (remaining === 0) { el.innerHTML = '<div class="ob-result-num">Already there!</div><div class="ob-result-sub">Your savings already cover the target.</div>'; return; }
+        var months = Math.max(1, ms / (30.44 * 24 * 3600 * 1000));
+        var monthly = Math.ceil(remaining / months);
+        var sym = { USD: '$', EUR: '€', CAD: 'CA$', AUD: 'A$' }[state.currency] || '£';
+        var ds = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+        el.innerHTML = '<div class="ob-result-num">' + sym + monthly.toLocaleString('en-GB') + ' / month</div><div class="ob-result-sub">to reach ' + sym + amount.toLocaleString('en-GB') + ' by ' + ds + '</div>';
+      }
+    }
   </script>
 </body>
 </html>
