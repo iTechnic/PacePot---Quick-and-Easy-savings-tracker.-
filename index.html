@@ -4521,19 +4521,27 @@
       });
 
       var ob = document.getElementById('onboarding');
+
+      function tryTour() {
+        if (localStorage.getItem(SEEN)) return;
+        if (ob && !ob.hidden) return; // onboarding still visible — MutationObserver will re-try
+        startTour();
+      }
+
       if (ob) {
         var obObs = new MutationObserver(function (ms) {
           ms.forEach(function (m) {
             if (m.attributeName === 'hidden' && ob.hidden) {
               obObs.disconnect();
-              if (!localStorage.getItem(SEEN)) setTimeout(startTour, 750);
+              setTimeout(tryTour, 750);
             }
           });
         });
         obObs.observe(ob, { attributes: true });
-        // Returning users: ob.hidden is already true before observer attached — trigger directly
-        if (ob.hidden && !localStorage.getItem(SEEN)) setTimeout(startTour, 1500);
       }
+
+      // Fires for everyone: new users who already dismissed onboarding, returning users who never saw the tour
+      setTimeout(tryTour, 2000);
 
       window.addEventListener('resize', function () {
         if (!active) return;
