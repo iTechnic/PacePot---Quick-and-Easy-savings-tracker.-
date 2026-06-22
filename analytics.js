@@ -1,0 +1,32 @@
+(function () {
+  const measurementId = String(window.PACEPOT_GA_MEASUREMENT_ID || "").trim();
+  const enabled = /^G-[A-Z0-9]+$/i.test(measurementId) && measurementId !== "G-XXXXXXXXXX";
+
+  window.trackPacePotEvent = function (eventName) {
+    if (!enabled || typeof window.gtag !== "function") return;
+    window.gtag("event", eventName);
+  };
+
+  if (!enabled) return;
+
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
+  document.head.appendChild(script);
+
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () {
+    window.dataLayer.push(arguments);
+  };
+  window.gtag("js", new Date());
+  window.gtag("config", measurementId, {
+    page_title: document.title,
+    page_path: window.location.pathname
+  });
+
+  if (document.body?.dataset?.seoPage === "true") {
+    window.gtag("event", "seo_page_viewed", {
+      page_path: window.location.pathname
+    });
+  }
+})();
