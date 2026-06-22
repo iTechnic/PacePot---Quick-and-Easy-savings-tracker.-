@@ -428,6 +428,7 @@
       color: var(--button-ink);
       cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      font-family: inherit; line-height: 1;
       transition: transform var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), opacity var(--motion-fast) var(--ease);
       white-space: nowrap; font-weight: 700; font-size: .87rem; letter-spacing: -.01em;
       box-shadow: 0 2px 8px rgba(5,150,105,.2), 0 1px 3px rgba(5,150,105,.12);
@@ -795,7 +796,7 @@
     .help-section p { margin: 0 0 9px; color: var(--muted); line-height: 1.6; font-size: .88rem; }
     .help-section ol, .help-section ul { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.6; font-size: .88rem; }
     .help-section li + li { margin-top: 6px; }
-    .mini-i { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; border: 1px solid currentColor; font-size: .7rem; font-weight: 900; line-height: 1; flex-shrink: 0; }
+    .mini-i { width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid currentColor; font-size: .7rem; font-weight: 900; line-height: 1; font-style: normal; flex-shrink: 0; }
 
     /* ============================================================
        CELEBRATION MODAL
