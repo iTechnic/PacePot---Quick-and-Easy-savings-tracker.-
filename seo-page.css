@@ -421,12 +421,33 @@ h3 {
 
 /* ---- Footer ---- */
 .footer {
-  padding: 28px 0 0;
+  padding: 28px 0 40px;
   color: var(--faint);
   font-size: .85rem;
   text-align: center;
   border-top: 1px solid var(--border);
   margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 6px 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.footer-nav a {
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--motion-fast) var(--ease);
+}
+
+.footer-nav a:hover {
+  color: var(--ink);
+  text-decoration: none;
 }
 
 /* ---- Responsive ---- */

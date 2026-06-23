@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -7,7 +7,6 @@
   <meta name="description" content="Track your savings goals, monitor progress, and stay on pace with PacePot. Free savings planner for holidays, cars, house deposits, emergency funds, and more. No login needed and your data stays in your browser.">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0f172a">
-  <meta name="google-site-verification" content="PASTE_VERIFICATION_CODE_HERE">
   <link rel="canonical" href="https://pacepot.com/">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -83,7 +82,7 @@
   </script>
   <style>
     /* ============================================================
-       DESIGN SYSTEM — v3.0 Liquid Glass Dark
+       DESIGN SYSTEM â€” v3.0 Liquid Glass Dark
        ============================================================ */
     :root {
       color-scheme: dark;
@@ -139,7 +138,7 @@
 
       /* Buttons */
       --button-bg:   var(--accent);
-      --button-ink:  #052e1e;
+      --button-ink:  #fff;
 
       /* Chrome / shimmer */
       --chrome: linear-gradient(135deg,rgba(255,255,255,.12),rgba(148,163,184,.06) 44%,rgba(255,255,255,.1) 100%);
@@ -249,27 +248,6 @@
 
     .sidebar-inner { padding: 0 0 38px; }
 
-    /* ============================================================
-       BRAND
-       ============================================================ */
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 28px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border);
-    }
-    .brand::before {
-      content: "";
-      width: 46px; height: 46px;
-      flex: 0 0 auto;
-      border-radius: 13px;
-      background:
-        radial-gradient(circle at 50% 33%, rgba(255,255,255,.92) 0 18%, transparent 19%),
-        linear-gradient(135deg, #34d399, #059669 60%, #047857);
-      box-shadow: 0 8px 26px rgba(16,185,129,.42), inset 0 1px 0 rgba(255,255,255,.25);
-    }
     h1 { font-size: 1.3rem; font-weight: 900; letter-spacing: -.025em; line-height: 1.2; margin: 0; }
     .brand-kicker { display: block; font-size: .64rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; opacity: .9; }
     .subtle { color: var(--muted); font-size: .84rem; line-height: 1.5; margin: 3px 0 0; }
@@ -1050,7 +1028,7 @@
     .ob-progress { display: flex; gap: 5px; align-items: center; }
     .ob-dot { height: 5px; width: 5px; border-radius: var(--radius-full); background: var(--border-strong); transition: all var(--motion) var(--ease); flex-shrink: 0; }
     .ob-dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
-    .ob-mark { width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; background: radial-gradient(circle at 50% 33%, rgba(255,255,255,.9) 0 18%, transparent 19%), linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 18px rgba(5,150,105,.3); }
+    .ob-mark { width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; overflow: hidden; }
     .ob-headline { font-size: clamp(1.4rem,3.5vw,1.85rem); font-weight: 900; letter-spacing: -.03em; line-height: 1.1; color: var(--ink); text-transform: none; }
     .ob-sub { color: var(--muted); font-size: .93rem; line-height: 1.6; margin-top: 8px; }
     .ob-trust { display: flex; flex-wrap: wrap; gap: 8px 10px; }
@@ -1498,7 +1476,7 @@
         <div class="ob-dot"></div>
         <div class="ob-dot"></div>
       </div>
-      <div class="ob-mark" aria-hidden="true"></div>
+      <img class="ob-mark" src="/logo-icon.png" alt="" width="40" height="40" aria-hidden="true">
       <div>
         <h2 class="ob-headline">What will you save for first?</h2>
         <p class="ob-sub">PacePot turns any savings goal into a monthly figure. No login, no bank connection. Your data stays in your browser.</p>
@@ -1535,7 +1513,7 @@
         <button class="ob-cat" type="button" data-name="Other goal"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>Other</button>
       </div>
       <button class="ob-btn-back" id="ob-back-1" type="button">&larr; Back</button>
-      <button class="ob-btn-skip" id="ob-skip-2" type="button">Skip for now — I'll set a goal later</button>
+      <button class="ob-btn-skip" id="ob-skip-2" type="button">Skip for now â€” I'll set a goal later</button>
     </div>
 
     <!-- Step 3: Setup -->
@@ -2301,7 +2279,7 @@
       var isReturning = !!(state.targets.length || state.salary || state.savingsPot || state.accountBalance);
       if (isReturning) { lp.hidden = true; return; }
 
-      // New user — landing sits above everything; onboarding initialises normally underneath
+      // New user â€” landing sits above everything; onboarding initialises normally underneath
       function enterApp() { lp.hidden = true; }
 
       function openAppDirect() {
@@ -3319,7 +3297,7 @@
       els.budgetListPanel.classList.toggle("collapsed", Boolean(state.budgetListCollapsed));
       els.budgetListToggle.setAttribute("aria-expanded", String(!state.budgetListCollapsed));
       els.budgetListCount.textContent = itemCount
-        ? `${itemCount} item${itemCount === 1 ? "" : "s"} · +${money(budget.extraIncome)} / -${money(budget.outgoings)}`
+        ? `${itemCount} item${itemCount === 1 ? "" : "s"} Â· +${money(budget.extraIncome)} / -${money(budget.outgoings)}`
         : "0 items";
       els.budgetList.innerHTML = state.budgetItems.length ? state.budgetItems.map((item) => `
         <div class="budget-item ${item.type}">
@@ -4293,9 +4271,9 @@
         if (remaining === 0) { el.innerHTML = '<div class="ob-result-num">Already there!</div><div class="ob-result-sub">Your savings already cover the target.</div>'; return; }
         var months = Math.max(1, ms / (30.44 * 24 * 3600 * 1000));
         var monthly = Math.ceil(remaining / months);
-        var sym = { USD: '$', EUR: '€', CAD: 'CA$', AUD: 'A$' }[state.currency] || '£';
+        var sym = { USD: '$', EUR: 'â‚¬', CAD: 'CA$', AUD: 'A$' }[state.currency] || 'Â£';
         var ds = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-        el.innerHTML = '<div class="ob-result-num">' + sym + monthly.toLocaleString('en-GB') + ' / month</div><div class="ob-result-sub">to reach ' + sym + amount.toLocaleString('en-GB') + ' by ' + ds + '</div>';
+        el.innerHTML = '<div class="ob-result-num">' + sym + monthly.toLocaleString('en-GB') + 'Â / month</div><div class="ob-result-sub">to reach ' + sym + amount.toLocaleString('en-GB') + ' by ' + ds + '</div>';
       }
     }
   </script>
@@ -4490,7 +4468,7 @@
             if (D.kk) D.kk.textContent = 'Step ' + (n + 1) + ' of ' + STEPS.length;
             if (D.hh) D.hh.textContent = step.title;
             if (D.pp) D.pp.textContent = step.body;
-            if (D.nx) D.nx.textContent = step.last ? 'Done' : 'Next →';
+            if (D.nx) D.nx.textContent = step.last ? 'Done' : 'Next â†’';
             if (D.tp) D.tp.classList.add('on');
             setTimeout(function () { posTip(r, step.pos); }, 10);
           }, 450);
@@ -4536,7 +4514,7 @@
 
       function tryTour() {
         if (localStorage.getItem(SEEN)) return;
-        if (ob && !ob.hidden) return; // onboarding still visible — MutationObserver will re-try
+        if (ob && !ob.hidden) return; // onboarding still visible â€” MutationObserver will re-try
         startTour();
       }
 
