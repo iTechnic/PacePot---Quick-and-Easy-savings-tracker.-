@@ -82,7 +82,7 @@
   </script>
   <style>
     /* ============================================================
-       DESIGN SYSTEM â€” v3.0 Liquid Glass Dark
+       DESIGN SYSTEM - v3.0 Liquid Glass Dark
        ============================================================ */
     :root {
       color-scheme: dark;
@@ -1513,7 +1513,7 @@
         <button class="ob-cat" type="button" data-name="Other goal"><span class="ob-cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>Other</button>
       </div>
       <button class="ob-btn-back" id="ob-back-1" type="button">&larr; Back</button>
-      <button class="ob-btn-skip" id="ob-skip-2" type="button">Skip for now â€” I'll set a goal later</button>
+      <button class=”ob-btn-skip” id=”ob-skip-2” type=”button”>Skip for now. I'll set a goal later</button>
     </div>
 
     <!-- Step 3: Setup -->
@@ -2279,7 +2279,7 @@
       var isReturning = !!(state.targets.length || state.salary || state.savingsPot || state.accountBalance);
       if (isReturning) { lp.hidden = true; return; }
 
-      // New user â€” landing sits above everything; onboarding initialises normally underneath
+      // New user - landing sits above everything; onboarding initialises normally underneath
       function enterApp() { lp.hidden = true; }
 
       function openAppDirect() {
@@ -4519,7 +4519,7 @@
 
       function tryTour() {
         if (localStorage.getItem(SEEN)) return;
-        if (ob && !ob.hidden) return; // onboarding still visible â€” MutationObserver will re-try
+        if (ob && !ob.hidden) return; // onboarding still visible - MutationObserver will re-try
         startTour();
       }
 
