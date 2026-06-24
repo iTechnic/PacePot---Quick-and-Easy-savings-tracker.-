@@ -1830,9 +1830,9 @@
           <h4>Your targets</h4>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <div class="target-filter" role="group" aria-label="Filter targets">
-              <button class="filter-btn active" id="filterAll" type="button">All</button>
-              <button class="filter-btn" id="filterActive" type="button">Active</button>
-              <button class="filter-btn" id="filterDone" type="button">Done</button>
+              <button class="filter-btn active" id="filterAll" type="button" aria-pressed="true">All</button>
+              <button class="filter-btn" id="filterActive" type="button" aria-pressed="false">Active</button>
+              <button class="filter-btn" id="filterDone" type="button" aria-pressed="false">Done</button>
             </div>
             <div class="target-bulk-actions" id="targetBulkActions" hidden>
               <button class="ghost small-btn" id="expandTargetsBtn" type="button">Expand all</button>
@@ -3027,6 +3027,7 @@
       link.download = `saving-targets-backup-${isoDate(today)}.json`;
       link.click();
       URL.revokeObjectURL(url);
+      trackAppEvent("backup_created");
       showToast("Backup downloaded.");
     }
 
@@ -3056,6 +3057,7 @@
               els.savingsPot.value = state.savingsPot || "";
               els.currency.value = state.currency;
               closeHistory();
+              trackAppEvent("import_completed");
               saveAndRender("Backup imported.");
             }
           );
@@ -3086,6 +3088,9 @@
       els.filterAll.classList.toggle("active", filter === "all");
       els.filterActive.classList.toggle("active", filter === "active");
       els.filterDone.classList.toggle("active", filter === "done");
+      els.filterAll.setAttribute("aria-pressed", String(filter === "all"));
+      els.filterActive.setAttribute("aria-pressed", String(filter === "active"));
+      els.filterDone.setAttribute("aria-pressed", String(filter === "done"));
       render();
     }
 
