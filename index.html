@@ -3302,7 +3302,7 @@
       els.budgetListPanel.classList.toggle("collapsed", Boolean(state.budgetListCollapsed));
       els.budgetListToggle.setAttribute("aria-expanded", String(!state.budgetListCollapsed));
       els.budgetListCount.textContent = itemCount
-        ? `${itemCount} item${itemCount === 1 ? "" : "s"} Â· +${money(budget.extraIncome)} / -${money(budget.outgoings)}`
+        ? `${itemCount} item${itemCount === 1 ? "" : "s"} · +${money(budget.extraIncome)} / -${money(budget.outgoings)}`
         : "0 items";
       els.budgetList.innerHTML = state.budgetItems.length ? state.budgetItems.map((item) => `
         <div class="budget-item ${item.type}">
@@ -4276,9 +4276,9 @@
         if (remaining === 0) { el.innerHTML = '<div class="ob-result-num">Already there!</div><div class="ob-result-sub">Your savings already cover the target.</div>'; return; }
         var months = Math.max(1, ms / (30.44 * 24 * 3600 * 1000));
         var monthly = Math.ceil(remaining / months);
-        var sym = { USD: '$', EUR: 'â‚¬', CAD: 'CA$', AUD: 'A$' }[state.currency] || 'Â£';
+        var sym = { USD: '$', EUR: '€', CAD: 'CA$', AUD: 'A$' }[state.currency] || '£';
         var ds = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-        el.innerHTML = '<div class="ob-result-num">' + sym + monthly.toLocaleString('en-GB') + 'Â / month</div><div class="ob-result-sub">to reach ' + sym + amount.toLocaleString('en-GB') + ' by ' + ds + '</div>';
+        el.innerHTML = '<div class="ob-result-num">' + sym + monthly.toLocaleString('en-GB') + ' / month</div><div class="ob-result-sub">to reach ' + sym + amount.toLocaleString('en-GB') + ' by ' + ds + '</div>';
       }
     }
   </script>
