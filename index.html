@@ -533,7 +533,7 @@
     details.scenario-details > summary.scenario-toggle::-webkit-details-marker { display: none; }
     details.scenario-details > summary.scenario-toggle::marker { display: none; }
     details.scenario-details > summary.scenario-toggle:hover { color: var(--ink); background: var(--surface-3, var(--surface)); border-color: rgba(5,150,105,.22); }
-    details.scenario-details[open] > summary.scenario-toggle { color: var(--ink); border-color: rgba(5,150,105,.22); margin-bottom: 10px; }
+    details.scenario-details[open] > summary.scenario-toggle { color: var(--ink); border-color: rgba(5,150,105,.22); margin-bottom: 0; }
     .scenario-chevron { width: 14px; height: 14px; transition: transform var(--motion-fast) var(--ease); flex-shrink: 0; margin-left: auto; opacity: .6; }
     details.scenario-details[open] .scenario-chevron { transform: rotate(180deg); opacity: 1; }
 
@@ -2287,6 +2287,7 @@
     today.setHours(0, 0, 0, 0);
 
     const state = loadState();
+    const openScenarioIds = new Set();
     (function initLanding() {
       var lp = document.getElementById('landingPage');
       if (!lp) return;
@@ -2579,6 +2580,16 @@
       const preset = event.target.closest("[data-preset]");
       if (preset) {
         addPreset(preset.dataset.preset);
+        return;
+      }
+
+      const scenarioToggle = event.target.closest("summary.scenario-toggle");
+      if (scenarioToggle) {
+        const details = scenarioToggle.closest(".scenario-details");
+        if (details && details.dataset.scenarioId) {
+          if (details.open) { openScenarioIds.delete(details.dataset.scenarioId); }
+          else { openScenarioIds.add(details.dataset.scenarioId); }
+        }
         return;
       }
 
@@ -3755,7 +3766,7 @@
             ${recoveryTemplate(recovery, cadenceLabel)}
             ${recurringGuidance}
             ${milestone ? `<div class="recovery milestone"><strong>${milestone.title}</strong><span>${milestone.body}</span></div>` : ""}
-            <details class="scenario-details">
+            <details class="scenario-details" data-scenario-id="${target.id}"${openScenarioIds.has(target.id) ? " open" : ""}>
               <summary class="scenario-toggle">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 9h6m0 0V3m0 6L3 3M21 15h-6m0 0v6m0-6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 Compare saving amounts
