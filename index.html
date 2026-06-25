@@ -833,15 +833,20 @@
        ============================================================ */
     .celebration-modal { position: fixed; inset: 0; z-index: 30; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(10,18,32,.6); backdrop-filter: blur(8px); }
     .celebration-modal.show { display: flex; }
-    .celebration-panel { width: min(480px,100%); position: relative; overflow: hidden; padding: 32px 28px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); animation: modalIn 200ms var(--ease); }
-    .celebration-burst { width: 80px; height: 80px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(from 10deg, var(--accent-strong), #34d399, #d1fae5, var(--accent-strong)); box-shadow: 0 14px 36px rgba(5,150,105,.28); }
-    .celebration-burst span { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); color: var(--accent-strong); font-size: .9rem; font-weight: 900; }
-    .celebration-panel h4 { font-size: clamp(1.5rem,4vw,2.1rem); line-height: 1.1; margin: 0 0 8px; letter-spacing: -.025em; }
-    .celebration-panel p { color: var(--muted); margin: 0 auto 18px; max-width: 340px; line-height: 1.5; font-size: .9rem; }
-    .celebration-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 18px 0; }
-    .celebration-stats div { padding: 13px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); }
-    .celebration-stats span { display: block; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
-    .celebration-stats strong { display: block; font-size: 1.02rem; font-weight: 800; overflow-wrap: anywhere; }
+    .celebration-panel { width: min(480px,100%); position: relative; overflow: hidden; padding: 36px 28px 32px; text-align: center; background: var(--surface); border: 1px solid rgba(16,185,129,.2); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl), 0 0 60px rgba(16,185,129,.08); animation: modalIn 200ms var(--ease); }
+    .celebration-ring-wrap { position: relative; width: 100px; height: 100px; margin: 0 auto 20px; }
+    .celebration-ring { width: 100px; height: 100px; }
+    .ring-track { fill: none; stroke: rgba(16,185,129,.12); }
+    .ring-progress { fill: none; stroke: var(--accent-strong); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 44px 44px; stroke-dasharray: 226.2; stroke-dashoffset: 226.2; }
+    .ring-progress.animate { animation: ringFill 650ms cubic-bezier(.4,0,.15,1) forwards; }
+    @keyframes ringFill { to { stroke-dashoffset: 0; } }
+    @media (prefers-reduced-motion: reduce) { .ring-progress { stroke-dashoffset: 0; } .ring-progress.animate { animation: none; } }
+    .ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--accent-strong); font-size: 1rem; font-weight: 900; letter-spacing: -.01em; }
+    .celebration-panel h4 { font-size: clamp(1.4rem,4vw,1.9rem); line-height: 1.1; margin: 0 0 8px; letter-spacing: -.025em; }
+    .celebration-panel p { color: var(--muted); margin: 0 auto 20px; max-width: 340px; line-height: 1.5; font-size: .9rem; }
+    .celebration-stat { padding: 14px 20px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid rgba(16,185,129,.15); margin: 0 0 20px; }
+    .celebration-stat span { display: block; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px; }
+    .celebration-stat strong { display: block; font-size: 1.1rem; font-weight: 800; color: var(--ink); overflow-wrap: anywhere; }
 
     /* ============================================================
        FOOTER
@@ -2268,14 +2273,20 @@
      ============================================================ -->
 <div class="celebration-modal" id="celebrationModal" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle">
   <div class="celebration-panel">
-    <div class="celebration-burst" aria-hidden="true"><span>100%</span></div>
-    <h4 id="celebrationTitle">Goal complete</h4>
-    <p id="celebrationText">You fully funded this target.</p>
-    <div class="celebration-stats">
-      <div><span>Target</span><strong id="celebrationTarget">&pound;0</strong></div>
-      <div><span>Saved</span><strong id="celebrationSaved">&pound;0</strong></div>
+    <div class="celebration-ring-wrap" aria-hidden="true">
+      <svg class="celebration-ring" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="44" cy="44" r="36" stroke-width="5" class="ring-track"/>
+        <circle cx="44" cy="44" r="36" stroke-width="5" class="ring-progress" id="celebrationRing"/>
+      </svg>
+      <span class="ring-pct">100%</span>
     </div>
-    <button type="button" id="celebrationClose">Keep going</button>
+    <h4 id="celebrationTitle">Goal complete</h4>
+    <p id="celebrationText">Every deposit added up.</p>
+    <div class="celebration-stat">
+      <span>Time to complete</span>
+      <strong id="celebrationDuration">--</strong>
+    </div>
+    <button type="button" id="celebrationClose">What's next?</button>
   </div>
 </div>
 
@@ -2401,8 +2412,8 @@
       celebrationModal: document.querySelector("#celebrationModal"),
       celebrationTitle: document.querySelector("#celebrationTitle"),
       celebrationText: document.querySelector("#celebrationText"),
-      celebrationTarget: document.querySelector("#celebrationTarget"),
-      celebrationSaved: document.querySelector("#celebrationSaved"),
+      celebrationRing: document.querySelector("#celebrationRing"),
+      celebrationDuration: document.querySelector("#celebrationDuration"),
       celebrationClose: document.querySelector("#celebrationClose"),
       toast: document.querySelector("#toast"),
       confirmModal: document.querySelector("#confirmModal"),
@@ -3957,15 +3968,40 @@
 
     function openCelebration(target) {
       els.celebrationTitle.textContent = `${target.name} is fully funded`;
-      els.celebrationText.textContent = "You reached 100%. That target is no longer a plan, it is done.";
-      els.celebrationTarget.textContent = money(target.amount);
-      els.celebrationSaved.textContent = money(savedFor(target));
+
+      // Compute how long the goal took from first deposit to now
+      const deposits = target.deposits || [];
+      const dates = deposits.map(d => new Date(d.date)).filter(d => !isNaN(d.getTime()));
+      let durationText = "--";
+      if (dates.length > 0) {
+        const earliest = new Date(Math.min(...dates.map(d => d.getTime())));
+        const now = new Date();
+        const months = (now.getFullYear() - earliest.getFullYear()) * 12 + (now.getMonth() - earliest.getMonth());
+        if (months < 1) {
+          const days = Math.round((now - earliest) / 86400000);
+          durationText = days <= 1 ? "today" : `${days} days`;
+        } else {
+          durationText = months === 1 ? "1 month" : `${months} months`;
+        }
+      }
+      els.celebrationDuration.textContent = durationText;
+
       els.celebrationModal.classList.add("show");
+
+      // Animate progress ring
+      els.celebrationRing.classList.remove("animate");
+      void els.celebrationRing.offsetWidth;
+      els.celebrationRing.classList.add("animate");
+
+      // Fire comets
+      if (window.__launchComets) window.__launchComets(11);
+
       els.celebrationClose.focus();
     }
 
     function closeCelebration() {
       els.celebrationModal.classList.remove("show");
+      els.celebrationRing.classList.remove("animate");
     }
 
     function savedFor(target) {
