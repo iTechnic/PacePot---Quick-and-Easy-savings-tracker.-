@@ -838,7 +838,7 @@
     .celebration-ring { width: 100px; height: 100px; }
     .ring-track { fill: none; stroke: rgba(16,185,129,.12); }
     .ring-progress { fill: none; stroke: var(--accent-strong); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 44px 44px; stroke-dasharray: 226.2; stroke-dashoffset: 226.2; }
-    .ring-progress.animate { animation: ringFill 650ms cubic-bezier(.4,0,.15,1) forwards; }
+    .ring-progress.animate { animation: ringFill 1400ms cubic-bezier(.4,0,.15,1) forwards; }
     @keyframes ringFill { to { stroke-dashoffset: 0; } }
     @media (prefers-reduced-motion: reduce) { .ring-progress { stroke-dashoffset: 0; } .ring-progress.animate { animation: none; } }
     .ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--accent-strong); font-size: 1rem; font-weight: 900; letter-spacing: -.01em; }
@@ -2645,7 +2645,7 @@
         target.deposits.unshift({ id: makeId(), amount, date: isoDate(today), note: "Saved" });
         if (window.__launchComets && !wasComplete && !isComplete(target)) {
           const prog = Math.min(99, Math.round((savedFor(target) / target.amount) * 100));
-          window.__launchComets(Math.max(2, Math.min(6, Math.round(prog / 17))));
+          window.__launchComets(Math.max(4, Math.min(12, Math.round(prog / 8))));
         }
         input.value = "";
         trackAppEvent("contribution_added");
@@ -3994,7 +3994,7 @@
       els.celebrationRing.classList.add("animate");
 
       // Fire comets
-      if (window.__launchComets) window.__launchComets(11);
+      if (window.__launchComets) window.__launchComets(20);
 
       els.celebrationClose.focus();
     }
