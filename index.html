@@ -489,9 +489,8 @@
     .summary::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(180deg, var(--accent), rgba(5,150,105,.15)); opacity: .5; border-radius: var(--radius) 0 0 var(--radius); }
     .summary .label { color: var(--muted); font-size: .67rem; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .09em; }
     .summary .value { font-size: clamp(1.15rem, 1.7vw, 1.5rem); font-weight: 900; line-height: 1.05; overflow-wrap: anywhere; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
-    /* Hero metrics: Safe to spend (3rd) and Monthly pace (8th) */
-    .summary-strip .summary:nth-child(3),
-    .summary-strip .summary:nth-child(8) {
+    /* Hero metrics: Safe to spend and Monthly pace needed */
+    .summary-strip .summary--hero {
       border-color: rgba(16,185,129,.28);
       border-width: 1.5px;
       background: linear-gradient(140deg, rgba(16,185,129,.13) 0%, rgba(16,185,129,.07) 45%, rgba(16,185,129,.03) 100%);
@@ -499,30 +498,44 @@
       min-height: 118px;
       box-shadow: 0 0 0 1px rgba(16,185,129,.12) inset, 0 6px 28px rgba(16,185,129,.08);
     }
-    .summary-strip .summary:nth-child(3)::before,
-    .summary-strip .summary:nth-child(8)::before {
+    .summary-strip .summary--hero::before {
       background: linear-gradient(180deg, #34d399, #10b981);
       opacity: 1;
       width: 4px;
     }
-    .summary-strip .summary:nth-child(3) .label,
-    .summary-strip .summary:nth-child(8) .label {
+    .summary-strip .summary--hero .label {
       color: var(--accent-strong);
       font-size: .66rem;
     }
-    .summary-strip .summary:nth-child(3) .value,
-    .summary-strip .summary:nth-child(8) .value {
+    .summary-strip .summary--hero .value {
       color: var(--accent-strong);
       font-size: clamp(1.75rem, 2.8vw, 2.4rem);
       letter-spacing: -.04em;
       text-shadow: 0 0 28px rgba(52,211,153,.3);
     }
-    .summary-strip .summary:nth-child(3):hover,
-    .summary-strip .summary:nth-child(8):hover {
+    .summary-strip .summary--hero:hover {
       border-color: rgba(16,185,129,.4);
       transform: translateY(-2px);
       box-shadow: 0 8px 32px rgba(16,185,129,.18), 0 0 0 1px rgba(16,185,129,.2) inset;
     }
+    /* Pace health states on Goals on pace card */
+    .summary.pace-good .value { color: var(--accent-strong) !important; }
+    .summary.pace-warn .value { color: var(--amber, #f59e0b) !important; }
+    /* Scenario panel collapsed behind a toggle */
+    details.scenario-details { margin: 10px 0 0; }
+    details.scenario-details > summary.scenario-toggle {
+      list-style: none; display: flex; align-items: center; gap: 8px;
+      padding: 9px 13px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface-2); cursor: pointer; font-size: .82rem; font-weight: 700;
+      color: var(--muted); transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
+      user-select: none;
+    }
+    details.scenario-details > summary.scenario-toggle::-webkit-details-marker { display: none; }
+    details.scenario-details > summary.scenario-toggle::marker { display: none; }
+    details.scenario-details > summary.scenario-toggle:hover { color: var(--ink); background: var(--surface-3, var(--surface)); border-color: rgba(5,150,105,.22); }
+    details.scenario-details[open] > summary.scenario-toggle { color: var(--ink); border-color: rgba(5,150,105,.22); margin-bottom: 10px; }
+    .scenario-chevron { width: 14px; height: 14px; transition: transform var(--motion-fast) var(--ease); flex-shrink: 0; margin-left: auto; opacity: .6; }
+    details.scenario-details[open] .scenario-chevron { transform: rotate(180deg); opacity: 1; }
 
     /* ============================================================
        ALLOCATION PANEL
@@ -1703,13 +1716,14 @@
     <section class="summary-strip" aria-label="Savings summary">
       <div class="summary"><div class="label">Total income</div><div class="value" id="topIncome">&pound;0</div></div>
       <div class="summary"><div class="label">Total outgoing</div><div class="value" id="topOutgoing">&pound;0</div></div>
-      <div class="summary"><div class="label">Safe to spend</div><div class="value" id="safeToSpend">&pound;0</div></div>
-      <div class="summary"><div class="label">Account cushion</div><div class="value" id="accountCushion">&pound;0</div></div>
+      <div class="summary summary--hero"><div class="label">Safe to spend</div><div class="value" id="safeToSpend">&pound;0</div></div>
+      <div class="summary" id="accountCushionCard" hidden><div class="label">Account cushion</div><div class="value" id="accountCushion">&pound;0</div></div>
       <div class="summary"><div class="label">Saved so far</div><div class="value" id="savedTotal">&pound;0</div></div>
       <div class="summary"><div class="label">Still needed</div><div class="value" id="remainingTotal">&pound;0</div></div>
-      <div class="summary"><div class="label">Active targets</div><div class="value" id="targetCount">0</div></div>
-      <div class="summary"><div class="label">Monthly pace needed</div><div class="value" id="paceTotal">&pound;0</div></div>
+      <div class="summary" id="goalsOnPaceCard"><div class="label">Goals on pace</div><div class="value" id="goalsOnPaceValue">&mdash;</div></div>
+      <div class="summary summary--hero"><div class="label">Monthly pace needed</div><div class="value" id="paceTotal">&pound;0</div></div>
       <div class="summary" id="netWorthCard" hidden><div class="label">Tracked net worth</div><div class="value" id="netWorthTotal">&pound;0</div></div>
+      <span id="targetCount" hidden></span>
     </section>
 
     <section class="allocation-panel" aria-label="Suggested allocation">
@@ -2328,10 +2342,14 @@
       topOutgoing: document.querySelector("#topOutgoing"),
       safeToSpend: document.querySelector("#safeToSpend"),
       accountCushion: document.querySelector("#accountCushion"),
+      accountCushionCard: document.querySelector("#accountCushionCard"),
       savedTotal: document.querySelector("#savedTotal"),
       remainingTotal: document.querySelector("#remainingTotal"),
       targetCount: document.querySelector("#targetCount"),
       paceTotal: document.querySelector("#paceTotal"),
+      goalsOnPaceCard: document.querySelector("#goalsOnPaceCard"),
+      goalsOnPaceValue: document.querySelector("#goalsOnPaceValue"),
+      planGuidance: document.querySelector(".plan-guidance"),
       allocationIntro: document.querySelector("#allocationIntro"),
       allocationList: document.querySelector("#allocationList"),
       applyAllocationBtn: document.querySelector("#applyAllocationBtn"),
@@ -3167,11 +3185,24 @@
       els.topOutgoing.textContent = money(budget.outgoings);
       els.safeToSpend.textContent = money(budget.safeToSpend);
       els.accountCushion.textContent = money(budget.accountCushion);
+      els.accountCushionCard.hidden = !Number(state.accountBalance || 0);
       els.savedTotal.textContent = money(savedTotal);
       els.remainingTotal.textContent = money(remainingTotal);
       els.targetCount.textContent = state.targets.length;
       els.paceTotal.textContent = money(paceTotal);
       els.netWorthCard.hidden = state.investments.length === 0;
+
+      // Goals on pace
+      const activeTargets = state.targets.filter(t => !isComplete(t));
+      if (activeTargets.length === 0) {
+        els.goalsOnPaceValue.textContent = "—";
+        els.goalsOnPaceCard.classList.remove("pace-good", "pace-warn");
+      } else {
+        const onPace = activeTargets.filter(t => recoveryPlan(t, t.cadence || "month").status === "on-track").length;
+        els.goalsOnPaceValue.textContent = onPace + "/" + activeTargets.length;
+        els.goalsOnPaceCard.classList.toggle("pace-good", onPace === activeTargets.length);
+        els.goalsOnPaceCard.classList.toggle("pace-warn", onPace < activeTargets.length);
+      }
       els.netWorthTotal.textContent = money(Number(state.accountBalance || 0) + savedTotal + investmentTotal);
 
       if (!state.salary && !state.budgetItems.length) {
@@ -3245,6 +3276,9 @@
         els.nextStepTitle.textContent = "Plan looks balanced";
         els.nextStepText.textContent = "Keep adding saved amounts when you move money aside. Your progress, history and recovery figures will stay updated.";
       }
+
+      const fullySet = hasBudget && hasPot && hasTarget && budget.overspend === 0 && paceTotal <= budget.savingsPot;
+      els.planGuidance.hidden = fullySet;
     }
 
     function budgetTotals() {
@@ -3721,8 +3755,14 @@
             ${recoveryTemplate(recovery, cadenceLabel)}
             ${recurringGuidance}
             ${milestone ? `<div class="recovery milestone"><strong>${milestone.title}</strong><span>${milestone.body}</span></div>` : ""}
-            <div class="progress-line" aria-hidden="true"><i></i></div>
-            ${scenarioPanelTemplate(target, monthly)}
+            <details class="scenario-details">
+              <summary class="scenario-toggle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 9h6m0 0V3m0 6L3 3M21 15h-6m0 0v6m0-6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Compare saving amounts
+                <svg class="scenario-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </summary>
+              ${scenarioPanelTemplate(target, monthly)}
+            </details>
             <div class="deposit-row">
               <label>
                 Add saved amount
