@@ -4486,6 +4486,14 @@
       var active = false;
       var cur  = 0;
 
+      // Defined here so it's available even if the setup below throws.
+      // goTo/endTour are function declarations and are hoisted to the top of this scope.
+      window.__startTour = function () {
+        try { localStorage.removeItem(SEEN); } catch (e) {}
+        active = true;
+        goTo(0);
+      };
+
       var STEPS = [
         { id:  'budgetDrawerOpen',
           title: 'Start with your budget',
@@ -4701,11 +4709,6 @@
         posTip(r, STEPS[cur].pos);
       });
 
-      window.__startTour = function () {
-        try { localStorage.removeItem(SEEN); } catch (e) {}
-        active = true;
-        goTo(0);
-      };
     })();
   </script>
 
