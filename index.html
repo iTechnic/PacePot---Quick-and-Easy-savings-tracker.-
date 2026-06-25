@@ -2632,6 +2632,10 @@
         }
         const wasComplete = isComplete(target);
         target.deposits.unshift({ id: makeId(), amount, date: isoDate(today), note: "Saved" });
+        if (window.__launchComets && !wasComplete && !isComplete(target)) {
+          const prog = Math.min(99, Math.round((savedFor(target) / target.amount) * 100));
+          window.__launchComets(Math.max(2, Math.min(6, Math.round(prog / 17))));
+        }
         input.value = "";
         trackAppEvent("contribution_added");
         saveAndRender("Saving entry added.");
@@ -4606,6 +4610,82 @@
         paintDims(r);
         posTip(r, STEPS[cur].pos);
       });
+    })();
+  </script>
+
+  <script>
+    (function initCometCelebration() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var canvas = document.createElement('canvas');
+      canvas.setAttribute('aria-hidden', 'true');
+      canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;';
+      document.body.appendChild(canvas);
+      var ctx = canvas.getContext('2d');
+      var W = 0, H = 0, comets = [], running = false, animId = null, endTimer = null;
+
+      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+      window.addEventListener('resize', resize);
+      resize();
+
+      window.__launchComets = function (n) {
+        if (endTimer) clearTimeout(endTimer);
+        running = true;
+        for (var i = 0; i < n; i++) {
+          (function (delay) {
+            setTimeout(function () {
+              if (!running) return;
+              comets.push({
+                x: -20 - Math.random() * 60,
+                y: H * 0.08 + Math.random() * H * 0.84,
+                vx: 3.2 + Math.random() * 2.4,
+                vy: (Math.random() - 0.5) * 0.6,
+                tail: 75 + Math.random() * 55,
+                alpha: 0.45 + Math.random() * 0.2,
+                r: 1.1 + Math.random() * 0.8
+              });
+            }, delay);
+          })(i * 190 + Math.random() * 110);
+        }
+        endTimer = setTimeout(function () {
+          running = false;
+          comets = [];
+          if (animId) { cancelAnimationFrame(animId); animId = null; }
+          ctx.clearRect(0, 0, W, H);
+        }, n * 190 + 2600);
+        if (!animId) tick();
+      };
+
+      function tick() {
+        ctx.clearRect(0, 0, W, H);
+        comets = comets.filter(function (c) { return c.x < W + c.tail; });
+        for (var i = 0; i < comets.length; i++) {
+          var c = comets[i];
+          c.x += c.vx;
+          c.y += c.vy;
+          var f = c.x > W * 0.78 ? Math.max(0, 1 - (c.x - W * 0.78) / (W * 0.22)) : 1;
+          var a = c.alpha * f;
+          var g = ctx.createLinearGradient(c.x - c.tail, c.y, c.x, c.y);
+          g.addColorStop(0, 'rgba(16,185,129,0)');
+          g.addColorStop(0.55, 'rgba(52,211,153,' + (a * 0.14) + ')');
+          g.addColorStop(1, 'rgba(52,211,153,' + (a * 0.5) + ')');
+          ctx.beginPath();
+          ctx.moveTo(c.x - c.tail, c.y);
+          ctx.lineTo(c.x, c.y);
+          ctx.strokeStyle = g;
+          ctx.lineWidth = c.r;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+          var glow = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r * 4.5);
+          glow.addColorStop(0, 'rgba(167,243,208,' + a + ')');
+          glow.addColorStop(0.45, 'rgba(52,211,153,' + (a * 0.55) + ')');
+          glow.addColorStop(1, 'rgba(16,185,129,0)');
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, c.r * 4.5, 0, 6.2832);
+          ctx.fillStyle = glow;
+          ctx.fill();
+        }
+        animId = running ? requestAnimationFrame(tick) : null;
+      }
     })();
   </script>
 </body>
