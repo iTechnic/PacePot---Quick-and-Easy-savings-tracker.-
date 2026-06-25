@@ -487,8 +487,9 @@
     .summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow-xs); min-height: 92px; position: relative; overflow: hidden; transition: transform var(--motion) var(--ease), box-shadow var(--motion) var(--ease), border-color var(--motion) var(--ease); }
     .summary:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: rgba(13,27,46,.14); }
     .summary::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(180deg, var(--accent), rgba(5,150,105,.15)); opacity: .5; border-radius: var(--radius) 0 0 var(--radius); }
-    .summary .label { color: var(--muted); font-size: .67rem; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .09em; }
+    .summary .label { color: var(--muted); font-size: .72rem; font-weight: 700; margin-bottom: 10px; letter-spacing: .03em; }
     .summary .value { font-size: clamp(1.15rem, 1.7vw, 1.5rem); font-weight: 900; line-height: 1.05; overflow-wrap: anywhere; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
+    #paceTotalCard { grid-column: span 2; }
     /* Hero metrics: Safe to spend and Monthly pace needed */
     .summary-strip .summary--hero {
       border-color: rgba(16,185,129,.28);
@@ -505,7 +506,8 @@
     }
     .summary-strip .summary--hero .label {
       color: var(--accent-strong);
-      font-size: .66rem;
+      font-size: .72rem;
+      letter-spacing: .03em;
     }
     .summary-strip .summary--hero .value {
       color: var(--accent-strong);
@@ -519,7 +521,11 @@
       box-shadow: 0 8px 32px rgba(16,185,129,.18), 0 0 0 1px rgba(16,185,129,.2) inset;
     }
     /* Pace health states on Goals on pace card */
+    .summary.pace-good { border-color: rgba(16,185,129,.22); }
+    .summary.pace-good .label { color: var(--accent-strong); }
     .summary.pace-good .value { color: var(--accent-strong) !important; }
+    .summary.pace-warn { border-color: rgba(251,191,36,.22); }
+    .summary.pace-warn .label { color: var(--amber, #f59e0b); }
     .summary.pace-warn .value { color: var(--amber, #f59e0b) !important; }
     /* Scenario panel collapsed behind a toggle */
     details.scenario-details { margin: 10px 0 0; }
@@ -1726,7 +1732,7 @@
       <div class="summary"><div class="label">Saved so far</div><div class="value" id="savedTotal">&pound;0</div></div>
       <div class="summary"><div class="label">Still needed</div><div class="value" id="remainingTotal">&pound;0</div></div>
       <div class="summary" id="goalsOnPaceCard"><div class="label">Goals on pace</div><div class="value" id="goalsOnPaceValue">&mdash;</div></div>
-      <div class="summary summary--hero"><div class="label">Monthly pace needed</div><div class="value" id="paceTotal">&pound;0</div></div>
+      <div class="summary summary--hero" id="paceTotalCard"><div class="label">Monthly pace needed</div><div class="value" id="paceTotal">&pound;0</div></div>
       <div class="summary" id="netWorthCard" hidden><div class="label">Tracked net worth</div><div class="value" id="netWorthTotal">&pound;0</div></div>
       <span id="targetCount" hidden></span>
     </section>
