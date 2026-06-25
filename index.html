@@ -2712,7 +2712,13 @@
       if (event.target === els.historyModal) closeHistory();
     });
     els.helpBtn.addEventListener("click", openHelp);
-    els.tourBtn.addEventListener("click", () => { if (window.__startTour) window.__startTour(); });
+    els.tourBtn.addEventListener("click", () => {
+      if (window.__startTour) {
+        window.__startTour();
+      } else {
+        showToast("Tour script not ready — please refresh the page.");
+      }
+    });
     els.helpClose.addEventListener("click", closeHelp);
     els.helpModal.addEventListener("click", (event) => {
       if (event.target === els.helpModal) closeHelp();
