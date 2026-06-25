@@ -1606,8 +1606,8 @@
   <div class="header-actions">
     <button id="budgetDrawerOpen" class="budget-open-btn" type="button">Monthly budget</button>
     <a class="support-link" href="https://buymeacoffee.com/pacepot" target="_blank" rel="noopener noreferrer" title="Support PacePot">Support PacePot</a>
-    <button class="ghost small-btn" id="tourBtn" type="button" title="Take the guided tour">Tour</button>
     <button class="ghost icon-btn" id="helpBtn" type="button" title="Open help"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v1M12 11v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button class="ghost small-btn" id="tourBtn" type="button" title="Take the guided tour">Tour</button>
     <button class="ghost small-btn" id="importBtn" type="button" title="Import a backup">Import</button>
     <button class="ghost small-btn" id="backupBtn" type="button" title="Download a backup">Backup</button>
     <button class="ghost small-btn danger" id="resetBtn" type="button" title="Clear all saved data">Clear</button>
@@ -2395,6 +2395,7 @@
       netWorthCard: document.querySelector("#netWorthCard"),
       netWorthTotal: document.querySelector("#netWorthTotal"),
       helpBtn: document.querySelector("#helpBtn"),
+      tourBtn: document.querySelector("#tourBtn"),
       helpModal: document.querySelector("#helpModal"),
       helpClose: document.querySelector("#helpClose"),
       privacyBtn: document.querySelector("#privacyBtn"),
@@ -2711,6 +2712,7 @@
       if (event.target === els.historyModal) closeHistory();
     });
     els.helpBtn.addEventListener("click", openHelp);
+    els.tourBtn.addEventListener("click", () => { if (window.__startTour) window.__startTour(); });
     els.helpClose.addEventListener("click", closeHelp);
     els.helpModal.addEventListener("click", (event) => {
       if (event.target === els.helpModal) closeHelp();
@@ -4652,13 +4654,6 @@
         goTo(0);
       }
 
-      var tourBtn = document.getElementById('tourBtn');
-      if (tourBtn) tourBtn.addEventListener('click', function () {
-        try { localStorage.removeItem(SEEN); } catch (e) {}
-        active = true;
-        goTo(0);
-      });
-
       if (D.nx) D.nx.addEventListener('click', function () { goTo(cur + 1); });
       if (D.sk) D.sk.addEventListener('click', endTour);
       ['t','r','b','l'].forEach(function (k) {
@@ -4699,6 +4694,12 @@
         paintDims(r);
         posTip(r, STEPS[cur].pos);
       });
+
+      window.__startTour = function () {
+        try { localStorage.removeItem(SEEN); } catch (e) {}
+        active = true;
+        goTo(0);
+      };
     })();
   </script>
 
