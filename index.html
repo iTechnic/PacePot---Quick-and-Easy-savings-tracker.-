@@ -326,7 +326,7 @@
 
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .field-row.three { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
-    .field-row.three.investment-fields { grid-template-columns: 1fr; gap: 8px; }
+
 
     .budget-add { display: grid; gap: 8px; margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--border); }
 
@@ -728,6 +728,11 @@
     .investment-item strong { display: block; overflow-wrap: anywhere; font-weight: 700; font-size: .88rem; }
     .investment-item span { display: block; color: var(--muted); font-size: .76rem; margin-top: 2px; }
     .investment-value { font-weight: 800; white-space: nowrap; font-size: .94rem; }
+    .investment-item.stale { border-color: rgba(251,191,36,.22); }
+    .investment-item.stale .investment-value { color: var(--amber); }
+    .stale-dot { display: inline-block !important; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); margin-right: 5px; vertical-align: middle; flex-shrink: 0; }
+    .invest-coverage { font-size: .78rem; color: var(--accent-strong); font-weight: 700; margin-top: 2px; }
+    .field-hint { font-size: .75rem; font-weight: 400; color: var(--muted); margin-left: 4px; text-transform: none; letter-spacing: 0; }
 
     /* ============================================================
        EMPTY STATE
@@ -1717,7 +1722,7 @@
       <div class="summary"><div class="label">Total income</div><div class="value" id="topIncome">&pound;0</div></div>
       <div class="summary"><div class="label">Total outgoing</div><div class="value" id="topOutgoing">&pound;0</div></div>
       <div class="summary summary--hero"><div class="label">Safe to spend</div><div class="value" id="safeToSpend">&pound;0</div></div>
-      <div class="summary" id="accountCushionCard" hidden><div class="label">Account cushion</div><div class="value" id="accountCushion">&pound;0</div></div>
+      <div class="summary" id="accountCushionCard" hidden><div class="label">Left in account</div><div class="value" id="accountCushion">&pound;0</div></div>
       <div class="summary"><div class="label">Saved so far</div><div class="value" id="savedTotal">&pound;0</div></div>
       <div class="summary"><div class="label">Still needed</div><div class="value" id="remainingTotal">&pound;0</div></div>
       <div class="summary" id="goalsOnPaceCard"><div class="label">Goals on pace</div><div class="value" id="goalsOnPaceValue">&mdash;</div></div>
@@ -1802,23 +1807,12 @@
             <form id="investmentForm">
               <label>
                 Account name
-                <input id="investmentName" type="text" maxlength="50" placeholder="e.g. Stocks &amp; Shares ISA">
+                <input id="investmentName" type="text" maxlength="50" placeholder="e.g. S&amp;S ISA, Pension, Premium Bonds">
               </label>
-              <div class="field-row three investment-fields">
+              <div class="field-row investment-fields">
                 <label>
                   Current value
                   <input id="investmentValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
-                </label>
-                <label>
-                  Type
-                  <select id="investmentKind">
-                    <option value="Stocks &amp; Shares ISA">Stocks &amp; Shares ISA</option>
-                    <option value="Trading account">Trading account</option>
-                    <option value="Pension">Pension</option>
-                    <option value="Crypto wallet">Crypto wallet</option>
-                    <option value="Premium Bonds">Premium Bonds</option>
-                    <option value="Other investment">Other investment</option>
-                  </select>
                 </label>
                 <label>
                   Access
@@ -1829,10 +1823,10 @@
                 </label>
               </div>
               <label>
-                Note
-                <input id="investmentNote" type="text" maxlength="80" placeholder="e.g. Retirement">
+                Note <span class="field-hint">optional</span>
+                <input id="investmentNote" type="text" maxlength="80" placeholder="e.g. Retirement pot">
               </label>
-              <button type="submit">Add investment</button>
+              <button type="submit">Add</button>
             </form>
             <div class="investment-list" id="investmentList"></div>
           </div>
@@ -2370,7 +2364,7 @@
       investmentForm: document.querySelector("#investmentForm"),
       investmentName: document.querySelector("#investmentName"),
       investmentValue: document.querySelector("#investmentValue"),
-      investmentKind: document.querySelector("#investmentKind"),
+
       investmentAccess: document.querySelector("#investmentAccess"),
       investmentNote: document.querySelector("#investmentNote"),
       investmentList: document.querySelector("#investmentList"),
@@ -2962,7 +2956,6 @@
         id: makeId(),
         name,
         value,
-        kind: els.investmentKind.value,
         access: els.investmentAccess.value,
         note: els.investmentNote.value.trim(),
         updatedAt: isoDate(today)
@@ -3188,7 +3181,7 @@
       const investmentTotal = investmentsTotal();
 
       renderBudget(budget);
-      renderInvestments(savedTotal, investmentTotal);
+      renderInvestments(savedTotal, investmentTotal, budget);
       renderAllocation(budget);
       renderNextStep(budget, paceTotal);
       els.availableAmount.textContent = money(available);
@@ -3382,7 +3375,7 @@
       return state.investments.reduce((sum, item) => sum + Number(item.value || 0), 0);
     }
 
-    function renderInvestments(savedTotal, investmentTotal) {
+    function renderInvestments(savedTotal, investmentTotal, budget) {
       if (!state.investments.length) {
         els.investmentList.innerHTML = `<p class="subtle">No investments added. This section stays optional and does not affect monthly safe-to-spend money.</p>`;
         return;
@@ -3392,6 +3385,12 @@
         .filter((item) => item.access === "accessible")
         .reduce((sum, item) => sum + Number(item.value || 0), 0);
 
+      const monthlyOutgoings = budget ? budget.outgoings : 0;
+      const coverageMonths = monthlyOutgoings > 0 ? (accessibleTotal / monthlyOutgoings) : null;
+      const coverageText = coverageMonths !== null
+        ? (coverageMonths >= 0.1 ? `Covers ${coverageMonths.toFixed(1)} months of expenses` : "Less than 0.1 months of expenses covered")
+        : "";
+
       els.investmentList.innerHTML = `
         <div class="mini-stat">
           <span>Investments total</span>
@@ -3400,17 +3399,21 @@
         <div class="mini-stat">
           <span>Accessible in emergency</span>
           <strong>${money(accessibleTotal)}</strong>
+          ${coverageText ? `<div class="invest-coverage">${coverageText}</div>` : ""}
         </div>
         <div class="mini-stat">
           <span>Tracked net worth</span>
           <strong>${money(Number(state.accountBalance || 0) + savedTotal + investmentTotal)}</strong>
         </div>
-        ${state.investments.map((item) => `
-          <div class="investment-item">
+        ${state.investments.map((item) => {
+          const days = Math.floor((today - new Date(item.updatedAt || isoDate(today))) / 86400000);
+          const stale = days > 30;
+          return `
+          <div class="investment-item${stale ? " stale" : ""}">
             <div>
               <strong>${escapeHtml(item.name)}</strong>
-              <span>${escapeHtml(item.kind || "Investment")} - ${item.access === "accessible" ? "Accessible" : "Long-term"}${item.note ? ` - ${escapeHtml(item.note)}` : ""}</span>
-              <span>Updated ${formatDate(item.updatedAt || isoDate(today))}</span>
+              <span>${item.access === "accessible" ? "Accessible in emergency" : "Long-term"}${item.note ? ` - ${escapeHtml(item.note)}` : ""}</span>
+              <span>${stale ? `<span class="stale-dot"></span>Value last updated ${formatDate(item.updatedAt)} - consider refreshing` : `Updated ${formatDate(item.updatedAt || isoDate(today))}`}</span>
             </div>
             <div class="investment-value">${money(item.value)}</div>
             <button class="ghost icon-btn" type="button" data-investment-action="edit" data-id="${item.id}" title="Edit ${escapeHtml(item.name)}" aria-label="Edit ${escapeHtml(item.name)}">
@@ -3424,7 +3427,7 @@
               </svg>
             </button>
           </div>
-        `).join("")}
+        `}).join("")}
       `;
     }
 
