@@ -2318,10 +2318,8 @@
 
       function openAppDirect() {
         lp.hidden = true;
-        var ob = document.getElementById('onboarding');
-        if (ob) ob.hidden = true;
-        var shell = document.querySelector('.app-shell');
-        if (shell) { shell.removeAttribute('aria-hidden'); shell.style.visibility = ''; }
+        // For new users, let the onboarding show (it sits at z-index 9999 under the landing page).
+        // dismiss() inside the onboarding will restore the shell when the user finishes or skips.
       }
 
       var btn1 = document.getElementById('lpGetStarted');
@@ -3987,17 +3985,23 @@
       els.celebrationTitle.textContent = `${target.name} is fully funded`;
       els.celebrationText.textContent = punchlines[Math.floor(Math.random() * punchlines.length)];
 
-      // Compute how long the goal took from first deposit to now
+      // Compute how long the goal took from first deposit to today.
+      // Parse stored date strings as LOCAL midnight to avoid UTC offset giving wrong day counts.
       const deposits = target.deposits || [];
-      const dates = deposits.map(d => new Date(d.date)).filter(d => !isNaN(d.getTime()));
+      const dates = deposits.map(d => {
+        if (!d.date) return null;
+        const p = d.date.split('-');
+        return p.length === 3 ? new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])) : null;
+      }).filter(Boolean);
       let durationText = "--";
       if (dates.length > 0) {
         const earliest = new Date(Math.min(...dates.map(d => d.getTime())));
-        const now = new Date();
-        const months = (now.getFullYear() - earliest.getFullYear()) * 12 + (now.getMonth() - earliest.getMonth());
+        const n = new Date();
+        const todayLocal = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+        const months = (todayLocal.getFullYear() - earliest.getFullYear()) * 12 + (todayLocal.getMonth() - earliest.getMonth());
         if (months < 1) {
-          const days = Math.round((now - earliest) / 86400000);
-          durationText = days <= 1 ? "today" : `${days} days`;
+          const days = Math.round((todayLocal - earliest) / 86400000);
+          durationText = days === 0 ? "today" : days === 1 ? "1 day" : `${days} days`;
         } else {
           durationText = months === 1 ? "1 month" : `${months} months`;
         }
