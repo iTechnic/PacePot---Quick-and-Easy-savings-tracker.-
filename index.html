@@ -847,6 +847,14 @@
     .celebration-stat { padding: 14px 20px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid rgba(16,185,129,.15); margin: 0 0 20px; }
     .celebration-stat span { display: block; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px; }
     .celebration-stat strong { display: block; font-size: 1.1rem; font-weight: 800; color: var(--ink); overflow-wrap: anywhere; }
+    @keyframes celebEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    .celebration-panel.celebrate-enter > * { animation: celebEnter 380ms ease both; }
+    .celebration-panel.celebrate-enter > .celebration-ring-wrap { animation-delay: 0ms; }
+    .celebration-panel.celebrate-enter > h4 { animation-delay: 220ms; }
+    .celebration-panel.celebrate-enter > p { animation-delay: 380ms; }
+    .celebration-panel.celebrate-enter > .celebration-stat { animation-delay: 520ms; }
+    .celebration-panel.celebrate-enter > button { animation-delay: 660ms; }
+    @media (prefers-reduced-motion: reduce) { .celebration-panel.celebrate-enter > * { animation: none; } }
 
     /* ============================================================
        FOOTER
@@ -3967,7 +3975,17 @@
     }
 
     function openCelebration(target) {
+      const punchlines = [
+        "You actually did it.",
+        "Every deposit counted.",
+        "That one's closed out.",
+        "Well saved. Well done.",
+        "You didn't just plan it.",
+        "Funded. Time for the next one.",
+        "You showed up every time.",
+      ];
       els.celebrationTitle.textContent = `${target.name} is fully funded`;
+      els.celebrationText.textContent = punchlines[Math.floor(Math.random() * punchlines.length)];
 
       // Compute how long the goal took from first deposit to now
       const deposits = target.deposits || [];
@@ -3988,13 +4006,35 @@
 
       els.celebrationModal.classList.add("show");
 
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // Stagger panel content entrance
+      const panel = els.celebrationModal.querySelector(".celebration-panel");
+      panel.classList.remove("celebrate-enter");
+      void panel.offsetWidth;
+      if (!reducedMotion) panel.classList.add("celebrate-enter");
+
       // Animate progress ring
       els.celebrationRing.classList.remove("animate");
       void els.celebrationRing.offsetWidth;
       els.celebrationRing.classList.add("animate");
 
+      // Count up the percentage label in sync with the ring sweep
+      const pctEl = els.celebrationModal.querySelector(".ring-pct");
+      if (reducedMotion) {
+        pctEl.textContent = "100%";
+      } else {
+        const duration = 1400;
+        const startTime = performance.now();
+        (function countUp(now) {
+          const pct = Math.min(100, Math.round(((now - startTime) / duration) * 100));
+          pctEl.textContent = pct + "%";
+          if (pct < 100) requestAnimationFrame(countUp);
+        })(performance.now());
+      }
+
       // Fire comets
-      if (window.__launchComets) window.__launchComets(20);
+      if (window.__launchComets && !reducedMotion) window.__launchComets(20);
 
       els.celebrationClose.focus();
     }
@@ -4002,6 +4042,7 @@
     function closeCelebration() {
       els.celebrationModal.classList.remove("show");
       els.celebrationRing.classList.remove("animate");
+      els.celebrationModal.querySelector(".celebration-panel").classList.remove("celebrate-enter");
     }
 
     function savedFor(target) {
