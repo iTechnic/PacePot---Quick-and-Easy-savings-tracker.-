@@ -1393,6 +1393,68 @@
       background: #0f172a;
       transform: rotate(45deg);
     }
+
+    /* ============================================================
+       SAVE LIST
+       ============================================================ */
+    .save-list-section { margin: 28px 0 32px; }
+    .sl-section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .sl-section-head h4 { font-size: 1rem; font-weight: 700; letter-spacing: -.01em; margin-bottom: 2px; }
+    .sl-section-desc { color: var(--muted); font-size: .82rem; line-height: 1.4; }
+    .sl-form-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 14px; }
+    .sl-form-wrap form { display: grid; gap: 12px; }
+    .sl-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .sl-form-actions { display: flex; gap: 8px; }
+    .sl-stats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .sl-stat { flex: 1; min-width: 110px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; }
+    .sl-stat-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 4px; }
+    .sl-stat-value { font-size: 1.05rem; font-weight: 800; color: var(--ink); }
+    .sl-stat-value.accent { color: var(--accent-strong); }
+    .sl-planner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 14px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .sl-planner-col { flex: 1; min-width: 180px; }
+    .sl-planner-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 4px; }
+    .sl-planner-value { font-size: .9rem; font-weight: 700; color: var(--ink); }
+    .sl-date-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .sl-date-row label { font-size: .78rem; color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .sl-date-row input[type=date] { font-size: .83rem; padding: 5px 9px; border-radius: var(--radius-xs); border: 1px solid var(--border-mid); background: var(--field); color: var(--ink); }
+    .sl-date-result { font-size: .88rem; font-weight: 700; color: var(--accent-strong); white-space: nowrap; }
+    .sl-items { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
+    .sl-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; display: flex; gap: 11px; align-items: flex-start; transition: border-color var(--motion-fast); }
+    .sl-item:hover { border-color: var(--border-mid); }
+    .sl-item.sl-purchased { opacity: .5; }
+    .sl-item.sl-purchased .sl-item-name { text-decoration: line-through; }
+    .sl-check { flex-shrink: 0; margin-top: 3px; width: 17px; height: 17px; appearance: none; -webkit-appearance: none; border: 1.5px solid var(--border-strong); border-radius: 4px; background: var(--field); cursor: pointer; position: relative; transition: background var(--motion-fast), border-color var(--motion-fast); min-height: unset; }
+    .sl-check:checked { background: var(--accent); border-color: var(--accent); }
+    .sl-check:checked::after { content:''; display:block; position:absolute; top:1px; left:4px; width:6px; height:10px; border:2px solid #fff; border-top:0; border-left:0; transform:rotate(45deg); }
+    .sl-item-body { flex: 1; min-width: 0; }
+    .sl-item-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
+    .sl-item-name { font-weight: 700; font-size: .9rem; color: var(--ink); }
+    .sl-price { font-size: .9rem; font-weight: 800; color: var(--accent-strong); margin-left: auto; white-space: nowrap; }
+    .sl-meta { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-bottom: 3px; }
+    .sl-badge { display: inline-flex; align-items: center; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 2px 7px; border-radius: var(--radius-full); line-height: 1.6; }
+    .sl-need { background: rgba(251,191,36,.15); color: var(--amber); }
+    .sl-want { background: rgba(96,165,250,.13); color: var(--blue); }
+    .sl-maybe { background: rgba(118,148,173,.13); color: var(--muted); }
+    .sl-cat { background: rgba(255,255,255,.06); color: var(--muted); border: 1px solid var(--border); }
+    .sl-added { font-size: .7rem; color: var(--faint); }
+    .sl-note { font-size: .8rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+    .sl-link { display: inline-flex; align-items: center; gap: 4px; font-size: .77rem; color: var(--blue); text-decoration: none; margin-top: 3px; overflow-wrap: anywhere; }
+    .sl-link:hover { text-decoration: underline; }
+    .sl-item-btns { flex-shrink: 0; display: flex; gap: 3px; align-items: flex-start; }
+    .sl-btn { background: none; border: 1px solid transparent; color: var(--muted); cursor: pointer; padding: 3px 7px; border-radius: var(--radius-xs); font-size: .76rem; font-weight: 600; transition: color var(--motion-fast), background var(--motion-fast), border-color var(--motion-fast); min-height: unset; box-shadow: none; transform: none; }
+    .sl-btn:hover { color: var(--ink); background: var(--surface-3); border-color: var(--border); transform: none; box-shadow: none; }
+    .sl-btn.sl-remove:hover { color: var(--red); border-color: rgba(248,113,113,.2); background: rgba(248,113,113,.06); }
+    .sl-empty { text-align: center; padding: 28px 16px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+    .sl-empty strong { font-size: .94rem; color: var(--ink-soft); display: block; }
+    .sl-empty p { font-size: .83rem; margin-top: 4px; }
+    .sl-goal-wrap { padding-top: 2px; }
+    .sl-goal-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--radius-sm); border: 1px solid var(--accent-mid); background: var(--accent-subtle); color: var(--accent-strong); font-size: .84rem; font-weight: 700; cursor: pointer; transition: background var(--motion-fast), border-color var(--motion-fast); box-shadow: none; }
+    .sl-goal-btn:hover { background: var(--accent-soft); border-color: var(--accent); transform: none; box-shadow: none; }
+    @media (max-width: 600px) {
+      .sl-form-row { grid-template-columns: 1fr; }
+      .sl-stats { gap: 6px; }
+      .sl-stat { min-width: 90px; padding: 9px 11px; }
+    }
   </style>
 </head>
 <body>
@@ -1872,6 +1934,103 @@
       </section>
     </div>
 
+    <!-- ============================================================
+         SAVE LIST SECTION
+         ============================================================ -->
+    <section class="save-list-section" id="saveListSection" aria-label="Save list">
+      <div class="sl-section-head">
+        <div>
+          <h4>Save list</h4>
+          <p class="sl-section-desc">Add items you're thinking about buying, then turn them into a savings plan.</p>
+        </div>
+        <button class="ghost small-btn" id="slAddBtn" type="button">+ Add item</button>
+      </div>
+
+      <div class="sl-form-wrap" id="slFormWrap" hidden>
+        <form id="slForm" novalidate>
+          <label>
+            Item name
+            <input id="slName" type="text" maxlength="80" placeholder="e.g. La Sportiva boots">
+          </label>
+          <div class="sl-form-row">
+            <label>
+              Price
+              <input id="slPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="220">
+            </label>
+            <label>
+              Category <span class="field-hint">optional</span>
+              <input id="slCategory" type="text" maxlength="40" placeholder="e.g. Mountaineering">
+            </label>
+          </div>
+          <div class="sl-form-row">
+            <label>
+              Priority
+              <select id="slPriority">
+                <option value="need">Need</option>
+                <option value="want" selected>Want</option>
+                <option value="maybe">Maybe later</option>
+              </select>
+            </label>
+            <label>
+              Product link <span class="field-hint">optional</span>
+              <input id="slLink" type="url" maxlength="500" placeholder="https://...">
+            </label>
+          </div>
+          <label>
+            Note <span class="field-hint">optional</span>
+            <input id="slNote" type="text" maxlength="120" placeholder="e.g. Need before Alps trip">
+          </label>
+          <div class="sl-form-actions">
+            <button type="submit">Add to list</button>
+            <button class="ghost" type="button" id="slFormCancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="sl-stats" id="slStats" hidden>
+        <div class="sl-stat">
+          <div class="sl-stat-label">Total</div>
+          <div class="sl-stat-value" id="slTotalAll">£0</div>
+        </div>
+        <div class="sl-stat">
+          <div class="sl-stat-label">Still to buy</div>
+          <div class="sl-stat-value accent" id="slTotalUnbought">£0</div>
+        </div>
+        <div class="sl-stat">
+          <div class="sl-stat-label">Need priority</div>
+          <div class="sl-stat-value" id="slTotalNeed">£0</div>
+        </div>
+        <div class="sl-stat">
+          <div class="sl-stat-label">Items</div>
+          <div class="sl-stat-value" id="slItemCount">0</div>
+        </div>
+      </div>
+
+      <div class="sl-planner" id="slPlanner" hidden>
+        <div class="sl-planner-col">
+          <div class="sl-planner-label">Based on your savings pot</div>
+          <div class="sl-planner-value" id="slTimeEstimate">—</div>
+        </div>
+        <div class="sl-planner-col">
+          <div class="sl-planner-label">Monthly needed by date</div>
+          <div class="sl-date-row">
+            <label for="slTargetDate">Save by</label>
+            <input type="date" id="slTargetDate">
+            <span class="sl-date-result" id="slMonthlyNeeded"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sl-items" id="slItems"></div>
+
+      <div class="sl-goal-wrap" id="slGoalWrap" hidden>
+        <button class="sl-goal-btn" id="slCreateGoalBtn" type="button">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Create savings goal from this list
+        </button>
+      </div>
+    </section>
+
     <footer class="site-footer">
       <div>
         <strong>PacePot v3.0</strong>. Savings targets that fit real life.
@@ -2085,6 +2244,60 @@
     <div class="modal-footer">
       <button class="ghost" id="depositEditCancel" type="button">Cancel</button>
       <button type="button" id="depositEditSave">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SAVE LIST EDIT MODAL
+     ============================================================ -->
+<div class="modal" id="slEditModal" role="dialog" aria-modal="true" aria-labelledby="slEditTitle">
+  <div class="modal-panel narrow">
+    <div class="modal-head">
+      <div><h4 id="slEditTitle">Edit item</h4></div>
+      <button class="ghost icon-btn" id="slEditClose" type="button" aria-label="Close edit item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="slEditForm" novalidate style="display:grid;gap:12px">
+        <label>
+          Item name
+          <input id="slEditName" type="text" maxlength="80" required>
+        </label>
+        <div class="field-row">
+          <label>
+            Price
+            <input id="slEditPrice" type="number" min="0" step="0.01" inputmode="decimal" required>
+          </label>
+          <label>
+            Category
+            <input id="slEditCategory" type="text" maxlength="40">
+          </label>
+        </div>
+        <div class="field-row">
+          <label>
+            Priority
+            <select id="slEditPriority">
+              <option value="need">Need</option>
+              <option value="want">Want</option>
+              <option value="maybe">Maybe later</option>
+            </select>
+          </label>
+          <label>
+            Product link
+            <input id="slEditLink" type="url" maxlength="500">
+          </label>
+        </div>
+        <label>
+          Note
+          <input id="slEditNote" type="text" maxlength="120">
+        </label>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="ghost" id="slEditCancel" type="button">Cancel</button>
+      <button type="button" id="slEditSave">Save changes</button>
     </div>
   </div>
 </div>
@@ -3110,6 +3323,7 @@
               state.budgetItems = restored.budgetItems;
               state.investments = restored.investments;
               state.targets = restored.targets;
+              state.saveList = restored.saveList || [];
               els.salary.value = state.salary || "";
               els.accountBalance.value = state.accountBalance || "";
               els.savingsPot.value = state.savingsPot || "";
@@ -3276,6 +3490,7 @@
       } else {
         els.targets.innerHTML = visible.map(targetTemplate).join("");
       }
+      renderSaveList();
     }
 
     function orderedTargets() {
@@ -4256,7 +4471,7 @@
         const parsed = JSON.parse(localStorage.getItem(storeKey));
         return normalizePlannerData(parsed);
       } catch {
-        return { salary: 0, accountBalance: 0, savingsPot: 0, budgetListCollapsed: false, budgetItems: [], investments: [], currency: "GBP", targets: [] };
+        return { salary: 0, accountBalance: 0, savingsPot: 0, budgetListCollapsed: false, budgetItems: [], investments: [], currency: "GBP", targets: [], saveList: [] };
       }
     }
 
@@ -4283,7 +4498,8 @@
         budgetItems,
         investments: Array.isArray(parsed?.investments) ? parsed.investments.map(normalizeInvestment).filter(Boolean) : [],
         currency: ["GBP", "USD", "EUR", "CAD", "AUD"].includes(parsed?.currency) ? parsed.currency : "GBP",
-        targets: Array.isArray(parsed?.targets) ? parsed.targets.map(normalizeTarget).filter(Boolean) : []
+        targets: Array.isArray(parsed?.targets) ? parsed.targets.map(normalizeTarget).filter(Boolean) : [],
+        saveList: Array.isArray(parsed?.saveList) ? parsed.saveList.map(normalizeSaveListItem).filter(Boolean) : []
       };
     }
 
@@ -4347,12 +4563,283 @@
       return Number.isNaN(date.getTime()) ? "" : String(value).slice(0, 10);
     }
 
+    function normalizeSaveListItem(item) {
+      const name = String(item?.name || "").trim();
+      const price = toMoney(item?.price);
+      if (!name || price <= 0) return null;
+      const priority = ["need", "want", "maybe"].includes(item?.priority) ? item.priority : "want";
+      return {
+        id: item.id || makeId(),
+        name,
+        price,
+        category: String(item?.category || "").trim().slice(0, 40),
+        priority,
+        link: String(item?.link || "").slice(0, 500),
+        note: String(item?.note || "").trim().slice(0, 120),
+        purchased: Boolean(item?.purchased),
+        addedAt: validDateValue(item?.addedAt) || isoDate(today)
+      };
+    }
+
     let toastTimer;
     function showToast(message) {
       els.toast.textContent = message;
       els.toast.classList.add("show");
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => els.toast.classList.remove("show"), 3000);
+    }
+
+    // === SAVE LIST ===
+    let editingSaveListItemId = "";
+
+    const slEl = {
+      addBtn:        document.getElementById("slAddBtn"),
+      formWrap:      document.getElementById("slFormWrap"),
+      form:          document.getElementById("slForm"),
+      formCancel:    document.getElementById("slFormCancel"),
+      name:          document.getElementById("slName"),
+      price:         document.getElementById("slPrice"),
+      category:      document.getElementById("slCategory"),
+      priority:      document.getElementById("slPriority"),
+      link:          document.getElementById("slLink"),
+      note:          document.getElementById("slNote"),
+      stats:         document.getElementById("slStats"),
+      totalAll:      document.getElementById("slTotalAll"),
+      totalUnbought: document.getElementById("slTotalUnbought"),
+      totalNeed:     document.getElementById("slTotalNeed"),
+      itemCount:     document.getElementById("slItemCount"),
+      planner:       document.getElementById("slPlanner"),
+      timeEstimate:  document.getElementById("slTimeEstimate"),
+      targetDate:    document.getElementById("slTargetDate"),
+      monthlyNeeded: document.getElementById("slMonthlyNeeded"),
+      items:         document.getElementById("slItems"),
+      goalWrap:      document.getElementById("slGoalWrap"),
+      createGoalBtn: document.getElementById("slCreateGoalBtn"),
+      editModal:     document.getElementById("slEditModal"),
+      editClose:     document.getElementById("slEditClose"),
+      editCancel:    document.getElementById("slEditCancel"),
+      editSave:      document.getElementById("slEditSave"),
+      editName:      document.getElementById("slEditName"),
+      editPrice:     document.getElementById("slEditPrice"),
+      editCategory:  document.getElementById("slEditCategory"),
+      editPriority:  document.getElementById("slEditPriority"),
+      editLink:      document.getElementById("slEditLink"),
+      editNote:      document.getElementById("slEditNote")
+    };
+
+    slEl.addBtn.addEventListener("click", () => {
+      const open = !slEl.formWrap.hidden;
+      slEl.formWrap.hidden = open;
+      slEl.addBtn.textContent = open ? "+ Add item" : "Cancel";
+      if (!open) slEl.name.focus();
+    });
+
+    slEl.formCancel.addEventListener("click", () => {
+      slEl.formWrap.hidden = true;
+      slEl.addBtn.textContent = "+ Add item";
+      slEl.form.reset();
+    });
+
+    slEl.form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = slEl.name.value.trim();
+      const price = toMoney(slEl.price.value);
+      if (!name) { showToast("Enter an item name."); return; }
+      if (price <= 0) { showToast("Enter a price greater than zero."); return; }
+      const rawLink = slEl.link.value.trim();
+      state.saveList.unshift({
+        id: makeId(),
+        name,
+        price,
+        category: slEl.category.value.trim(),
+        priority: slEl.priority.value,
+        link: isValidSaveLink(rawLink) ? rawLink : "",
+        note: slEl.note.value.trim(),
+        purchased: false,
+        addedAt: isoDate(today)
+      });
+      slEl.form.reset();
+      slEl.formWrap.hidden = true;
+      slEl.addBtn.textContent = "+ Add item";
+      trackAppEvent("save_list_item_added");
+      saveAndRender("Added to save list.");
+    });
+
+    slEl.items.addEventListener("click", (e) => {
+      const checkEl = e.target.closest("[data-sl-check]");
+      if (checkEl) {
+        const item = state.saveList.find(i => i.id === checkEl.dataset.slCheck);
+        if (item) {
+          item.purchased = !item.purchased;
+          if (item.purchased) trackAppEvent("save_list_item_completed");
+          persistState();
+          renderSaveList();
+        }
+        return;
+      }
+      const btn = e.target.closest("[data-sl-action]");
+      if (!btn) return;
+      const { slAction, slId } = btn.dataset;
+      const item = state.saveList.find(i => i.id === slId);
+      if (!item) return;
+      if (slAction === "edit") {
+        openSlEditModal(item);
+      } else if (slAction === "delete") {
+        customConfirm(
+          `Remove "${item.name}"?`,
+          "This will remove the item from your save list.",
+          "Remove",
+          () => {
+            state.saveList = state.saveList.filter(i => i.id !== slId);
+            saveAndRender("Item removed.");
+          }
+        );
+      }
+    });
+
+    function openSlEditModal(item) {
+      editingSaveListItemId = item.id;
+      slEl.editName.value = item.name;
+      slEl.editPrice.value = item.price || "";
+      slEl.editCategory.value = item.category || "";
+      slEl.editPriority.value = item.priority || "want";
+      slEl.editLink.value = item.link || "";
+      slEl.editNote.value = item.note || "";
+      slEl.editModal.classList.add("show");
+      slEl.editName.focus();
+    }
+
+    function closeSlEditModal() {
+      closeModal(slEl.editModal);
+      editingSaveListItemId = "";
+    }
+
+    slEl.editClose.addEventListener("click", closeSlEditModal);
+    slEl.editCancel.addEventListener("click", closeSlEditModal);
+    slEl.editModal.addEventListener("click", (e) => {
+      if (e.target === slEl.editModal) closeSlEditModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && slEl.editModal.classList.contains("show")) closeSlEditModal();
+    });
+
+    slEl.editSave.addEventListener("click", () => {
+      const name = slEl.editName.value.trim();
+      const price = toMoney(slEl.editPrice.value);
+      if (!name) { showToast("Item name is required."); return; }
+      if (price <= 0) { showToast("Price must be greater than zero."); return; }
+      const item = state.saveList.find(i => i.id === editingSaveListItemId);
+      if (!item) { closeSlEditModal(); return; }
+      const rawLink = slEl.editLink.value.trim();
+      item.name = name;
+      item.price = price;
+      item.category = slEl.editCategory.value.trim();
+      item.priority = slEl.editPriority.value;
+      item.link = isValidSaveLink(rawLink) ? rawLink : "";
+      item.note = slEl.editNote.value.trim();
+      closeSlEditModal();
+      saveAndRender("Item updated.");
+    });
+
+    slEl.createGoalBtn.addEventListener("click", () => {
+      const unpurchased = (state.saveList || []).filter(i => !i.purchased);
+      if (!unpurchased.length) { showToast("All items are already purchased."); return; }
+      const total = unpurchased.reduce((s, i) => s + i.price, 0);
+      els.targetName.value = "Save list";
+      els.targetAmount.value = total;
+      els.targetSaved.value = "";
+      els.targetDate.value = "";
+      els.targetPriority.value = "medium";
+      els.targetForm.scrollIntoView({ behavior: "smooth", block: "center" });
+      els.targetName.focus();
+      trackAppEvent("save_list_goal_created");
+      showToast(`Target prefilled with ${money(total)}. Add a date and save.`);
+    });
+
+    slEl.targetDate.addEventListener("input", renderSaveList);
+
+    function isValidSaveLink(url) {
+      if (!url) return false;
+      try { const p = new URL(url); return p.protocol === "http:" || p.protocol === "https:"; }
+      catch { return false; }
+    }
+
+    function renderSaveList() {
+      const items = state.saveList || [];
+      const hasItems = items.length > 0;
+      slEl.stats.hidden = !hasItems;
+      slEl.planner.hidden = !hasItems;
+      slEl.goalWrap.hidden = !hasItems;
+
+      if (!hasItems) {
+        slEl.items.innerHTML = `<div class="sl-empty"><strong>Your save list is empty.</strong><p>Add items you’re thinking about buying, then plan how to afford them.</p></div>`;
+        return;
+      }
+
+      const totalAll = items.reduce((s, i) => s + i.price, 0);
+      const unbought = items.filter(i => !i.purchased);
+      const totalUnbought = unbought.reduce((s, i) => s + i.price, 0);
+      const totalNeed = items.filter(i => i.priority === "need" && !i.purchased).reduce((s, i) => s + i.price, 0);
+
+      slEl.totalAll.textContent = money(totalAll);
+      slEl.totalUnbought.textContent = money(totalUnbought);
+      slEl.totalNeed.textContent = money(totalNeed);
+      slEl.itemCount.textContent = items.length + (items.length === 1 ? " item" : " items");
+
+      const pot = toMoney(state.savingsPot);
+      if (totalUnbought <= 0) {
+        slEl.timeEstimate.textContent = "Everything purchased!";
+      } else if (pot > 0) {
+        const mos = Math.ceil(totalUnbought / pot);
+        slEl.timeEstimate.textContent = mos === 1 ? "1 month at your current pace" : mos + " months at your current pace";
+      } else {
+        slEl.timeEstimate.textContent = "Set a savings pot to see your pace";
+      }
+
+      const dateVal = slEl.targetDate.value;
+      if (dateVal && totalUnbought > 0) {
+        const p = dateVal.split("-");
+        const td = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+        const ms = td - today;
+        if (ms > 0) {
+          const mos = Math.max(1, ms / (30.44 * 24 * 3600 * 1000));
+          slEl.monthlyNeeded.textContent = money(Math.ceil(totalUnbought / mos)) + "/month";
+        } else {
+          slEl.monthlyNeeded.textContent = "Choose a future date";
+        }
+      } else {
+        slEl.monthlyNeeded.textContent = "";
+      }
+
+      const pLabel = { need: "Need", want: "Want", maybe: "Maybe later" };
+      const pClass = { need: "sl-need", want: "sl-want", maybe: "sl-maybe" };
+
+      slEl.items.innerHTML = items.map(item => {
+        const label = pLabel[item.priority] || "Want";
+        const cls   = pClass[item.priority] || "sl-want";
+        const catHtml  = item.category ? `<span class="sl-badge sl-cat">${escapeHtml(item.category)}</span>` : "";
+        const noteHtml = item.note ? `<div class="sl-note">${escapeHtml(item.note)}</div>` : "";
+        const linkHtml = item.link
+          ? `<a class="sl-link" href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>View product</a>`
+          : "";
+        return `<div class="sl-item${item.purchased ? " sl-purchased" : ""}">
+        <input type="checkbox" class="sl-check" data-sl-check="${item.id}" ${item.purchased ? "checked" : ""} aria-label="Mark ${escapeHtml(item.name)} as purchased">
+        <div class="sl-item-body">
+          <div class="sl-item-top">
+            <span class="sl-item-name">${escapeHtml(item.name)}</span>
+            <span class="sl-price">${money(item.price)}</span>
+          </div>
+          <div class="sl-meta">
+            ${catHtml}<span class="sl-badge ${cls}">${label}</span><span class="sl-added">Added ${formatShortDate(item.addedAt)}</span>
+          </div>
+          ${noteHtml}${linkHtml}
+        </div>
+        <div class="sl-item-btns">
+          <button class="sl-btn" data-sl-action="edit" data-sl-id="${item.id}" aria-label="Edit ${escapeHtml(item.name)}" type="button">Edit</button>
+          <button class="sl-btn sl-remove" data-sl-action="delete" data-sl-id="${item.id}" aria-label="Remove ${escapeHtml(item.name)}" type="button">Remove</button>
+        </div>
+      </div>`;
+      }).join("");
     }
 
     initOnboarding();
