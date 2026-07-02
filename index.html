@@ -863,9 +863,9 @@
     /* ============================================================
        FOOTER
        ============================================================ */
-    .site-footer { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; }
-    .footer-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .footer-link { min-height: auto; padding: 0; border: 0; background: transparent; color: var(--muted); box-shadow: none; font-size: .8rem; text-decoration: underline; text-underline-offset: 3px; border-radius: 3px; }
+    .site-footer { display: grid; justify-items: center; text-align: center; gap: 10px; margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; }
+    .footer-links { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .footer-link { min-height: auto; padding: 0; border: 0; background: transparent; color: var(--muted); box-shadow: none; font-size: .8rem; font-weight: 400; letter-spacing: 0; line-height: 1.5; text-decoration: underline; text-underline-offset: 3px; border-radius: 3px; }
     a.footer-link, a.footer-link:visited { color: var(--muted); }
     .footer-link:hover { color: var(--ink); transform: none; box-shadow: none; }
     .site-footer strong { color: var(--ink); font-weight: 700; }
@@ -1401,20 +1401,20 @@
        SAVE LIST
        ============================================================ */
     .save-list-section { margin: 28px 0 32px; }
-    .sl-section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .sl-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
     .sl-section-head h4 { font-size: 1rem; font-weight: 700; letter-spacing: -.01em; margin-bottom: 2px; }
     .sl-section-desc { color: var(--muted); font-size: .82rem; line-height: 1.4; }
     .sl-form-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 14px; }
     .sl-form-wrap form { display: grid; gap: 12px; }
     .sl-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .sl-form-actions { display: flex; gap: 8px; }
-    .sl-stats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-    .sl-stat { flex: 1; min-width: 110px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; }
+    .sl-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; margin-bottom: 14px; }
+    .sl-stat { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; }
     .sl-stat-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 4px; }
     .sl-stat-value { font-size: 1.05rem; font-weight: 800; color: var(--ink); }
     .sl-stat-value.accent { color: var(--accent-strong); }
-    .sl-planner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 14px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-    .sl-planner-col { flex: 1; min-width: 180px; }
+    .sl-planner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; align-items: center; }
+    .sl-planner-col { min-width: 0; }
     .sl-planner-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 4px; }
     .sl-planner-value { font-size: .9rem; font-weight: 700; color: var(--ink); }
     .sl-date-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -1426,9 +1426,9 @@
     .sl-item:hover { border-color: var(--border-mid); }
     .sl-item.sl-purchased { opacity: .5; }
     .sl-item.sl-purchased .sl-item-name { text-decoration: line-through; }
-    .sl-check { flex-shrink: 0; margin-top: 3px; width: 17px; height: 17px; appearance: none; -webkit-appearance: none; border: 1.5px solid var(--border-strong); border-radius: 4px; background: var(--field); cursor: pointer; position: relative; transition: background var(--motion-fast), border-color var(--motion-fast); min-height: unset; }
+    .sl-check { flex-shrink: 0; margin-top: 3px; width: 17px; height: 17px; appearance: none; -webkit-appearance: none; border: 1.5px solid var(--border-strong); border-radius: 4px; background: var(--field); cursor: pointer; display: grid; place-content: center; transition: background var(--motion-fast), border-color var(--motion-fast); min-height: unset; padding: 0; }
     .sl-check:checked { background: var(--accent); border-color: var(--accent); }
-    .sl-check:checked::after { content:''; display:block; position:absolute; top:1px; left:4px; width:6px; height:10px; border:2px solid #fff; border-top:0; border-left:0; transform:rotate(45deg); }
+    .sl-check:checked::after { content:''; width: 5px; height: 9px; border: 2px solid #fff; border-top: 0; border-left: 0; transform: rotate(45deg) translate(-.5px, -1px); }
     .sl-item-body { flex: 1; min-width: 0; }
     .sl-item-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
     .sl-item-name { font-weight: 700; font-size: .9rem; color: var(--ink); }
@@ -1443,20 +1443,23 @@
     .sl-note { font-size: .8rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
     .sl-link { display: inline-flex; align-items: center; gap: 4px; font-size: .77rem; color: var(--blue); text-decoration: none; margin-top: 3px; overflow-wrap: anywhere; }
     .sl-link:hover { text-decoration: underline; }
-    .sl-item-btns { flex-shrink: 0; display: flex; gap: 3px; align-items: flex-start; }
-    .sl-btn { background: none; border: 1px solid transparent; color: var(--muted); cursor: pointer; padding: 3px 7px; border-radius: var(--radius-xs); font-size: .76rem; font-weight: 600; transition: color var(--motion-fast), background var(--motion-fast), border-color var(--motion-fast); min-height: unset; box-shadow: none; transform: none; }
-    .sl-btn:hover { color: var(--ink); background: var(--surface-3); border-color: var(--border); transform: none; box-shadow: none; }
-    .sl-btn.sl-remove:hover { color: var(--red); border-color: rgba(248,113,113,.2); background: rgba(248,113,113,.06); }
+    .sl-item-btns { flex-shrink: 0; display: flex; gap: 6px; align-items: flex-start; }
+    .sl-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; min-height: 28px; padding: 4px 10px; border-radius: var(--radius-xs); font-size: .76rem; font-weight: 600; letter-spacing: 0; transition: color var(--motion-fast), background var(--motion-fast), border-color var(--motion-fast); box-shadow: none; transform: none; }
+    .sl-btn:hover { color: var(--ink); background: var(--surface-3); border-color: var(--border-strong); transform: none; box-shadow: none; }
+    .sl-btn.sl-remove:hover { color: var(--red); border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); }
+    .sl-more-btn { width: 100%; min-height: 34px; background: var(--surface); border: 1px dashed var(--border-mid); color: var(--muted); font-size: .8rem; font-weight: 600; letter-spacing: 0; border-radius: var(--radius-sm); box-shadow: none; }
+    .sl-more-btn:hover { color: var(--ink); background: var(--surface-2); border-color: var(--border-strong); transform: none; box-shadow: none; }
     .sl-empty { text-align: center; padding: 28px 16px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
     .sl-empty strong { font-size: .94rem; color: var(--ink-soft); display: block; }
     .sl-empty p { font-size: .83rem; margin-top: 4px; }
-    .sl-goal-wrap { padding-top: 2px; }
+    .sl-goal-wrap { padding-top: 2px; display: flex; justify-content: center; }
     .sl-goal-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--radius-sm); border: 1px solid var(--accent-mid); background: var(--accent-subtle); color: var(--accent-strong); font-size: .84rem; font-weight: 700; cursor: pointer; transition: background var(--motion-fast), border-color var(--motion-fast); box-shadow: none; }
     .sl-goal-btn:hover { background: var(--accent-soft); border-color: var(--accent); transform: none; box-shadow: none; }
     @media (max-width: 600px) {
       .sl-form-row { grid-template-columns: 1fr; }
-      .sl-stats { gap: 6px; }
-      .sl-stat { min-width: 90px; padding: 9px 11px; }
+      .sl-stats { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; }
+      .sl-stat { padding: 9px 11px; }
+      .sl-planner { grid-template-columns: 1fr; gap: 12px; }
     }
   </style>
 </head>
@@ -4594,6 +4597,8 @@
 
     // === SAVE LIST ===
     let editingSaveListItemId = "";
+    let slShowAll = false;
+    const SL_VISIBLE_LIMIT = 5;
 
     const slEl = {
       addBtn:        document.getElementById("slAddBtn"),
@@ -4669,6 +4674,12 @@
     });
 
     slEl.items.addEventListener("click", (e) => {
+      const moreBtn = e.target.closest("[data-sl-more]");
+      if (moreBtn) {
+        slShowAll = !slShowAll;
+        renderSaveList();
+        return;
+      }
       const checkEl = e.target.closest("[data-sl-check]");
       if (checkEl) {
         const item = state.saveList.find(i => i.id === checkEl.dataset.slCheck);
@@ -4817,7 +4828,12 @@
       const pLabel = { need: "Need", want: "Want", maybe: "Maybe later" };
       const pClass = { need: "sl-need", want: "sl-want", maybe: "sl-maybe" };
 
-      slEl.items.innerHTML = items.map(item => {
+      const visibleItems = slShowAll ? items : items.slice(0, SL_VISIBLE_LIMIT);
+      const moreHtml = items.length > SL_VISIBLE_LIMIT
+        ? `<button type="button" class="sl-more-btn" data-sl-more>${slShowAll ? "Show fewer items" : `Show all ${items.length} items`}</button>`
+        : "";
+
+      slEl.items.innerHTML = visibleItems.map(item => {
         const label = pLabel[item.priority] || "Want";
         const cls   = pClass[item.priority] || "sl-want";
         const catHtml  = item.category ? `<span class="sl-badge sl-cat">${escapeHtml(item.category)}</span>` : "";
@@ -4842,7 +4858,7 @@
           <button class="sl-btn sl-remove" data-sl-action="delete" data-sl-id="${item.id}" aria-label="Remove ${escapeHtml(item.name)}" type="button">Remove</button>
         </div>
       </div>`;
-      }).join("");
+      }).join("") + moreHtml;
     }
 
     initOnboarding();
