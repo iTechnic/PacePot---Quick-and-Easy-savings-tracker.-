@@ -292,6 +292,49 @@
     /* Views hold content at a sane measure — width buys columns inside a view,
        it never strands a lone panel in a wide empty band. */
     /* ============================================================
+       CALIBRATION CHECKLIST
+       ============================================================ */
+    .setup-block {
+      margin-bottom: 24px; padding: 22px clamp(18px, 2.4vw, 26px);
+      background: var(--surface); border: 1px solid rgba(16,185,129,.26); border-radius: var(--radius);
+    }
+    .setup-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 18px; }
+    .setup-head h3 { font-size: 1.02rem; font-weight: 800; letter-spacing: -.02em; margin: 0 0 4px; }
+    .setup-head p { color: var(--muted); font-size: .84rem; line-height: 1.5; max-width: 52ch; }
+    .setup-progress { display: grid; gap: 7px; min-width: 132px; }
+    .setup-count {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 1.05rem; font-weight: 700; color: var(--accent-strong); text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .setup-count i { font-style: normal; color: var(--faint); font-size: .8rem; }
+    .setup-bar { height: 3px; background: var(--surface-3); }
+    .setup-bar-fill { height: 100%; background: var(--accent); transition: width 380ms var(--ease); }
+
+    .setup-list { list-style: none; margin: 0; padding: 0; display: grid; }
+    .setup-step {
+      display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 13px; align-items: center;
+      padding: 12px 0; border-top: 1px solid var(--border);
+    }
+    .setup-mark { width: 10px; height: 10px; border: 1.5px solid var(--border-strong); }
+    .setup-step.is-done .setup-mark { background: var(--accent); border-color: var(--accent); }
+    .setup-step.is-next .setup-mark { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(16,185,129,.14); }
+    .setup-text strong { display: block; font-size: .89rem; font-weight: 700; color: var(--ink); }
+    .setup-step.is-done .setup-text strong { color: var(--muted); font-weight: 600; }
+    .setup-hint { display: block; margin-top: 2px; font-size: .78rem; color: var(--muted); line-height: 1.45; }
+    .setup-detail {
+      display: block; margin-top: 2px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .68rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--accent-strong);
+    }
+    .setup-go {
+      min-height: 32px; padding: 5px 16px; font-size: .8rem; font-weight: 700;
+      background: var(--surface-3); border: 1px solid var(--border-mid); color: var(--ink-soft);
+      box-shadow: none; transform: none;
+    }
+    .setup-step.is-next .setup-go { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .setup-go:hover { transform: none; box-shadow: none; filter: brightness(1.1); }
+
+    /* ============================================================
        PACE SCORE
        ============================================================ */
     .score-block {
@@ -961,18 +1004,25 @@
     /* Goals go two-up on big screens. Measured: two wide columns scroll less
        than three narrow ones, because narrow cards stack their internals and
        grow taller than the row they save. So this deliberately caps at 2. */
-    .targets { display: grid; gap: 14px; grid-template-columns: minmax(0,1fr); align-items: start; }
+    /* stretch, not start: expanded cards sharing a row match the tallest one,
+       so they read as a set rather than a ragged edge. Collapsed cards opt out
+       below — otherwise a collapsed summary next to an expanded card would be
+       stretched into a mostly empty box. */
+    .targets { display: grid; gap: 14px; grid-template-columns: minmax(0,1fr); align-items: stretch; }
     @media (min-width: 1600px) { .targets { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; } }
     /* Each card sizes its own internals — see the @container rules after the
        target-card block below. */
-    .target-card { container-type: inline-size; }
+    /* Column layout so the body fills a stretched card instead of leaving a
+       gap at the bottom of the shorter one in a row. */
+    .target-card { container-type: inline-size; display: flex; flex-direction: column; }
+    .target-card > .target-full { flex: 1 1 auto; }
 
     /* ============================================================
        TARGET CARDS
        ============================================================ */
     .target-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xs); overflow: visible; transition: box-shadow var(--motion) var(--ease), border-color var(--motion) var(--ease), transform var(--motion) var(--ease); }
     .target-card:hover { box-shadow: var(--shadow-sm); border-color: rgba(5,150,105,.16); transform: translateY(-1px); }
-    .target-card.is-collapsed { border-radius: var(--radius); }
+    .target-card.is-collapsed { border-radius: var(--radius); align-self: start; }
     .target-collapse-summary { display: none; grid-template-columns: minmax(0,1fr) auto; gap: 14px; align-items: center; min-width: 0; padding: 16px 18px; }
     .target-card.is-collapsed .target-collapse-summary { display: grid; }
     .target-summary-main { display: grid; gap: 8px; min-width: 0; }
@@ -2351,6 +2401,8 @@
       </div>
     </div>
 
+    <section class="setup-block" id="setupHost" aria-label="Setting up" hidden></section>
+
     <section class="score-block" id="paceScoreHost" aria-label="Pace score"></section>
 
     <section class="plan-guidance" aria-label="Next best step">
@@ -3613,6 +3665,15 @@
     els.backupBtn.addEventListener("click", exportBackup);
     els.applyAllocationBtn.addEventListener("click", applySuggestedAllocation);
 
+    const setupHostEl = document.getElementById("setupHost");
+    if (setupHostEl) {
+      setupHostEl.addEventListener("click", (event) => {
+        const btn = event.target.closest("[data-setup-go]");
+        if (!btn) return;
+        gotoSetupStep(btn.dataset.setupGo);
+      });
+    }
+
     // The forecast slider is a what-if: it re-projects only, and never writes
     // to state. Its value deliberately resets on reload.
     const forecastExtraEl = document.getElementById("forecastExtra");
@@ -4347,6 +4408,107 @@
       }).join("") + `<div class="fc-legend"><span class="fc-legend-due"></span> deadline</div>`;
     }
 
+    // ================================================================
+    // CALIBRATION CHECKLIST
+    // Every step is derived from real state, so it cannot tick because
+    // someone clicked "next" — only because the thing actually exists.
+    // It never blocks, and it removes itself once setup is done.
+    // ================================================================
+    function setupSteps() {
+      const income = Number(state.salary || 0) > 0
+        || state.budgetItems.some((i) => i.type === "income");
+      const outgoings = state.budgetItems.some((i) => i.type === "outgoing");
+      const pot = Number(state.savingsPot || 0) > 0;
+      const goal = state.targets.length > 0;
+      const deposit = state.targets.some((t) => (t.deposits || []).some((d) => Number(d.amount) > 0));
+
+      const incomeTotal = budgetTotals().resources;
+      const outCount = state.budgetItems.filter((i) => i.type === "outgoing").length;
+
+      return [
+        { key: "income", done: income, label: "Add what comes in",
+          hint: "Your monthly take-home pay. Everything else is worked out from it.",
+          detail: income ? money(incomeTotal) : "", action: "salary" },
+        { key: "outgoings", done: outgoings, label: "Add what goes out",
+          hint: "Rent, bills, subscriptions. The fuller the picture, the more honest your pace.",
+          detail: outgoings ? `${outCount} item${outCount === 1 ? "" : "s"}` : "", action: "outgoings" },
+        { key: "pot", done: pot, label: "Set your savings pot",
+          hint: "What you plan to set aside each month, across all goals.",
+          detail: pot ? money(state.savingsPot) : "", action: "pot" },
+        { key: "goal", done: goal, label: "Create your first goal",
+          hint: "What you are saving for, and the date you want it by.",
+          detail: goal ? `${state.targets.length} goal${state.targets.length === 1 ? "" : "s"}` : "", action: "goal" },
+        { key: "deposit", done: deposit, label: "Log your first deposit",
+          hint: "Even a small amount starts your streak and your pace score.",
+          detail: deposit ? "Started" : "", action: "deposit" }
+      ];
+    }
+
+    function renderSetupChecklist() {
+      const host = document.getElementById("setupHost");
+      if (!host) return;
+
+      const steps = setupSteps();
+      const done = steps.filter((s) => s.done).length;
+
+      // Once everything is in place the panel has nothing left to teach.
+      if (done === steps.length) { host.hidden = true; host.innerHTML = ""; return; }
+      host.hidden = false;
+
+      // The first unfinished step is the one to push; the rest stay quiet.
+      const nextKey = (steps.find((s) => !s.done) || {}).key;
+
+      host.innerHTML = `
+        <div class="setup-head">
+          <div>
+            <h3>Setting up</h3>
+            <p>Five things to get PacePot working properly. It ticks itself off as you go.</p>
+          </div>
+          <div class="setup-progress">
+            <span class="setup-count">${done}<i>/${steps.length}</i></span>
+            <div class="setup-bar"><div class="setup-bar-fill" style="width:${(done / steps.length) * 100}%"></div></div>
+          </div>
+        </div>
+        <ol class="setup-list">
+          ${steps.map((s) => `
+            <li class="setup-step${s.done ? " is-done" : ""}${s.key === nextKey ? " is-next" : ""}">
+              <span class="setup-mark" aria-hidden="true"></span>
+              <div class="setup-text">
+                <strong>${s.label}</strong>
+                ${s.done ? `<span class="setup-detail">${s.detail}</span>` : `<span class="setup-hint">${s.hint}</span>`}
+              </div>
+              ${s.done ? "" : `<button type="button" class="setup-go" data-setup-go="${s.action}">Go</button>`}
+            </li>`).join("")}
+        </ol>`;
+    }
+
+    // Sends you to the right place with the right field ready, rather than
+    // describing where to click and leaving you to find it.
+    function gotoSetupStep(action) {
+      const openDrawer = () => {
+        els.sidebarEl.classList.remove("sidebar-closed");
+        if (els.sidebarToggle) els.sidebarToggle.setAttribute("aria-expanded", "true");
+      };
+      const focus = (el) => {
+        if (!el) return;
+        window.setTimeout(() => {
+          el.focus({ preventScroll: false });
+          if (typeof el.select === "function" && el.value) el.select();
+        }, 320);
+      };
+
+      if (action === "salary") { openDrawer(); focus(document.getElementById("salary")); return; }
+      if (action === "outgoings") { openDrawer(); focus(document.getElementById("budgetName")); return; }
+      if (action === "pot") { openDrawer(); focus(document.getElementById("savingsPot")); return; }
+      if (action === "goal") { setView("goals"); focus(document.getElementById("targetName")); return; }
+      if (action === "deposit") {
+        setView("goals");
+        const first = document.querySelector("[data-deposit-input]");
+        if (first) focus(first);
+        else focus(document.getElementById("targetName"));
+      }
+    }
+
     // A measured arc with real graduations — the pace rule bent round a
     // corner — rather than the usual donut gauge.
     function scoreDialSvg(score) {
@@ -4511,6 +4673,7 @@
       renderInvestments(savedTotal, investmentTotal, budget);
       renderAllocation(budget);
       renderNextStep(budget, paceTotal);
+      renderSetupChecklist();
       renderPaceScore();
       renderInsights();
       renderMilestones();
@@ -6295,6 +6458,7 @@
       var cur  = 0;
 
       window.__startTour = function () {
+        if (!bindTourDom()) return;
         try { localStorage.removeItem(SEEN); } catch (e) {}
         active = true;
         goTo(0);
@@ -6331,20 +6495,38 @@
           pos: 'above', drawer: null, view: 'goals', last: true }
       ];
 
-      var D = {
-        t:  document.getElementById('tourDimT'),
-        r:  document.getElementById('tourDimR'),
-        b:  document.getElementById('tourDimB'),
-        l:  document.getElementById('tourDimL'),
-        rg: document.getElementById('tourRing'),
-        tp: document.getElementById('tourTip'),
-        kk: document.getElementById('ttKicker'),
-        hh: document.getElementById('ttH'),
-        pp: document.getElementById('ttP'),
-        nx: document.getElementById('ttNext'),
-        sk: document.getElementById('ttSkip'),
-        ar: document.getElementById('ttArrow')
-      };
+      // The tour's markup sits AFTER this script block in the document, so
+      // resolving these at parse time returned null for every one of them.
+      // Because each use is guarded (`if (D.tp)`), the whole tour then failed
+      // silently with no console error — and the Next/Skip listeners below
+      // were never attached either. Bind lazily instead.
+      var D = {};
+
+      function bindTourDom() {
+        if (D.__bound) return D.__bound;
+        var ids = {
+          t: 'tourDimT', r: 'tourDimR', b: 'tourDimB', l: 'tourDimL',
+          rg: 'tourRing', tp: 'tourTip', kk: 'ttKicker', hh: 'ttH',
+          pp: 'ttP', nx: 'ttNext', sk: 'ttSkip', ar: 'ttArrow'
+        };
+        Object.keys(ids).forEach(function (k) { D[k] = document.getElementById(ids[k]); });
+        if (!D.tp) return false;
+
+        if (D.nx) D.nx.addEventListener('click', function () { goTo(cur + 1); });
+        if (D.sk) D.sk.addEventListener('click', endTour);
+        ['t', 'r', 'b', 'l'].forEach(function (k) {
+          if (D[k]) D[k].addEventListener('click', endTour);
+        });
+
+        D.__bound = true;
+        return true;
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindTourDom);
+      } else {
+        bindTourDom();
+      }
 
       function getEl(step) {
         var el = step.id ? document.getElementById(step.id) : document.querySelector(step.sel);
@@ -6476,15 +6658,11 @@
 
       function startTour() {
         if (localStorage.getItem(SEEN)) return;
+        if (!bindTourDom()) return;
         active = true;
         goTo(0);
       }
 
-      if (D.nx) D.nx.addEventListener('click', function () { goTo(cur + 1); });
-      if (D.sk) D.sk.addEventListener('click', endTour);
-      ['t','r','b','l'].forEach(function (k) {
-        if (D[k]) D[k].addEventListener('click', endTour);
-      });
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && active) endTour();
       });
