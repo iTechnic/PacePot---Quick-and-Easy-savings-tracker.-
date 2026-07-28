@@ -164,7 +164,22 @@
       --motion:      220ms;
       --motion-fast: 150ms;
       --ease:        cubic-bezier(0.16,1,0.3,1);
+
+      /* Fluid shell — the app widens with the screen instead of sitting in a
+         fixed 1080px column. Extra width becomes extra COLUMNS (goals, stats,
+         save list), not longer lines of text. */
+      --shell-max:   1080px;
+      --shell-pad:   32px;
+      --sidebar-w:   300px;
     }
+
+    /* Shell width ladder. Each step hands the layout more room so the grids
+       below can add a column instead of forcing more vertical scroll. */
+    @media (min-width: 1280px) { :root { --shell-max: 1200px; --shell-pad: 36px; --sidebar-w: 310px; } }
+    @media (min-width: 1500px) { :root { --shell-max: 1420px; --shell-pad: 40px; --sidebar-w: 320px; } }
+    @media (min-width: 1750px) { :root { --shell-max: 1660px; --shell-pad: 44px; --sidebar-w: 340px; } }
+    @media (min-width: 2000px) { :root { --shell-max: 1900px; --shell-pad: 48px; --sidebar-w: 360px; } }
+    @media (min-width: 2400px) { :root { --shell-max: 2200px; --shell-pad: 56px; --sidebar-w: 380px; } }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; }
     [hidden] { display: none !important; }
@@ -173,11 +188,13 @@
     /* ============================================================
        APP SHELL
        ============================================================ */
+    /* Ground: a faint measured grid rather than the usual pair of coloured
+       gradient blobs. Squared paper you plot a pace on. */
     body {
       min-height: 100vh;
       background:
-        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(16,185,129,.07) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(96,165,250,.05) 0%, transparent 55%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.016) 0 1px, transparent 1px 88px),
+        repeating-linear-gradient(180deg, rgba(255,255,255,.016) 0 1px, transparent 1px 88px),
         linear-gradient(170deg, #07111f 0%, #060c19 50%, #080f1d 100%);
       background-attachment: fixed;
       color: var(--ink);
@@ -186,7 +203,204 @@
 
     .app-shell {
       display: block;
-      min-height: 100dvh;
+      /* Header is a sibling above this, so subtract it — otherwise short
+         sections gain a phantom 60px and scroll for no reason. */
+      min-height: calc(100dvh - 60px);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ============================================================
+       CURSOR-LIT GRID
+       The same 88px ground grid drawn in accent green, revealed only
+       through a soft radial mask that follows the pointer. Both layers
+       are viewport-anchored, so the lit lines land exactly on the dim
+       ones. One element, one mask — no per-line DOM, no layout work.
+       ============================================================ */
+    .grid-glow, .landing-page::after {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0;
+      transition: opacity 500ms var(--ease);
+      background:
+        repeating-linear-gradient(90deg, var(--accent) 0 1px, transparent 1px 88px),
+        repeating-linear-gradient(180deg, var(--accent) 0 1px, transparent 1px 88px);
+      -webkit-mask-image: radial-gradient(circle 165px at var(--gx, -400px) var(--gy, -400px), #000 0%, rgba(0,0,0,.5) 46%, transparent 76%);
+              mask-image: radial-gradient(circle 165px at var(--gx, -400px) var(--gy, -400px), #000 0%, rgba(0,0,0,.5) 46%, transparent 76%);
+    }
+    .grid-lit .grid-glow, .grid-lit .landing-page::after { opacity: .28; }
+
+    /* Touch has no cursor to follow, and reduced-motion users should not get a
+       trailing light. Neither case even attaches the listeners. */
+    @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+      .grid-glow, .landing-page::after { display: none; }
+    }
+
+    /* ============================================================
+       SECTION RAIL + VIEWS
+       PacePot is a sectioned app, not one long page. Every section stays
+       in the DOM and is shown/hidden with a class, so render() keeps
+       updating all of it regardless of which view is on screen — no
+       rendering logic depends on visibility.
+       ============================================================ */
+    /* Full-height column so the footer can be pushed to the bottom rather than
+       floating wherever the current section happens to end. */
+    .app-body { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: stretch; min-height: calc(100dvh - 60px); }
+
+    .rail {
+      position: sticky; top: 60px; align-self: start;
+      display: flex; flex-direction: column; gap: 2px;
+      width: 208px; padding: 22px 12px 22px clamp(10px, 2vw, 22px);
+      max-height: calc(100dvh - 60px); overflow-y: auto;
+    }
+    .rail-label {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .62rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--faint); padding: 0 10px; margin-bottom: 8px;
+    }
+    .rail-btn {
+      position: relative;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      width: 100%; min-height: 38px; padding: 8px 11px;
+      background: transparent; border: 0; border-radius: var(--radius-xs);
+      color: var(--muted); font-size: .87rem; font-weight: 600; text-align: left;
+      cursor: pointer; box-shadow: none; transform: none; letter-spacing: -.01em;
+      transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
+    }
+    .rail-btn:hover { background: var(--surface-2); color: var(--ink); transform: none; box-shadow: none; }
+    /* The active section is marked with a graduation, matching the pace rule. */
+    .rail-btn[aria-current="page"] { background: var(--surface-3); color: var(--ink); }
+    .rail-btn[aria-current="page"]::before {
+      content: ""; position: absolute; left: -11px;
+      top: 9px; bottom: 9px; width: 2px; background: var(--accent);
+    }
+    .rail-count {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .68rem; font-weight: 600; color: var(--faint); font-variant-numeric: tabular-nums;
+    }
+    .rail-btn[aria-current="page"] .rail-count { color: var(--accent-strong); }
+
+    .view { display: none; }
+    .view.is-active { display: block; animation: viewIn 180ms var(--ease) both; }
+    @keyframes viewIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    /* Views hold content at a sane measure — width buys columns inside a view,
+       it never strands a lone panel in a wide empty band. */
+    /* ============================================================
+       INSIGHTS
+       ============================================================ */
+    .ins-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 0; margin-bottom: 26px; }
+    .ins-stat { padding: 14px 18px 4px; border-top: 1px solid var(--border-mid); border-left: 1px solid var(--border); min-width: 0; }
+    .ins-stat:first-child { border-left: 0; padding-left: 0; }
+    .ins-stat-label {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .62rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--faint); margin-bottom: 7px;
+    }
+    .ins-stat-value { font-size: 1.35rem; font-weight: 800; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .ins-stat-value.accent { color: var(--accent-strong); }
+    .ins-stat-value strong { font-weight: 800; color: var(--accent-strong); }
+    .ins-stat-sub { display: block; font-size: .74rem; font-weight: 600; color: var(--muted); letter-spacing: 0; margin-top: 3px; }
+
+    .ins-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 16px; }
+    .ins-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+    .ins-panel-head h4 { font-size: .96rem; font-weight: 700; margin: 0; }
+    .ins-panel-note {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .63rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--faint);
+    }
+
+    /* Momentum bars sit on a baseline rule, read as a measured chart. */
+    .ins-chart { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0,1fr); gap: 6px; align-items: end; height: 190px; border-bottom: 1px solid var(--border-mid); padding-bottom: 0; }
+    .ins-bar { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; min-width: 0; }
+    .ins-bar-track { flex: 1; display: flex; align-items: flex-end; }
+    .ins-bar-fill {
+      width: 100%; background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+      min-height: 0; transition: height 320ms var(--ease);
+    }
+    .ins-bar.is-empty .ins-bar-fill { background: var(--surface-3); }
+    .ins-bar.is-now .ins-bar-fill { background: linear-gradient(180deg, #6ee7b7, var(--accent-strong)); }
+    .ins-bar-label {
+      margin-top: 8px; text-align: center;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .6rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .ins-bar.is-now .ins-bar-label { color: var(--accent-strong); }
+    /* ---- Forecast timeline ---- */
+    .fc-control { margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+    .fc-control label {
+      display: block; margin-bottom: 10px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .62rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--faint);
+    }
+    .fc-slider-row { display: flex; align-items: center; gap: 16px; }
+    .fc-slider-row input[type=range] {
+      flex: 1; min-width: 0; height: 4px; padding: 0; margin: 0; -webkit-appearance: none; appearance: none;
+      background: var(--surface-3); border: 0; border-radius: 0; cursor: pointer; min-height: 0;
+    }
+    .fc-slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--accent); border: 2px solid #0b1425; box-shadow: 0 0 0 1px var(--accent); cursor: pointer;
+    }
+    .fc-slider-row input[type=range]::-moz-range-thumb {
+      width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid #0b1425; cursor: pointer;
+    }
+    .fc-extra-value {
+      min-width: 74px; text-align: right; font-size: 1rem; font-weight: 800;
+      color: var(--accent-strong); font-variant-numeric: tabular-nums; letter-spacing: -.02em;
+    }
+
+    .fc-row { display: grid; grid-template-columns: minmax(140px, 1.1fr) minmax(0, 2fr) minmax(110px, auto); gap: 16px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--border); }
+    .fc-row:last-of-type { border-bottom: 0; }
+    .fc-name { min-width: 0; }
+    .fc-name strong { display: block; font-size: .88rem; font-weight: 700; color: var(--ink); overflow-wrap: anywhere; }
+    .fc-name span { display: block; margin-top: 2px; font-size: .74rem; color: var(--muted); }
+    /* The bar runs to projected completion; the tick marks the deadline, so a
+       bar overshooting its tick is the whole story at a glance. */
+    .fc-track { position: relative; height: 8px; background: var(--surface-3); min-width: 0; }
+    .fc-bar { height: 100%; background: var(--accent); transition: width 260ms var(--ease); }
+    .fc-row.is-late .fc-bar { background: var(--amber); }
+    .fc-row.is-idle .fc-bar { background: repeating-linear-gradient(90deg, var(--border-strong) 0 4px, transparent 4px 8px); }
+    .fc-due { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink-soft); opacity: .75; }
+    .fc-verdict { text-align: right; }
+    .fc-verdict strong { display: block; font-size: .84rem; font-weight: 700; color: var(--ink); white-space: nowrap; }
+    .fc-verdict span {
+      display: block; margin-top: 2px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .62rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--faint);
+    }
+    .fc-row.is-late .fc-verdict span { color: var(--amber); }
+    .fc-legend {
+      display: flex; align-items: center; gap: 7px; margin-top: 14px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .6rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--faint);
+    }
+    .fc-legend-due { width: 2px; height: 12px; background: var(--ink-soft); opacity: .75; }
+    @media (max-width: 720px) {
+      .fc-row { grid-template-columns: minmax(0,1fr) auto; }
+      .fc-track { grid-column: 1 / -1; order: 3; }
+    }
+
+    .ins-projection { color: var(--ink-soft); font-size: .92rem; line-height: 1.6; }
+    .ins-projection strong { color: var(--accent-strong); font-weight: 700; }
+
+    .view-head { margin-bottom: 22px; }
+    .view-head h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.03em; margin: 0 0 5px; }
+    .view-head p { color: var(--muted); font-size: .88rem; line-height: 1.5; max-width: 60ch; }
+
+    /* Rail collapses to a horizontal strip on narrow screens. */
+    @media (max-width: 900px) {
+      .app-body { grid-template-columns: minmax(0,1fr); }
+      .rail {
+        position: sticky; top: 60px; z-index: 12;
+        flex-direction: row; width: auto; max-height: none; overflow-x: auto; overflow-y: hidden;
+        gap: 4px; padding: 10px clamp(14px, 4vw, 22px);
+        background: #070c18; border-bottom: 1px solid var(--border);
+      }
+      .rail-label { display: none; }
+      .rail-btn { width: auto; white-space: nowrap; min-height: 40px; justify-content: flex-start; }
+      .rail-btn[aria-current="page"]::before { left: 0; right: 0; top: auto; bottom: -10px; width: auto; height: 2px; margin-left: 0; }
     }
 
     /* ============================================================
@@ -401,7 +615,9 @@
     /* ============================================================
        MAIN AREA
        ============================================================ */
-    main { max-width: 1080px; margin: 0 auto; padding: 48px 32px 60px; }
+    /* width:100% + margin:0 (not `margin:0 auto`) — auto inline margins on a
+       grid item cancel stretch and shrink it to content width. */
+    main { width: 100%; max-width: var(--shell-max); margin: 0; padding: clamp(28px, 3vw, 48px) var(--shell-pad) 48px; display: flex; flex-direction: column; }
 
     /* ============================================================
        TOOLBAR
@@ -410,12 +626,16 @@
     .toolbar h3 { font-size: clamp(2rem, 3.2vw, 3rem); font-weight: 900; letter-spacing: -.04em; line-height: 1.05; margin: 0; color: var(--ink); }
     .motto { margin: 8px 0 0; color: var(--muted); font-size: .94rem; font-weight: 500; line-height: 1.6; max-width: 480px; }
     .seo-intro { max-width: 640px; margin: 6px 0 0; color: var(--faint); font-size: .85rem; line-height: 1.5; }
+    /* Annotated off a short datum stub rather than sitting in a pill. */
     .privacy-note {
-      display: inline-flex; align-items: center; gap: 7px; margin-top: 10px;
-      padding: 5px 11px; border: 1px solid var(--border-mid); border-radius: var(--radius-full);
-      background: var(--surface); color: var(--muted); font-size: .76rem; font-weight: 600; box-shadow: var(--shadow-xs);
+      display: inline-flex; align-items: center; gap: 9px; margin-top: 12px;
+      color: var(--muted); font-size: .76rem; font-weight: 600;
     }
-    .privacy-note::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); flex-shrink: 0; }
+    .privacy-note::before {
+      content: ""; width: 26px; height: 7px; flex-shrink: 0;
+      background: repeating-linear-gradient(90deg, var(--accent) 0 1px, transparent 1px 6px);
+      opacity: .55;
+    }
 
     /* ============================================================
        ACTIONS
@@ -484,6 +704,10 @@
        SUMMARY STRIP
        ============================================================ */
     .summary-strip { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 28px; }
+    /* Wider screens fit more stats per row, so the strip gets shorter rather
+       than the tiles getting wider. Heroes keep their 2-column dominance. */
+    @media (min-width: 1500px) { .summary-strip { grid-template-columns: repeat(6, minmax(0,1fr)); } }
+    @media (min-width: 2000px) { .summary-strip { grid-template-columns: repeat(8, minmax(0,1fr)); } }
     .summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow-xs); min-height: 92px; position: relative; overflow: hidden; transition: transform var(--motion) var(--ease), box-shadow var(--motion) var(--ease), border-color var(--motion) var(--ease); }
     .summary:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: rgba(13,27,46,.14); }
     .summary::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(180deg, var(--accent), rgba(5,150,105,.15)); opacity: .5; border-radius: var(--radius) 0 0 var(--radius); }
@@ -491,10 +715,23 @@
     .summary .value { font-size: clamp(1.15rem, 1.7vw, 1.5rem); font-weight: 900; line-height: 1.05; overflow-wrap: anywhere; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
     /* Hero metrics dominate the first row; secondary stats sit compact below */
     .summary-strip .summary--hero { grid-column: span 2; }
-    .summary--compact { padding: 13px 16px; min-height: 64px; }
-    .summary--compact .label { margin-bottom: 5px; font-size: .68rem; }
-    .summary--compact .value { font-size: clamp(.98rem, 1.3vw, 1.18rem); }
-    .summary--compact::before { opacity: .25; }
+    /* Secondary stats stop being nine boxes competing with the two that matter.
+       They become readings hung under a shared rule — present when you look for
+       them, silent when you don't. */
+    .summary--compact {
+      background: none; border: 0; border-top: 1px solid var(--border-mid);
+      border-radius: 0; box-shadow: none;
+      padding: 12px 14px 2px 0; min-height: 0;
+    }
+    .summary--compact::before { display: none; }
+    .summary--compact:hover { transform: none; box-shadow: none; border-color: var(--border-strong); }
+    .summary--compact .label {
+      margin-bottom: 6px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .62rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--faint);
+    }
+    .summary--compact .value { font-size: clamp(.98rem, 1.3vw, 1.18rem); font-variant-numeric: tabular-nums; }
     .summary-strip .summary--hero {
       border-color: rgba(16,185,129,.28);
       border-width: 1.5px;
@@ -561,10 +798,44 @@
     .allocation-row > strong { font-weight: 800; color: var(--accent-strong); font-size: .96rem; white-space: nowrap; }
     .allocation-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 12px; flex-wrap: wrap; }
 
+    /* ---- Smart split rows ---- */
+    .alloc-row {
+      display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 14px; align-items: center;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+    }
+    .alloc-row:last-of-type { border-bottom: 0; }
+    .alloc-main { min-width: 0; }
+    .alloc-main strong { display: block; font-size: .9rem; font-weight: 700; color: var(--ink); overflow-wrap: anywhere; }
+    .alloc-why {
+      display: block; margin-top: 3px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .62rem; font-weight: 600; letter-spacing: .11em; text-transform: uppercase; color: var(--faint);
+    }
+    .alloc-amount { display: flex; align-items: center; gap: 5px; }
+    .alloc-currency { color: var(--muted); font-size: .86rem; font-weight: 700; }
+    .alloc-amount input {
+      width: 104px; min-height: 38px; padding: 7px 10px; text-align: right;
+      font-weight: 700; font-variant-numeric: tabular-nums; margin: 0;
+    }
+    .alloc-total {
+      display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap;
+      margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--border-mid);
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .64rem; font-weight: 600; letter-spacing: .11em; text-transform: uppercase; color: var(--faint);
+    }
+    .alloc-total strong {
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 1.15rem; font-weight: 800; letter-spacing: -.03em; color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+    .alloc-total .alloc-note { letter-spacing: .08em; }
+    .alloc-total.is-exact strong, .alloc-total.is-exact .alloc-note { color: var(--accent-strong); }
+    .alloc-total.is-over strong, .alloc-total.is-over .alloc-note { color: var(--amber); }
+
     /* ============================================================
        WORKSPACE
        ============================================================ */
-    .workspace { display: grid; grid-template-columns: minmax(260px, 300px) minmax(0,1fr); gap: 20px; align-items: start; }
+    .workspace { display: grid; grid-template-columns: minmax(260px, var(--sidebar-w)) minmax(0,1fr); gap: clamp(18px, 1.6vw, 28px); align-items: start; }
     .setup-column { display: grid; gap: 16px; }
     .targets-zone { min-width: 0; }
 
@@ -623,7 +894,16 @@
     .filter-btn:hover { background: var(--surface); color: var(--ink); box-shadow: none; transform: none; }
     .filter-btn.active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-xs); border-color: var(--border-mid); }
 
-    .targets { display: grid; gap: 12px; }
+    /* Goals flow into as many columns as the screen can hold. min(100%, 540px)
+       keeps a single column on narrow screens without overflowing. */
+    /* Goals go two-up on big screens. Measured: two wide columns scroll less
+       than three narrow ones, because narrow cards stack their internals and
+       grow taller than the row they save. So this deliberately caps at 2. */
+    .targets { display: grid; gap: 14px; grid-template-columns: minmax(0,1fr); align-items: start; }
+    @media (min-width: 1600px) { .targets { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; } }
+    /* Each card sizes its own internals — see the @container rules after the
+       target-card block below. */
+    .target-card { container-type: inline-size; }
 
     /* ============================================================
        TARGET CARDS
@@ -648,6 +928,29 @@
     .target-full { display: grid; grid-template-columns: minmax(180px,220px) minmax(0,1fr); gap: 20px; align-items: start; padding: 20px; max-height: 2000px; opacity: 1; overflow: visible; transition: max-height 300ms var(--ease), opacity 220ms var(--ease), padding 220ms var(--ease); }
     .target-card.is-collapsed .target-full { max-height: 0; opacity: 0; overflow: hidden; pointer-events: none; visibility: hidden; padding-top: 0; padding-bottom: 0; }
     .target-details { min-width: 0; }
+
+    /* Card-level responsiveness. When goals sit in a multi-column grid each card
+       is too narrow for the side-by-side viz, so it stacks — independent of the
+       viewport, so it stays correct at any column count. Must come after
+       .target-full above to win on source order. */
+    /* Only truly narrow cards stack. Measured: the two-up layout is ~240px
+       shorter per card even at 594px wide, because the viz sits beside the
+       details instead of on top of them. */
+    @container (max-width: 520px) {
+      .target-full { grid-template-columns: minmax(0,1fr); gap: 16px; }
+      .progress-viz { min-height: 0; padding: 16px 18px; }
+      .progress-score strong { font-size: clamp(2.6rem, 11cqi, 3.6rem); }
+    }
+    /* Mid-width cards keep two-up but the viz column gives ground so the
+       details beside it are not crushed. */
+    @container (min-width: 521px) and (max-width: 780px) {
+      .target-full { grid-template-columns: minmax(140px, 175px) minmax(0,1fr); gap: 14px; padding: 18px; }
+      .progress-viz { min-height: 0; padding: 16px; }
+      .progress-score strong { font-size: clamp(2.2rem, 7cqi, 3rem); }
+    }
+    @container (max-width: 470px) {
+      .target-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
 
     /* ============================================================
        PROGRESS VIZ
@@ -678,6 +981,19 @@
     .pill.warn { background: var(--amber-soft); color: var(--amber); }
     .pill.complete { background: rgba(5,150,105,.1); color: var(--accent-strong); border: 1px solid rgba(5,150,105,.2); }
     .pill.priority { background: var(--surface-3); color: var(--muted); border: 1px solid var(--border-mid); }
+    /* Goal position, stated as a signed distance from the pace — same device as
+       the landing hero. Monospace so the figures line up down a column of
+       goals, and the wording carries the meaning without relying on colour. */
+    .goal-delta {
+      display: inline-flex; align-items: center; white-space: nowrap;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .72rem; font-weight: 600; letter-spacing: -.01em;
+      color: var(--muted); padding-left: 10px; border-left: 1px solid var(--border-mid);
+      font-variant-numeric: tabular-nums;
+    }
+    .goal-delta.ahead { color: var(--accent-strong); }
+    .goal-delta.warn { color: var(--amber); }
+    .goal-delta.complete { color: var(--accent-strong); }
     .target-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
     .mini-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 13px; min-width: 0; transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease); }
     .mini-stat:hover { box-shadow: var(--shadow-xs); border-color: rgba(5,150,105,.18); }
@@ -863,7 +1179,10 @@
     /* ============================================================
        FOOTER
        ============================================================ */
-    .site-footer { display: grid; justify-items: center; text-align: center; gap: 10px; margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; }
+    /* margin-top:auto pins the footer to the bottom of the column, so it lands
+       in the same place whether a section is short or tall. Views differ in
+       height by ~1000px, which is what made it jump. */
+    .site-footer { display: grid; justify-items: center; text-align: center; gap: 10px; margin-top: auto; padding-top: 22px; border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; }
     .footer-links { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
     .footer-link { min-height: auto; padding: 0; border: 0; background: transparent; color: var(--muted); box-shadow: none; font-size: .8rem; font-weight: 400; letter-spacing: 0; line-height: 1.5; text-decoration: underline; text-underline-offset: 3px; border-radius: 3px; }
     a.footer-link, a.footer-link:visited { color: var(--muted); }
@@ -883,11 +1202,9 @@
       gap: 16px;
       padding: 0 28px;
       height: 60px;
-      background: rgba(7,12,24,.82);
-      backdrop-filter: blur(22px) saturate(1.4);
-      -webkit-backdrop-filter: blur(22px) saturate(1.4);
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 2px 20px rgba(0,0,0,.35);
+      /* Solid, with the datum line beneath it — not a frosted glass bar. */
+      background: #070c18;
+      border-bottom: 1px solid rgba(255,255,255,.10);
     }
     .app-brand {
       display: flex;
@@ -968,6 +1285,60 @@
       padding: 20px 22px 14px;
       border-bottom: 1px solid var(--border);
     }
+    /* ------------------------------------------------------------------
+       BUDGET DRAWER GROUPS
+       The drawer used to be one undifferentiated column of fields. It now
+       answers three separate questions in order — what comes in, what goes
+       in and out, what you set aside — then shows the result with weight.
+       ------------------------------------------------------------------ */
+    .bgroup { padding: 0 0 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .bgroup:last-of-type { border-bottom: 0; }
+    .bgroup-label {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .63rem; font-weight: 600; letter-spacing: .13em; text-transform: uppercase;
+      color: var(--accent-strong); margin-bottom: 13px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .bgroup-label::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .16; }
+
+    /* The result: the one number the form exists to produce. */
+    .bresult {
+      padding: 16px 16px 14px; margin-bottom: 20px;
+      border: 1px solid rgba(16,185,129,.28); border-radius: var(--radius);
+      background: rgba(16,185,129,.07);
+    }
+    .bresult-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .bresult-label {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .63rem; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; color: var(--accent-strong);
+    }
+    .bresult-head strong { font-size: 1.5rem; font-weight: 800; letter-spacing: -.035em; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+    .bresult .subtle { margin-top: 12px; font-size: .8rem; }
+
+    /* Set-once settings, folded away from the monthly workflow. */
+    .bgroup-quiet { border-bottom: 0; padding-bottom: 0; }
+    .bgroup-quiet > summary {
+      list-style: none; cursor: pointer; padding: 11px 0;
+      font-size: .82rem; font-weight: 600; color: var(--muted);
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid var(--border);
+    }
+    .bgroup-quiet > summary::-webkit-details-marker { display: none; }
+    .bgroup-quiet > summary::after { content: "+"; font-size: 1rem; color: var(--faint); }
+    .bgroup-quiet[open] > summary::after { content: "\2212"; }
+    .bgroup-quiet > summary:hover { color: var(--ink); }
+    .bgroup-body { padding-top: 6px; }
+
+    /* Split in/out groups inside the item list. */
+    .budget-group + .budget-group { margin-top: 14px; }
+    .budget-group-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      margin-bottom: 7px; padding-bottom: 5px; border-bottom: 1px solid var(--border);
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .62rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--faint);
+    }
+    .budget-group-total { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
     .drawer-kicker {
       display: block;
       font-size: .7rem;
@@ -1071,8 +1442,14 @@
     .ob-mark { width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; overflow: hidden; }
     .ob-headline { font-size: clamp(1.4rem,3.5vw,1.85rem); font-weight: 900; letter-spacing: -.03em; line-height: 1.1; color: var(--ink); text-transform: none; }
     .ob-sub { color: var(--muted); font-size: .93rem; line-height: 1.6; margin-top: 8px; }
-    .ob-trust { display: flex; flex-wrap: wrap; gap: 8px 10px; }
-    .ob-trust span { font-size: .78rem; font-weight: 600; color: var(--muted); padding: 4px 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-full); }
+    /* Onboarding facts use the same dimension-callout device as the landing
+       hero, so the pace rule reads as one language across the product. */
+    .ob-trust { position: relative; padding-top: 1px; }
+    .ob-trust::before { content: ""; display: block; height: 1px; background: var(--border-mid); }
+    .ob-trust ul { display: flex; flex-wrap: wrap; gap: 10px 26px; list-style: none; margin: 0; padding: 0; }
+    .ob-trust li { position: relative; padding-top: 14px; font-size: .77rem; font-weight: 600; color: var(--muted); }
+    .ob-trust li::before { content: ""; position: absolute; left: 0; top: 0; width: 1px; height: 9px; background: var(--accent); opacity: .5; }
+    .ob-trust li::after { content: ""; position: absolute; left: -1px; top: -2px; width: 3px; height: 3px; background: var(--accent); }
     .ob-btn { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: var(--radius-sm); font-size: .95rem; font-weight: 800; cursor: pointer; transition: all var(--motion-fast) var(--ease); border: 0; width: 100%; font-family: inherit; }
     .ob-btn-primary { background: var(--ink); color: #070c18; box-shadow: 0 4px 14px rgba(15,23,42,.18); }
     .ob-btn-primary:hover { background: #1e293b; color: #f1f5f9; transform: translateY(-1px); box-shadow: var(--shadow-lift); }
@@ -1108,24 +1485,23 @@
       overflow-y: auto;
       background: var(--bg);
     }
+    /* Squared paper behind the landing page, matching the app ground. */
     .landing-page::before {
       content: "";
       position: absolute;
-      top: -180px; left: 50%;
-      transform: translateX(-50%);
-      width: 860px; height: 560px;
-      background: radial-gradient(ellipse, rgba(16,185,129,.09) 0%, transparent 68%);
+      inset: 0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 88px),
+        repeating-linear-gradient(180deg, rgba(255,255,255,.018) 0 1px, transparent 1px 88px);
       pointer-events: none; z-index: 0;
     }
     .landing-nav {
       position: sticky; top: 0; z-index: 91;
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       padding: 0 clamp(20px,5vw,60px); height: 62px;
-      background: rgba(7,12,24,.82);
-      backdrop-filter: blur(22px) saturate(1.4);
-      -webkit-backdrop-filter: blur(22px) saturate(1.4);
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 2px 20px rgba(0,0,0,.35);
+      /* Solid, with the datum line beneath it — not a frosted glass bar. */
+      background: #070c18;
+      border-bottom: 1px solid rgba(255,255,255,.10);
     }
     .landing-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; text-decoration: none; }
     .lp-brand-name { font-size: 1.05rem; font-weight: 900; letter-spacing: -.03em; color: var(--ink); }
@@ -1152,16 +1528,22 @@
       max-width: 1100px; margin: 0 auto;
       padding: 88px clamp(20px,5vw,60px) 72px;
     }
+    /* ------------------------------------------------------------------
+       THE PACE RULE (landing) — see seo-page.css for the shared rationale.
+       A tick scale, the label, then the datum line running out to the edge.
+       ------------------------------------------------------------------ */
     .lp-kicker {
-      display: inline-flex; align-items: center; gap: 7px; margin-bottom: 20px;
-      padding: 4px 13px; background: rgba(16,185,129,.11); border: 1px solid rgba(16,185,129,.22);
-      border-radius: var(--radius-full); color: var(--accent-strong);
-      font-size: .71rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 11px; margin-bottom: 22px;
+      color: var(--accent-strong);
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .68rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
     }
     .lp-kicker::before {
-      content: ""; width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent); box-shadow: 0 0 8px var(--accent); flex-shrink: 0;
+      content: ""; flex: none; width: 38px; height: 8px;
+      background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 7px);
+      opacity: .55;
     }
+    .lp-kicker::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .16; }
     .lp-h1 {
       font-size: clamp(2.2rem,4.8vw,3.8rem); font-weight: 900;
       letter-spacing: -.045em; line-height: 1.04; color: var(--ink); margin: 0 0 20px;
@@ -1188,71 +1570,99 @@
       transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
     }
     .lp-cta-ghost:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.18); }
-    .lp-trust { display: flex; flex-wrap: wrap; gap: 8px; }
-    .lp-trust-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 4px 12px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
-      border-radius: var(--radius-full); color: var(--muted); font-size: .76rem; font-weight: 600;
+    /* Facts are annotated off the datum line like dimensions on a technical
+       drawing: a leader dropping from the line, a square node where it meets.
+       Square nodes, never glowing circles — that is the whole point. */
+    .lp-trust { position: relative; padding-top: 1px; }
+    .lp-trust::before { content: ""; display: block; height: 1px; background: rgba(255,255,255,.14); }
+    .lp-callouts { display: flex; flex-wrap: wrap; gap: clamp(16px, 3.4vw, 40px); list-style: none; margin: 0; padding: 0; }
+    .lp-callouts li {
+      position: relative; padding-top: 15px;
+      color: var(--muted); font-size: .78rem; font-weight: 600; letter-spacing: -.005em;
     }
-    .lp-trust-pill::before {
-      content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
+    .lp-callouts li::before {
+      content: ""; position: absolute; left: 0; top: 0; width: 1px; height: 10px;
+      background: var(--accent); opacity: .5;
+    }
+    .lp-callouts li::after {
+      content: ""; position: absolute; left: -1px; top: -2px; width: 3px; height: 3px; background: var(--accent);
     }
 
     /* Hero visual */
     .lp-hero-visual { position: relative; display: flex; flex-direction: column; gap: 14px; }
+    /* Goal readouts: flat and measured. No blur, no glow, no status pills —
+       position is stated as a signed delta against the pace, which is the one
+       number the product actually exists to give you. */
     .lp-preview-card {
-      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.11);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border-radius: var(--radius); padding: 20px 22px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.09);
+      background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius-sm); padding: 18px 20px;
     }
-    .lp-card-secondary {
-      margin-left: 28px; opacity: .82; transform: scale(.96); transform-origin: top left;
-    }
-    .lp-card-row { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
-    .lp-card-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .lp-card-dot.green { background: #34d399; box-shadow: 0 0 8px rgba(52,211,153,.55); }
-    .lp-card-dot.amber { background: #fbbf24; box-shadow: 0 0 8px rgba(251,191,36,.45); }
+    .lp-card-secondary { margin-left: 28px; }
+    .lp-card-row { display: flex; align-items: baseline; gap: 11px; margin-bottom: 12px; }
     .lp-card-name { font-size: .85rem; font-weight: 700; color: var(--ink); flex: 1; }
-    .lp-card-badge {
-      font-size: .67rem; font-weight: 700; padding: 2px 9px; border-radius: var(--radius-full);
-      background: rgba(52,211,153,.14); color: #34d399; white-space: nowrap;
+    .lp-delta {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .72rem; font-weight: 600; white-space: nowrap; color: var(--accent-strong);
+      padding-left: 11px; border-left: 1px solid rgba(255,255,255,.14);
     }
-    .lp-card-badge.warn { background: rgba(251,191,36,.14); color: #fbbf24; }
+    .lp-delta.warn { color: var(--amber); }
     .lp-card-amount {
       font-size: 1.4rem; font-weight: 800; letter-spacing: -.035em; color: var(--ink); margin-bottom: 11px;
+      font-variant-numeric: tabular-nums;
     }
     .lp-card-amount span { font-size: .8rem; font-weight: 600; color: var(--muted); }
-    .lp-progress-bar { height: 5px; background: rgba(255,255,255,.08); border-radius: 99px; overflow: hidden; margin-bottom: 9px; }
-    .lp-progress-fill { height: 100%; background: linear-gradient(90deg, #059669, #34d399); border-radius: inherit; }
-    .lp-progress-fill.amber { background: linear-gradient(90deg, #b45309, #fbbf24); }
-    .lp-card-meta { font-size: .79rem; color: var(--muted); font-weight: 600; }
-    .lp-safe-chip {
-      align-self: flex-end; display: inline-flex; align-items: center; gap: 12px;
-      padding: 10px 18px; background: rgba(16,185,129,.11); border: 1px solid rgba(16,185,129,.22);
-      border-radius: var(--radius-sm); backdrop-filter: blur(16px);
-      box-shadow: 0 4px 22px rgba(16,185,129,.13);
+    /* A measure bar with quarter graduations, not a rounded gradient pill. */
+    .lp-progress-bar { position: relative; height: 4px; background: rgba(255,255,255,.07); margin-bottom: 10px; }
+    .lp-progress-fill { height: 100%; background: var(--accent); }
+    .lp-progress-fill.amber { background: var(--amber); }
+    .lp-progress-bar::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px), rgba(255,255,255,.2) calc(25% - 1px) 25%);
     }
-    .lp-chip-label { font-size: .71rem; font-weight: 700; color: var(--accent); letter-spacing: .07em; text-transform: uppercase; }
-    .lp-chip-value { font-size: 1rem; font-weight: 800; color: var(--accent-strong); }
+    .lp-card-meta { font-size: .79rem; color: var(--muted); font-weight: 600; }
+    /* The headline figure, annotated off a datum stub. */
+    .lp-safe-chip {
+      align-self: flex-end; display: flex; align-items: baseline; gap: 12px;
+      padding: 11px 0 0; border-top: 1px solid rgba(16,185,129,.3);
+    }
+    .lp-chip-label {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .66rem; font-weight: 600; color: var(--accent); letter-spacing: .14em; text-transform: uppercase;
+    }
+    .lp-chip-value { font-size: 1.05rem; font-weight: 800; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
 
-    /* Features */
+    /* Features are four measured divisions along one rule, not four floating
+       cards with icon tiles. Each division is marked by a major graduation and
+       an index number, read like a label on a scale. */
     .lp-features {
       position: relative; z-index: 1;
-      display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px;
+      display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 0;
       max-width: 1100px; margin: 0 auto; padding: 0 clamp(20px,5vw,60px) 56px;
+      counter-reset: feat;
     }
     .lp-feature {
-      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius); padding: 26px 22px; backdrop-filter: blur(8px);
-      transition: background var(--motion) var(--ease), border-color var(--motion) var(--ease), transform var(--motion) var(--ease);
+      counter-increment: feat;
+      position: relative;
+      padding: 28px 26px 0;
+      border-top: 1px solid rgba(255,255,255,.13);
+      border-left: 1px solid rgba(255,255,255,.07);
     }
-    .lp-feature:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.13); transform: translateY(-3px); box-shadow: var(--shadow-sm); }
-    .lp-feature-icon {
-      width: 40px; height: 40px; border-radius: 11px;
-      background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.22);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--accent-strong); margin-bottom: 16px;
+    .lp-feature:first-child { border-left: 0; padding-left: 0; }
+    /* Major graduation sitting on the rule. */
+    .lp-feature::before {
+      content: ""; position: absolute; top: -1px; left: -1px; width: 30px; height: 2px;
+      background: var(--accent);
+      transition: width var(--motion) var(--ease);
+    }
+    .lp-feature:first-child::before { left: 0; }
+    .lp-feature:hover::before { width: 58px; }
+    /* The index, set like a measurement label. */
+    .lp-feature::after {
+      content: counter(feat, decimal-leading-zero);
+      position: absolute; top: 15px; right: 22px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .67rem; font-weight: 600; letter-spacing: .1em;
+      color: var(--accent-strong); opacity: .45;
     }
     .lp-feature h3 { font-size: .93rem; font-weight: 700; color: var(--ink); margin: 0 0 7px; line-height: 1.3; }
     .lp-feature p { font-size: .84rem; color: var(--muted); line-height: 1.6; margin: 0; }
@@ -1401,55 +1811,116 @@
        SAVE LIST
        ============================================================ */
     .save-list-section { margin: 28px 0 32px; }
-    .sl-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    /* A control belongs beside the thing it controls. space-between across a
+       wide container flung "Add item" over 1200px from its own heading, which
+       is how you lose a button on a big monitor. */
+    .sl-section-head { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; flex-wrap: wrap; }
+    .sl-section-head > div { flex: 0 1 auto; }
     .sl-section-head h4 { font-size: 1rem; font-weight: 700; letter-spacing: -.01em; margin-bottom: 2px; }
     .sl-section-desc { color: var(--muted); font-size: .82rem; line-height: 1.4; }
     .sl-form-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 14px; }
     .sl-form-wrap form { display: grid; gap: 12px; }
     .sl-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .sl-form-actions { display: flex; gap: 8px; }
-    .sl-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; margin-bottom: 14px; }
-    .sl-stat { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; }
-    .sl-stat-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 4px; }
-    .sl-stat-value { font-size: 1.05rem; font-weight: 800; color: var(--ink); }
+    /* Totals read as four divisions on one rule — the same measured device as
+       the landing features, so the list feels part of the instrument. */
+    .sl-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0; margin-bottom: 16px; }
+    .sl-stat {
+      min-width: 0; padding: 13px 16px 2px;
+      border-top: 1px solid var(--border-mid);
+      border-left: 1px solid var(--border);
+    }
+    .sl-stat:first-child { border-left: 0; padding-left: 0; }
+    .sl-stat-label {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .63rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em;
+      color: var(--faint); margin-bottom: 6px;
+    }
+    .sl-stat-value { font-size: 1.2rem; font-weight: 800; color: var(--ink); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
     .sl-stat-value.accent { color: var(--accent-strong); }
     .sl-planner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; align-items: center; }
     .sl-planner-col { min-width: 0; }
-    .sl-planner-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 4px; }
+    .sl-planner-label {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .63rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em;
+      color: var(--faint); margin-bottom: 5px;
+    }
     .sl-planner-value { font-size: .9rem; font-weight: 700; color: var(--ink); }
     .sl-date-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .sl-date-row label { font-size: .78rem; color: var(--muted); font-weight: 600; white-space: nowrap; }
     .sl-date-row input[type=date] { font-size: .83rem; padding: 5px 9px; border-radius: var(--radius-xs); border: 1px solid var(--border-mid); background: var(--field); color: var(--ink); }
     .sl-date-result { font-size: .88rem; font-weight: 700; color: var(--accent-strong); white-space: nowrap; }
-    .sl-items { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
-    .sl-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; display: flex; gap: 11px; align-items: flex-start; transition: border-color var(--motion-fast); }
-    .sl-item:hover { border-color: var(--border-mid); }
-    .sl-item.sl-purchased { opacity: .5; }
+    .sl-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 8px; margin-bottom: 14px; align-items: start; }
+    /* ------------------------------------------------------------------
+       SAVE LIST ITEM — rebuilt for hierarchy. The price is the number you
+       actually scan for, so it dominates. Priority is a graduation down the
+       left edge rather than a third pill, and the meta line drops to quiet
+       monospace, so one glance gives you item + cost and nothing competes.
+       ------------------------------------------------------------------ */
+    .sl-item {
+      position: relative;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 15px 16px 14px 19px;
+      display: grid;
+      grid-template-columns: auto minmax(0,1fr) auto;
+      grid-template-areas: "check name price" "check meta actions" "check note note" "check link link";
+      column-gap: 12px; row-gap: 5px; align-items: baseline;
+      transition: border-color var(--motion-fast), background var(--motion-fast);
+    }
+    /* Priority as a graduation on the edge, weighted like a scale mark. */
+    .sl-item::before {
+      content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 2px;
+      background: var(--sl-mark, var(--border-strong));
+    }
+    .sl-item.p-need  { --sl-mark: var(--amber); }
+    .sl-item.p-want  { --sl-mark: var(--accent); }
+    .sl-item.p-maybe { --sl-mark: var(--border-strong); }
+    .sl-item:hover { border-color: var(--border-mid); background: var(--surface-3); }
+    .sl-item.sl-purchased { opacity: .45; }
     .sl-item.sl-purchased .sl-item-name { text-decoration: line-through; }
-    .sl-check { flex-shrink: 0; margin-top: 3px; width: 17px; height: 17px; appearance: none; -webkit-appearance: none; border: 1.5px solid var(--border-strong); border-radius: 4px; background: var(--field); cursor: pointer; display: grid; place-content: center; transition: background var(--motion-fast), border-color var(--motion-fast); min-height: unset; padding: 0; }
+    .sl-check {
+      grid-area: check; align-self: start; margin-top: 2px;
+      width: 16px; height: 16px; appearance: none; -webkit-appearance: none;
+      border: 1.5px solid var(--border-strong); border-radius: 2px; background: var(--field);
+      cursor: pointer; display: grid; place-content: center;
+      transition: background var(--motion-fast), border-color var(--motion-fast); min-height: unset; padding: 0;
+    }
     .sl-check:checked { background: var(--accent); border-color: var(--accent); }
     .sl-check:checked::after { content:''; width: 5px; height: 9px; border: 2px solid #fff; border-top: 0; border-left: 0; transform: rotate(45deg) translate(-.5px, -1px); }
-    .sl-item-body { flex: 1; min-width: 0; }
-    .sl-item-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
-    .sl-item-name { font-weight: 700; font-size: .9rem; color: var(--ink); }
-    .sl-price { font-size: .9rem; font-weight: 800; color: var(--accent-strong); margin-left: auto; white-space: nowrap; }
-    .sl-meta { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-bottom: 3px; }
-    .sl-badge { display: inline-flex; align-items: center; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 2px 7px; border-radius: var(--radius-full); line-height: 1.6; }
-    .sl-need { background: rgba(251,191,36,.15); color: var(--amber); }
-    .sl-want { background: rgba(96,165,250,.13); color: var(--blue); }
-    .sl-maybe { background: rgba(118,148,173,.13); color: var(--muted); }
-    .sl-cat { background: rgba(255,255,255,.06); color: var(--muted); border: 1px solid var(--border); }
-    .sl-added { font-size: .7rem; color: var(--faint); }
-    .sl-note { font-size: .8rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
-    .sl-link { display: inline-flex; align-items: center; gap: 4px; font-size: .77rem; color: var(--blue); text-decoration: none; margin-top: 3px; overflow-wrap: anywhere; }
+    .sl-item-name { grid-area: name; font-weight: 700; font-size: .93rem; color: var(--ink); line-height: 1.3; overflow-wrap: anywhere; }
+    .sl-price {
+      grid-area: price; font-size: 1.18rem; font-weight: 800; color: var(--ink);
+      letter-spacing: -.03em; white-space: nowrap; font-variant-numeric: tabular-nums;
+    }
+    /* Quiet monospace meta — category, priority and date on one measured line. */
+    .sl-meta {
+      grid-area: meta; display: flex; flex-wrap: wrap; align-items: center; gap: 3px 0;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .64rem; font-weight: 600; letter-spacing: .11em; text-transform: uppercase;
+      color: var(--faint);
+    }
+    /* Hairline graduations between readings, not bullet dots. */
+    .sl-meta > span + span { margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--border-mid); }
+    .sl-prio { color: var(--sl-mark); }
+    .sl-note { grid-area: note; font-size: .81rem; color: var(--muted); line-height: 1.45; }
+    .sl-link { grid-area: link; display: inline-flex; align-items: center; gap: 5px; font-size: .77rem; color: var(--blue); text-decoration: none; justify-self: start; overflow-wrap: anywhere; }
     .sl-link:hover { text-decoration: underline; }
-    .sl-item-btns { flex-shrink: 0; display: flex; gap: 6px; align-items: flex-start; }
+    /* Actions stay out of the way until you reach for them. Always visible on
+       touch, where there is no hover to reveal them. */
+    .sl-item-btns {
+      grid-area: actions; display: flex; gap: 6px; align-items: center; justify-self: end;
+      opacity: 0; transition: opacity var(--motion-fast) var(--ease);
+    }
+    .sl-item:hover .sl-item-btns, .sl-item:focus-within .sl-item-btns { opacity: 1; }
+    @media (hover: none) { .sl-item-btns { opacity: 1; } }
     .sl-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; min-height: 28px; padding: 4px 10px; border-radius: var(--radius-xs); font-size: .76rem; font-weight: 600; letter-spacing: 0; transition: color var(--motion-fast), background var(--motion-fast), border-color var(--motion-fast); box-shadow: none; transform: none; }
     .sl-btn:hover { color: var(--ink); background: var(--surface-3); border-color: var(--border-strong); transform: none; box-shadow: none; }
     .sl-btn.sl-remove:hover { color: var(--red); border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); }
     .sl-more-btn { width: 100%; min-height: 34px; background: var(--surface); border: 1px dashed var(--border-mid); color: var(--muted); font-size: .8rem; font-weight: 600; letter-spacing: 0; border-radius: var(--radius-sm); box-shadow: none; }
     .sl-more-btn:hover { color: var(--ink); background: var(--surface-2); border-color: var(--border-strong); transform: none; box-shadow: none; }
-    .sl-empty { text-align: center; padding: 28px 16px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+    /* Empty states must span every column, or they sit stranded in one narrow
+       cell with the rest of the grid empty beside them. */
+    .sl-empty { grid-column: 1 / -1; text-align: center; padding: 34px 16px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
     .sl-empty strong { font-size: .94rem; color: var(--ink-soft); display: block; }
     .sl-empty p { font-size: .83rem; margin-top: 4px; }
     .sl-goal-wrap { padding-top: 2px; display: flex; justify-content: center; }
@@ -1464,6 +1935,9 @@
   </style>
 </head>
 <body>
+<!-- Cursor-lit grid. Sits above the page ground, below all content. -->
+<div class="grid-glow" id="gridGlow" aria-hidden="true"></div>
+
 <!-- ============================================================
      LANDING PAGE
      ============================================================ -->
@@ -1485,17 +1959,19 @@
   <!-- Hero -->
   <section class="lp-hero" aria-label="Hero">
     <div class="lp-hero-text">
-      <div class="lp-kicker">Free &bull; No sign-up &bull; Data stays local</div>
+      <div class="lp-kicker">UK savings planner</div>
       <h1 class="lp-h1">Save for anything.<br>See exactly how.</h1>
-      <p class="lp-sub">Enter your budget, set a goal, and PacePot tells you how much to put aside each month. No bank connection, no account, no nonsense.</p>
+      <p class="lp-sub">Enter your budget, set a goal, and PacePot works out what to put aside each month. It measures your pace against the deadline, so you know you are on track long before you get there.</p>
       <div class="lp-ctas">
-        <button class="lp-cta-primary lg" id="lpGetStarted" type="button">Get started free &rarr;</button>
+        <button class="lp-cta-primary lg" id="lpGetStarted" type="button">Start planning</button>
         <a class="lp-cta-ghost" href="/calculators">Try a calculator</a>
       </div>
       <div class="lp-trust">
-        <span class="lp-trust-pill">Free forever</span>
-        <span class="lp-trust-pill">No login needed</span>
-        <span class="lp-trust-pill">Stays on your device</span>
+        <ul class="lp-callouts">
+          <li>free, always</li>
+          <li>no account</li>
+          <li>data never leaves this browser</li>
+        </ul>
       </div>
     </div>
 
@@ -1503,23 +1979,21 @@
     <div class="lp-hero-visual" aria-hidden="true">
       <div class="lp-preview-card">
         <div class="lp-card-row">
-          <div class="lp-card-dot green"></div>
           <span class="lp-card-name">Holiday &mdash; Tenerife</span>
-          <span class="lp-card-badge">On track</span>
+          <span class="lp-delta">+&pound;40 ahead</span>
         </div>
         <div class="lp-card-amount">&pound;1,240 <span>of &pound;2,000</span></div>
         <div class="lp-progress-bar"><div class="lp-progress-fill" style="width:62%"></div></div>
-        <div class="lp-card-meta">Save &pound;190/month &bull; 4 months left</div>
+        <div class="lp-card-meta">&pound;190 a month &middot; 4 months left</div>
       </div>
       <div class="lp-preview-card lp-card-secondary">
         <div class="lp-card-row">
-          <div class="lp-card-dot amber"></div>
           <span class="lp-card-name">Emergency fund</span>
-          <span class="lp-card-badge warn">Behind</span>
+          <span class="lp-delta warn">&minus;&pound;85 off pace</span>
         </div>
         <div class="lp-card-amount">&pound;820 <span>of &pound;3,000</span></div>
         <div class="lp-progress-bar"><div class="lp-progress-fill amber" style="width:27%"></div></div>
-        <div class="lp-card-meta">Needs &pound;140/month to catch up</div>
+        <div class="lp-card-meta">&pound;140 a month to catch up</div>
       </div>
       <div class="lp-safe-chip">
         <span class="lp-chip-label">Safe to save</span>
@@ -1531,30 +2005,18 @@
   <!-- Features strip -->
   <div class="lp-features" role="list">
     <div class="lp-feature" role="listitem">
-      <div class="lp-feature-icon" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </div>
       <h3>Multiple goals at once</h3>
       <p>Track a holiday, a house deposit, and an emergency fund side by side. PacePot splits your savings pot across all of them.</p>
     </div>
     <div class="lp-feature" role="listitem">
-      <div class="lp-feature-icon" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="4" width="16" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 4V3a2 2 0 014 0v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </div>
       <h3>Budget-aware</h3>
       <p>Enter your take-home pay and outgoings and see exactly how much is safe to save. No guesswork, no spreadsheet.</p>
     </div>
     <div class="lp-feature" role="listitem">
-      <div class="lp-feature-icon" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="2"/><path d="M9 5v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
       <h3>Pace, not just total</h3>
       <p>Every goal shows a monthly saving pace and a health status so you know if you are on track before the deadline arrives.</p>
     </div>
     <div class="lp-feature" role="listitem">
-      <div class="lp-feature-icon" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 9l5 5L16 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
       <h3>Private by design</h3>
       <p>Your goals, amounts, and budget stay in this browser. No account, no bank connection, no server holding your money details.</p>
     </div>
@@ -1562,8 +2024,8 @@
 
   <!-- Bottom CTA -->
   <div class="lp-bottom-cta">
-    <button class="lp-cta-primary lg" id="lpGetStarted2" type="button">Start planning for free &rarr;</button>
-    <p class="lp-bottom-note">No email. No card. No catch.</p>
+    <button class="lp-cta-primary lg" id="lpGetStarted2" type="button">Set your first goal</button>
+    <p class="lp-bottom-note">Takes about a minute. Nothing to sign up for.</p>
   </div>
 
 </div><!-- /landingPage -->
@@ -1586,12 +2048,14 @@
         <h2 class="ob-headline">What will you save for first?</h2>
         <p class="ob-sub">PacePot turns any savings goal into a monthly figure. No login, no bank connection. Your data stays in your browser.</p>
       </div>
-      <div class="ob-trust" aria-label="Key features">
-        <span>Free forever</span>
-        <span>No sign-up needed</span>
-        <span>Stays on your device</span>
+      <div class="ob-trust">
+        <ul aria-label="What PacePot costs and where your data lives">
+          <li>free, always</li>
+          <li>no account</li>
+          <li>data stays in this browser</li>
+        </ul>
       </div>
-      <button class="ob-btn ob-btn-primary" id="ob-next-1" type="button">Get started &rarr;</button>
+      <button class="ob-btn ob-btn-primary" id="ob-next-1" type="button">Get started</button>
       <button class="ob-btn-skip" id="ob-skip" type="button">Already set up? Go straight to the app</button>
     </div>
 
@@ -1655,7 +2119,7 @@
           <span class="ob-placeholder">Enter an amount and date to see your monthly pace.</span>
         </div>
       </div>
-      <button class="ob-btn ob-btn-primary" id="ob-finish" type="button">Start tracking &rarr;</button>
+      <button class="ob-btn ob-btn-primary" id="ob-finish" type="button">Start tracking</button>
       <button class="ob-btn-back" id="ob-back-2" type="button">&larr; Back</button>
     </div>
 
@@ -1704,25 +2168,16 @@
 
       <div class="sidebar-body" id="sidebarBody">
         <form id="budgetForm">
-          <div class="section-title"><h2>Monthly Budget</h2></div>
-          <label>
-            Salary
-            <input id="salary" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
-          </label>
-          <label>
-            Current account balance
-            <input id="accountBalance" type="number" min="0" step="0.01" inputmode="decimal" placeholder="1200">
-          </label>
-          <label>
-            Currency
-            <select id="currency">
-              <option value="GBP">GBP (Pound)</option>
-              <option value="USD">USD (Dollar)</option>
-              <option value="EUR">EUR (Euro)</option>
-              <option value="CAD">CAD (Canadian dollar)</option>
-              <option value="AUD">AUD (Australian dollar)</option>
-            </select>
-          </label>
+          <div class="bgroup">
+            <div class="bgroup-label">Money in</div>
+            <label>
+              Salary <span class="field-hint">monthly, after tax</span>
+              <input id="salary" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
+            </label>
+          </div>
+
+          <div class="bgroup">
+            <div class="bgroup-label">Everything else in and out</div>
           <div class="budget-add">
             <div class="field-row">
               <label>
@@ -1746,7 +2201,7 @@
           <div class="budget-list-panel" id="budgetListPanel">
             <button class="budget-list-toggle" id="budgetListToggle" type="button" aria-expanded="true" aria-controls="budgetListShell">
               <span class="budget-list-summary">
-                <strong>Income &amp; outgoings</strong>
+                <strong>Your items</strong>
                 <span class="budget-list-count" id="budgetListCount">0 items</span>
               </span>
             </button>
@@ -1754,26 +2209,54 @@
               <div class="budget-list" id="budgetList"></div>
             </div>
           </div>
-          <div class="metric">
-            Estimated left each month
-            <strong id="availableAmount">&pound;0</strong>
           </div>
-          <label style="margin-top:14px">
-            Planned monthly savings pot
-            <input id="savingsPot" type="number" min="0" step="0.01" inputmode="decimal" placeholder="300">
-          </label>
-          <div class="budget-chart" id="budgetChart">
-            <div class="pie" id="budgetPie" aria-label="Monthly money split chart"></div>
-            <div class="chart-legend">
-              <div class="legend-row"><span><i class="dot outgoing"></i>Outgoings</span><strong id="totalOutgoings">&pound;0</strong></div>
-              <div class="legend-row"><span><i class="dot planned"></i>Goals</span><strong id="plannedSavings">&pound;0</strong></div>
-              <div class="legend-row"><span><i class="dot leftover"></i>Left over</span><strong id="totalAvailable">&pound;0</strong></div>
-            </div>
-          </div>
-        </form>
 
-        <div class="section-title"><h2>Quick View</h2></div>
-        <p class="subtle" id="budgetAdvice">Add salary, income and outgoings to see what saving pace is realistic.</p>
+          <div class="bgroup">
+            <div class="bgroup-label">Savings pot</div>
+            <label>
+              Planned monthly savings pot <span class="field-hint">what you aim to set aside</span>
+              <input id="savingsPot" type="number" min="0" step="0.01" inputmode="decimal" placeholder="300">
+            </label>
+          </div>
+
+          <!-- The answer the whole form exists to produce, given its own weight. -->
+          <div class="bresult">
+            <div class="bresult-head">
+              <span class="bresult-label">Estimated left each month</span>
+              <strong id="availableAmount">&pound;0</strong>
+            </div>
+            <div class="budget-chart" id="budgetChart">
+              <div class="pie" id="budgetPie" aria-label="Monthly money split chart"></div>
+              <div class="chart-legend">
+                <div class="legend-row"><span><i class="dot outgoing"></i>Outgoings</span><strong id="totalOutgoings">&pound;0</strong></div>
+                <div class="legend-row"><span><i class="dot planned"></i>Goals</span><strong id="plannedSavings">&pound;0</strong></div>
+                <div class="legend-row"><span><i class="dot leftover"></i>Left over</span><strong id="totalAvailable">&pound;0</strong></div>
+              </div>
+            </div>
+            <p class="subtle" id="budgetAdvice">Add salary, income and outgoings to see what saving pace is realistic.</p>
+          </div>
+
+          <!-- Set-once settings, kept out of the way of the monthly workflow. -->
+          <details class="bgroup bgroup-quiet">
+            <summary>Account &amp; currency</summary>
+            <div class="bgroup-body">
+              <label>
+                Current account balance
+                <input id="accountBalance" type="number" min="0" step="0.01" inputmode="decimal" placeholder="1200">
+              </label>
+              <label>
+                Currency
+                <select id="currency">
+                  <option value="GBP">GBP (Pound)</option>
+                  <option value="USD">USD (Dollar)</option>
+                  <option value="EUR">EUR (Euro)</option>
+                  <option value="CAD">CAD (Canadian dollar)</option>
+                  <option value="AUD">AUD (Australian dollar)</option>
+                </select>
+              </label>
+            </div>
+          </details>
+        </form>
       </div>
     </div>
   </aside>
@@ -1781,7 +2264,22 @@
   <!-- ============================================================
        MAIN
        ============================================================ -->
+  <div class="app-body">
+  <nav class="rail" aria-label="Sections">
+    <div class="rail-label">PacePot</div>
+    <button class="rail-btn" type="button" data-view-btn="dashboard" aria-current="page">Dashboard</button>
+    <button class="rail-btn" type="button" data-view-btn="goals">Goals <span class="rail-count" id="railGoalCount"></span></button>
+    <button class="rail-btn" type="button" data-view-btn="savelist">Save list <span class="rail-count" id="railSaveCount"></span></button>
+    <button class="rail-btn" type="button" data-view-btn="insights">Insights <span class="rail-count" id="railStreakCount"></span></button>
+    <button class="rail-btn" type="button" data-view-btn="money">Money setup</button>
+  </nav>
+
   <main>
+    <input id="importFile" type="file" accept="application/json,.json" hidden>
+    <div class="finance-alert" id="financeAlert" role="status" aria-live="polite"></div>
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <div class="view is-active" data-view="dashboard">
     <div class="toolbar">
       <div>
         <h3>Build savings targets that fit real life.</h3>
@@ -1790,9 +2288,6 @@
         <p class="privacy-note">No sign-up. Your data stays in this browser.</p>
       </div>
     </div>
-    <input id="importFile" type="file" accept="application/json,.json" hidden>
-
-    <div class="finance-alert" id="financeAlert" role="status" aria-live="polite"></div>
 
     <section class="plan-guidance" aria-label="Next best step">
       <div>
@@ -1827,7 +2322,14 @@
         <button type="button" id="applyAllocationBtn">Apply suggested allocation</button>
       </div>
     </section>
+    </div><!-- /view dashboard -->
 
+    <!-- ===================== GOALS ===================== -->
+    <div class="view" data-view="goals">
+    <div class="view-head">
+      <h2>Your goals</h2>
+      <p>Every goal shows the monthly pace it needs and whether you are ahead of or behind that pace.</p>
+    </div>
     <div class="workspace">
       <div class="setup-column">
         <section class="panel">
@@ -1884,41 +2386,6 @@
             <button type="submit">Add target</button>
           </form>
         </section>
-
-        <details class="panel" id="investmentPanel">
-          <summary>
-            <span>Investments &amp; long-term money</span>
-            <span class="details-cue"></span>
-          </summary>
-          <div class="details-body">
-            <p class="subtle">Optional. Track investment values without mixing them into monthly safe-to-spend money.</p>
-            <form id="investmentForm">
-              <label>
-                Account name
-                <input id="investmentName" type="text" maxlength="50" placeholder="e.g. S&amp;S ISA, Pension, Premium Bonds">
-              </label>
-              <div class="field-row investment-fields">
-                <label>
-                  Current value
-                  <input id="investmentValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
-                </label>
-                <label>
-                  Access
-                  <select id="investmentAccess">
-                    <option value="long-term">Long-term only</option>
-                    <option value="accessible">Accessible in emergency</option>
-                  </select>
-                </label>
-              </div>
-              <label>
-                Note <span class="field-hint">optional</span>
-                <input id="investmentNote" type="text" maxlength="80" placeholder="e.g. Retirement pot">
-              </label>
-              <button type="submit">Add</button>
-            </form>
-            <div class="investment-list" id="investmentList"></div>
-          </div>
-        </details>
       </div>
 
       <section class="targets-zone">
@@ -1939,17 +2406,17 @@
         <div class="targets" id="targets"></div>
       </section>
     </div>
+    </div><!-- /view goals -->
 
-    <!-- ============================================================
-         SAVE LIST SECTION
-         ============================================================ -->
+    <!-- ===================== SAVE LIST ===================== -->
+    <div class="view" data-view="savelist">
     <section class="save-list-section" id="saveListSection" aria-label="Save list">
       <div class="sl-section-head">
         <div>
           <h4>Save list</h4>
           <p class="sl-section-desc">Add items you're thinking about buying, then turn them into a savings plan.</p>
         </div>
-        <button class="ghost small-btn" id="slAddBtn" type="button">+ Add item</button>
+        <button id="slAddBtn" type="button">Add item</button>
       </div>
 
       <div class="sl-form-wrap" id="slFormWrap" hidden>
@@ -2036,6 +2503,80 @@
         </button>
       </div>
     </section>
+    </div><!-- /view savelist -->
+
+    <!-- ===================== INSIGHTS ===================== -->
+    <div class="view" data-view="insights">
+    <div class="view-head">
+      <h2>Insights</h2>
+      <p>Everything you have put aside, across every goal, month by month.</p>
+    </div>
+    <div id="insightsBody"></div>
+
+    <section class="ins-panel" id="forecastPanel" hidden>
+      <div class="ins-panel-head">
+        <h4>Forecast</h4>
+        <span class="ins-panel-note">Projected from your actual pace</span>
+      </div>
+      <div class="fc-control">
+        <label for="forecastExtra">If I saved extra each month</label>
+        <div class="fc-slider-row">
+          <input type="range" id="forecastExtra" min="0" max="500" step="10" value="0" aria-describedby="forecastExtraValue">
+          <output class="fc-extra-value" id="forecastExtraValue">+&pound;0</output>
+        </div>
+      </div>
+      <div id="forecastBody"></div>
+    </section>
+    </div><!-- /view insights -->
+
+    <!-- ===================== MONEY SETUP ===================== -->
+    <div class="view" data-view="money">
+    <div class="view-head">
+      <h2>Money setup</h2>
+      <p>What comes in, what goes out, and what is safe to put aside. Long-term pots are tracked separately so they never inflate your monthly spending money.</p>
+    </div>
+
+    <section class="panel money-open-panel">
+      <h4>Monthly budget</h4>
+      <p class="subtle">Your income, regular outgoings and savings pot drive every figure in PacePot.</p>
+      <button type="button" id="openBudgetFromView">Open budget</button>
+    </section>
+
+    <details class="panel" id="investmentPanel">
+      <summary>
+        <span>Long-term pots</span>
+        <span class="details-cue"></span>
+      </summary>
+      <div class="details-body">
+        <p class="subtle">Optional. Track investments and other long-term money without mixing it into your monthly safe-to-spend figure.</p>
+        <form id="investmentForm">
+          <label>
+            Account name
+            <input id="investmentName" type="text" maxlength="50" placeholder="e.g. S&amp;S ISA, Pension, Premium Bonds">
+          </label>
+          <div class="field-row investment-fields">
+            <label>
+              Current value
+              <input id="investmentValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
+            </label>
+            <label>
+              Access
+              <select id="investmentAccess">
+                <option value="long-term">Long-term only</option>
+                <option value="accessible">Accessible in emergency</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Note <span class="field-hint">optional</span>
+            <input id="investmentNote" type="text" maxlength="80" placeholder="e.g. Retirement pot">
+          </label>
+          <button type="submit">Add</button>
+        </form>
+        <div class="investment-list" id="investmentList"></div>
+      </div>
+    </details>
+    </div><!-- /view money -->
 
     <footer class="site-footer">
       <div>
@@ -2053,6 +2594,7 @@
       </div>
     </footer>
   </main>
+  </div><!-- /app-body -->
 </div>
 
 <!-- ============================================================
@@ -2999,6 +3541,27 @@
     els.backupBtn.addEventListener("click", exportBackup);
     els.applyAllocationBtn.addEventListener("click", applySuggestedAllocation);
 
+    // The forecast slider is a what-if: it re-projects only, and never writes
+    // to state. Its value deliberately resets on reload.
+    const forecastExtraEl = document.getElementById("forecastExtra");
+    if (forecastExtraEl) {
+      forecastExtraEl.addEventListener("input", () => {
+        const out = document.getElementById("forecastExtraValue");
+        if (out) out.textContent = `+${money(Number(forecastExtraEl.value) || 0)}`;
+        renderForecast();
+      });
+    }
+
+    // Edits update the running total only — a full re-render here would tear
+    // the input out from under the cursor mid-keystroke.
+    els.allocationList.addEventListener("input", (event) => {
+      const input = event.target.closest("[data-alloc-id]");
+      if (!input) return;
+      const value = input.value === "" ? 0 : Number(input.value);
+      allocationOverrides.set(input.dataset.allocId, Number.isFinite(value) ? Math.max(0, value) : 0);
+      updateAllocationTotal();
+    });
+
     // Confirm modal
     els.confirmCancel.addEventListener("click", () => {
       closeModal(els.confirmModal);
@@ -3428,6 +3991,212 @@
       modal.classList.remove("show");
     }
 
+    function renderInsights() {
+      const host = document.getElementById("insightsBody");
+      if (!host) return;
+
+      const h = savingsHistory(12);
+
+      if (!h.allTime) {
+        host.innerHTML = `
+          <div class="empty">
+            <strong>Nothing to chart yet</strong>
+            <p>Log your first deposit against a goal and your saving history will build here, month by month.</p>
+          </div>`;
+        return;
+      }
+
+      const monthShort = (d) => new Intl.DateTimeFormat(undefined, { month: "short" }).format(d);
+      const peak = h.peak || 1;
+
+      const bars = h.buckets.map((b) => {
+        const pct = Math.round((b.total / peak) * 100);
+        const isNow = b.key === monthKey(today);
+        return `
+          <div class="ins-bar${isNow ? " is-now" : ""}${b.total ? "" : " is-empty"}" title="${monthShort(b.date)} ${b.date.getFullYear()}: ${money(b.total)}">
+            <div class="ins-bar-track"><div class="ins-bar-fill" style="height:${Math.max(b.total ? 3 : 0, pct)}%"></div></div>
+            <span class="ins-bar-label">${monthShort(b.date)}</span>
+          </div>`;
+      }).join("");
+
+      // Projection: at the rate actually achieved, when does everything land?
+      const remaining = state.targets.reduce((sum, t) => sum + remainingFor(t), 0);
+      let projection = "";
+      if (remaining > 0) {
+        if (h.average > 0) {
+          const monthsLeft = Math.ceil(remaining / h.average);
+          const done = new Date(today.getFullYear(), today.getMonth() + monthsLeft, 1);
+          projection = `At ${money(Math.round(h.average))} a month you finish every goal around <strong>${formatMonthYear(done)}</strong>.`;
+        } else {
+          projection = `You still need ${money(remaining)} across your goals.`;
+        }
+      } else {
+        projection = `Every goal is funded. Nothing left to save.`;
+      }
+
+      const streakLine = h.streak > 1
+        ? `<strong>${h.streak}</strong> months in a row`
+        : (h.streak === 1 ? `<strong>1</strong> month so far` : `No run going`);
+
+      host.innerHTML = `
+        <div class="ins-stats">
+          <div class="ins-stat">
+            <div class="ins-stat-label">Saved all time</div>
+            <div class="ins-stat-value accent">${money(h.allTime)}</div>
+          </div>
+          <div class="ins-stat">
+            <div class="ins-stat-label">Save streak</div>
+            <div class="ins-stat-value">${streakLine}</div>
+          </div>
+          <div class="ins-stat">
+            <div class="ins-stat-label">Best month</div>
+            <div class="ins-stat-value">${h.best ? money(h.best.total) : "&mdash;"}<span class="ins-stat-sub">${h.best ? formatMonthYear(h.best.date) : ""}</span></div>
+          </div>
+          <div class="ins-stat">
+            <div class="ins-stat-label">Average a month</div>
+            <div class="ins-stat-value">${money(Math.round(h.average))}</div>
+          </div>
+        </div>
+
+        <section class="ins-panel">
+          <div class="ins-panel-head">
+            <h4>Month by month</h4>
+            <span class="ins-panel-note">Across all goals &middot; last 12 months</span>
+          </div>
+          <div class="ins-chart">${bars}</div>
+        </section>
+
+        <section class="ins-panel">
+          <div class="ins-panel-head">
+            <h4>Where this is heading</h4>
+          </div>
+          <p class="ins-projection">${projection}</p>
+        </section>`;
+    }
+
+    // ================================================================
+    // FORECAST
+    // Projects each goal from the pace it has actually been saved at,
+    // not from the pace it was planned at — the planned figure is a
+    // wish, the observed one is what will really land.
+    // ================================================================
+    function goalMonthlyRate(target) {
+      const deps = (target.deposits || []).filter((d) => Number(d.amount) > 0);
+      if (!deps.length) return 0;
+
+      let total = 0;
+      let earliest = null;
+      deps.forEach((d) => {
+        total += Number(d.amount) || 0;
+        const dt = parseDate(d.date);
+        if (!Number.isNaN(dt.getTime()) && (!earliest || dt < earliest)) earliest = dt;
+      });
+      if (!earliest || total <= 0) return 0;
+
+      const months = Math.max(1,
+        (today.getFullYear() - earliest.getFullYear()) * 12 + (today.getMonth() - earliest.getMonth()) + 1);
+      return total / months;
+    }
+
+    function forecastRows(extra) {
+      const extraTotal = Math.max(0, Number(extra) || 0);
+      const active = state.targets.filter((t) => remainingFor(t) > 0);
+      if (!active.length) return [];
+
+      // Extra money follows the same weighting as the smart split, so the
+      // forecast agrees with what applying a split would actually do.
+      const split = suggestedAllocations();
+      const shareById = new Map(split.map((s) => [s.target.id, s.amount]));
+      const shareTotal = split.reduce((sum, s) => sum + s.amount, 0);
+
+      return active.map((target) => {
+        const remaining = remainingFor(target);
+        const observed = goalMonthlyRate(target);
+        const planned = shareById.get(target.id) || Number(target.recurringAmount) || 0;
+        const baseRate = observed > 0 ? observed : planned;
+
+        const extraShare = shareTotal > 0
+          ? extraTotal * ((shareById.get(target.id) || 0) / shareTotal)
+          : extraTotal / active.length;
+
+        const rate = baseRate + extraShare;
+        const months = rate > 0 ? Math.ceil(remaining / rate) : null;
+        const projected = months === null ? null : addMonths(today, months);
+        const due = parseDate(target.dueDate);
+        const monthsToDue = Math.max(0, monthsUntil(target.dueDate));
+
+        let lateBy = null;
+        if (projected && !Number.isNaN(due.getTime())) {
+          lateBy = (projected.getFullYear() - due.getFullYear()) * 12 + (projected.getMonth() - due.getMonth());
+        }
+
+        return { target, remaining, rate, months, projected, due, monthsToDue, lateBy };
+      });
+    }
+
+    function renderForecast() {
+      const panel = document.getElementById("forecastPanel");
+      const host = document.getElementById("forecastBody");
+      const slider = document.getElementById("forecastExtra");
+      if (!panel || !host) return;
+
+      const rows = forecastRows(slider ? Number(slider.value) : 0);
+      panel.hidden = !rows.length;
+      if (!rows.length) { host.innerHTML = ""; return; }
+
+      // One shared scale so the bars are comparable across goals.
+      const horizon = Math.max(
+        6,
+        ...rows.map((r) => Math.max(r.months === null ? 0 : r.months, r.monthsToDue))
+      );
+
+      host.innerHTML = rows.map((r) => {
+        const pct = r.months === null ? 100 : Math.min(100, (r.months / horizon) * 100);
+        const duePct = Math.min(100, (r.monthsToDue / horizon) * 100);
+        const late = r.lateBy !== null && r.lateBy > 0;
+
+        let verdict;
+        if (r.months === null) verdict = "No pace yet";
+        else if (late) verdict = `${r.lateBy} month${r.lateBy === 1 ? "" : "s"} late`;
+        else verdict = "On time";
+
+        return `
+          <div class="fc-row${late ? " is-late" : ""}${r.months === null ? " is-idle" : ""}">
+            <div class="fc-name">
+              <strong>${escapeHtml(r.target.name)}</strong>
+              <span>${r.months === null ? `${money(r.remaining)} left, nothing saved yet` : `${money(Math.round(r.rate))}/mo &middot; ${money(r.remaining)} left`}</span>
+            </div>
+            <div class="fc-track">
+              <div class="fc-bar" style="width:${pct}%"></div>
+              <div class="fc-due" style="left:${duePct}%" title="Deadline: ${formatDate(r.target.dueDate)}"></div>
+            </div>
+            <div class="fc-verdict">
+              <strong>${r.projected ? formatMonthYear(r.projected) : "&mdash;"}</strong>
+              <span>${verdict}</span>
+            </div>
+          </div>`;
+      }).join("") + `<div class="fc-legend"><span class="fc-legend-due"></span> deadline</div>`;
+    }
+
+    // Counts sit in the rail so a hidden section still tells you what is in it.
+    function renderRailCounts() {
+      const goalEl = document.getElementById("railGoalCount");
+      const saveEl = document.getElementById("railSaveCount");
+      if (goalEl) {
+        const active = state.targets.filter((t) => savedFor(t) < t.amount).length;
+        goalEl.textContent = state.targets.length ? String(active || state.targets.length) : "";
+      }
+      if (saveEl) {
+        const unbought = state.saveList.filter((i) => !i.purchased).length;
+        saveEl.textContent = unbought ? String(unbought) : "";
+      }
+      const streakEl = document.getElementById("railStreakCount");
+      if (streakEl) {
+        const streak = savingsHistory(12).streak;
+        streakEl.textContent = streak > 1 ? `${streak}mo` : "";
+      }
+    }
+
     function render() {
       const budget = budgetTotals();
       const available = budget.available;
@@ -3440,6 +4209,9 @@
       renderInvestments(savedTotal, investmentTotal, budget);
       renderAllocation(budget);
       renderNextStep(budget, paceTotal);
+      renderInsights();
+      renderForecast();
+      renderRailCounts();
       els.availableAmount.textContent = money(available);
       els.topIncome.textContent = money(budget.resources);
       els.topOutgoing.textContent = money(budget.outgoings);
@@ -3597,15 +4369,16 @@
       els.budgetListPanel.classList.toggle("collapsed", Boolean(state.budgetListCollapsed));
       els.budgetListToggle.setAttribute("aria-expanded", String(!state.budgetListCollapsed));
       els.budgetListCount.textContent = itemCount
-        ? `${itemCount} item${itemCount === 1 ? "" : "s"} · +${money(budget.extraIncome)} / -${money(budget.outgoings)}`
+        ? `${itemCount} item${itemCount === 1 ? "" : "s"} · +${money(budget.extraIncome)} / ${MINUS}${money(budget.outgoings)}`
         : "0 items";
-      els.budgetList.innerHTML = state.budgetItems.length ? state.budgetItems.map((item) => `
+      // Money in and money out are separate questions, so they get separate
+      // labelled groups instead of one mixed list you have to read the badge on.
+      const budgetItemRow = (item) => `
         <div class="budget-item ${item.type}">
           <div>
             <strong>${escapeHtml(item.name)}</strong>
-            <span>${item.type === "income" ? "Income" : "Outgoing"}</span>
           </div>
-          <div class="amount">${item.type === "income" ? "+" : "-"}${money(item.value)}</div>
+          <div class="amount">${item.type === "income" ? "+" : MINUS}${money(item.value)}</div>
           <button class="ghost icon-btn" type="button" data-budget-action="edit" data-id="${item.id}" title="Edit ${escapeHtml(item.name)}" aria-label="Edit ${escapeHtml(item.name)}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="m5 16-.8 3.8L8 19l10.5-10.5-3-3L5 16Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -3617,7 +4390,24 @@
             </svg>
           </button>
         </div>
-      `).join("") : `<p class="subtle">Add named income or outgoing items to build your monthly picture.</p>`;
+      `;
+
+      const incomeItems = state.budgetItems.filter((i) => i.type === "income");
+      const outgoingItems = state.budgetItems.filter((i) => i.type === "outgoing");
+      const group = (title, items, total, sign) => items.length ? `
+        <div class="budget-group">
+          <div class="budget-group-head">
+            <span>${title}</span>
+            <span class="budget-group-total">${sign}${money(total)}</span>
+          </div>
+          ${items.map(budgetItemRow).join("")}
+        </div>
+      ` : "";
+
+      els.budgetList.innerHTML = state.budgetItems.length
+        ? group("Coming in", incomeItems, budget.extraIncome, "+") +
+          group("Going out", outgoingItems, budget.outgoings, MINUS)
+        : `<p class="subtle">Add named income or outgoing items to build your monthly picture.</p>`;
 
       const outgoingSlice = budget.resources > 0 ? Math.min(100, (budget.outgoings / budget.resources) * 100) : 0;
       const plannedSlice = budget.resources > 0 ? Math.min(100, outgoingSlice + ((budget.savingsPot / budget.resources) * 100)) : 0;
@@ -3689,55 +4479,147 @@
     }
 
     function renderAllocation(budget) {
-      const suggestions = suggestedAllocations(budget);
+      const rows = effectiveAllocations(budget);
 
-      if (!suggestions.length) {
+      if (!rows.length) {
         els.allocationIntro.textContent = "Set a monthly savings pot and add targets to see a suggested split.";
         els.allocationList.innerHTML = "";
         els.applyAllocationBtn.hidden = true;
         return;
       }
 
-      els.allocationIntro.textContent = `Splitting ${money(budget.savingsPot)} planned for goals, while leaving ${money(budget.safeToSpend)} safe to spend.`;
+      els.allocationIntro.textContent = `Splitting ${money(budget.savingsPot)} across your goals, leaving ${money(budget.safeToSpend)} safe to spend. Adjust any figure before applying.`;
       els.applyAllocationBtn.hidden = false;
-      els.allocationList.innerHTML = suggestions.map(({ target, amount }) => `
-          <div class="allocation-row">
-            <div>
+
+      els.allocationList.innerHTML = rows.map(({ target, amount, reason }) => `
+          <div class="alloc-row">
+            <div class="alloc-main">
               <strong>${escapeHtml(target.name)}</strong>
-              <span>${priorityLabel(target.priority)} - ${timeLeftLabel(target.dueDate)}</span>
+              <span class="alloc-why">${reason}</span>
             </div>
-            <strong>${money(amount)}</strong>
+            <div class="alloc-amount">
+              <span class="alloc-currency" aria-hidden="true">${currencySymbol()}</span>
+              <input type="number" min="0" step="1" inputmode="decimal"
+                     value="${Math.round(amount)}"
+                     data-alloc-id="${target.id}"
+                     aria-label="Amount to put toward ${escapeHtml(target.name)}">
+            </div>
           </div>
-      `).join("");
+      `).join("") + `<div class="alloc-total" id="allocTotal"></div>`;
+
+      updateAllocationTotal(budget);
     }
 
+    function updateAllocationTotal(budget = budgetTotals()) {
+      const el = document.getElementById("allocTotal");
+      if (!el) return;
+      let total = 0;
+      els.allocationList.querySelectorAll("[data-alloc-id]").forEach((input) => {
+        total += Number(input.value) || 0;
+      });
+      const pot = budget.savingsPot;
+      const diff = Math.round((pot - total) * 100) / 100;
+      const state_ = diff < -0.005 ? "over" : (diff > 0.005 ? "under" : "exact");
+      const note = state_ === "over"
+        ? `${money(Math.abs(diff))} more than your pot`
+        : (state_ === "under" ? `${money(diff)} of your pot unassigned` : `matches your pot exactly`);
+      el.className = `alloc-total is-${state_}`;
+      el.innerHTML = `<span>Allocating</span><strong>${money(total)}</strong><span class="alloc-note">${note}</span>`;
+    }
+
+    function currencySymbol() {
+      try {
+        return new Intl.NumberFormat(undefined, { style: "currency", currency: state.currency || "GBP" })
+          .formatToParts(0).find((p) => p.type === "currency").value;
+      } catch (e) {
+        return "";
+      }
+    }
+
+    // Manual tweaks to the suggested split, keyed by target id. Session-only:
+    // this is a staging area, not saved state — the deposits it produces are.
+    const allocationOverrides = new Map();
+
+    // Weighting on three axes rather than priority alone. A low-priority goal
+    // due next month with a shortfall should out-rank a high-priority one due
+    // in two years, and priority-only weighting got that backwards.
     function suggestedAllocations(budget = budgetTotals()) {
-      const activeTargets = state.targets
-        .filter((target) => remainingFor(target) > 0)
-        .sort((a, b) => priorityWeight(b.priority) - priorityWeight(a.priority) || daysUntil(a.dueDate) - daysUntil(b.dueDate));
+      const active = state.targets.filter((target) => remainingFor(target) > 0);
+      if (!active.length || budget.savingsPot <= 0) return [];
 
-      if (!activeTargets.length || budget.savingsPot <= 0) return [];
+      const scored = active.map((target) => {
+        const remaining = remainingFor(target);
+        const months = Math.max(1, monthsUntil(target.dueDate));
+        const recovery = recoveryPlan(target, "month");
+        const behindRatio = remaining > 0 ? Math.min(1, recovery.behind / remaining) : 0;
 
-      const totalWeight = activeTargets.reduce((sum, target) => sum + priorityWeight(target.priority), 0);
-      return activeTargets
-        .map((target) => ({
+        return {
           target,
-          amount: Math.min(remainingFor(target), budget.savingsPot * (priorityWeight(target.priority) / totalWeight))
-        }))
-        .filter((item) => item.amount > 0);
+          remaining,
+          months,
+          behindRatio,
+          // priority 1-4 · urgency 1-4 · catch-up 1-3
+          weight: priorityWeight(target.priority) * (1 + Math.min(3, 12 / months)) * (1 + behindRatio * 2),
+          amount: 0
+        };
+      });
+
+      // Capping a goal at its remaining balance frees up pot, so redistribute
+      // the surplus instead of leaving it unallocated.
+      let pot = budget.savingsPot;
+      for (let pass = 0; pass < 5 && pot > 0.005; pass++) {
+        const open = scored.filter((s) => s.amount < s.remaining - 0.005);
+        if (!open.length) break;
+        const totalWeight = open.reduce((sum, s) => sum + s.weight, 0);
+        if (totalWeight <= 0) break;
+
+        let distributed = 0;
+        open.forEach((s) => {
+          const give = Math.min(pot * (s.weight / totalWeight), s.remaining - s.amount);
+          s.amount += give;
+          distributed += give;
+        });
+        pot -= distributed;
+        if (distributed <= 0.005) break;
+      }
+
+      return scored
+        .filter((s) => s.amount > 0.005)
+        .sort((a, b) => b.amount - a.amount)
+        .map((s) => ({
+          target: s.target,
+          amount: Math.round(s.amount * 100) / 100,
+          reason: allocationReason(s)
+        }));
+    }
+
+    function allocationReason(s) {
+      if (s.behindRatio > 0.08) return "behind pace";
+      if (s.months <= 3) return `due in ${s.months} month${s.months === 1 ? "" : "s"}`;
+      if (s.target.priority === "high") return "high priority";
+      return "on pace";
+    }
+
+    // What will actually be applied: the suggestion unless you have edited it.
+    function effectiveAllocations(budget = budgetTotals()) {
+      return suggestedAllocations(budget).map((item) => {
+        const override = allocationOverrides.get(item.target.id);
+        const amount = override === undefined ? item.amount : override;
+        return { ...item, amount: Math.max(0, Math.min(remainingFor(item.target), amount)) };
+      }).filter((item) => item.amount > 0.005);
     }
 
     function applySuggestedAllocation() {
-      const suggestions = suggestedAllocations();
+      const suggestions = effectiveAllocations();
       if (!suggestions.length) {
-        showToast("There is no suggested allocation to apply.");
+        showToast("There is no allocation to apply.");
         return;
       }
 
       const total = suggestions.reduce((sum, item) => sum + item.amount, 0);
       customConfirm(
-        "Apply suggested allocation?",
-        `This will add ${money(total)} across ${suggestions.length} target${suggestions.length === 1 ? "" : "s"} as saved today.`,
+        "Apply this split?",
+        `This will add ${money(total)} across ${suggestions.length} goal${suggestions.length === 1 ? "" : "s"}, dated today.`,
         "Apply",
         () => {
           const completed = [];
@@ -3747,12 +4629,15 @@
               id: makeId(),
               amount: Math.round(amount * 100) / 100,
               date: isoDate(today),
-              note: "Suggested allocation"
+              note: "Split across goals"
             });
             if (!wasComplete && isComplete(target)) completed.push(target);
           });
 
-          saveAndRender("Suggested allocation applied.");
+          // Edits applied to real deposits — clear the staging area so the next
+          // split is suggested fresh rather than reusing stale numbers.
+          allocationOverrides.clear();
+          saveAndRender("Split applied across your goals.");
           if (completed.length) openCelebration(completed[0]);
         }
       );
@@ -3763,6 +4648,10 @@
       week: { short: "weekly", unit: "week", plural: "weeks" },
       month: { short: "monthly", unit: "month", plural: "months" }
     };
+
+    // True minus (U+2212), not a hyphen — it matches digit width and reads as a
+    // sign rather than a dash.
+    const MINUS = "−";
 
     const priorityLabels = {
       high: "High priority",
@@ -3778,14 +4667,28 @@
       return { high: 4, medium: 2, low: 1 }[priority] || 2;
     }
 
+    // Position is stated as a signed distance from the pace, not a colour-coded
+    // word. "-£85 off pace" tells you the size of the problem; "Behind" doesn't,
+    // and it leaves colour doing all the work for anyone who can't see it.
     function targetStatusLabel(target, recovery, affordable) {
       if (isComplete(target) || recovery.status === "complete") {
-        return { label: "Complete", tone: "complete" };
+        return { label: "Target reached", tone: "complete" };
       }
-      if (recovery.status === "behind" || !affordable) {
-        return { label: "Behind", tone: "warn" };
+
+      const delta = Number(recovery.delta || 0);
+      const rounded = Math.round(Math.abs(delta));
+
+      if (rounded >= 1) {
+        return delta < 0
+          ? { label: `${MINUS}${money(rounded)} off pace`, tone: "warn" }
+          : { label: `+${money(rounded)} ahead`, tone: "ahead" };
       }
-      return { label: "On Track", tone: "" };
+      // Level with the pace, but the monthly figure exceeds the pot it has to
+      // come out of — worth saying plainly rather than calling it on track.
+      if (!affordable) {
+        return { label: "Above your pot", tone: "warn" };
+      }
+      return { label: "On pace", tone: "" };
     }
 
     function chevronIcon() {
@@ -3960,7 +4863,7 @@
               <div class="target-summary-title">
                 <h5>${escapeHtml(target.name)}</h5>
                 <span class="pill priority">${priorityLabel(target.priority)}</span>
-                <span class="pill ${status.tone}">${status.label}</span>
+                <span class="goal-delta ${status.tone}">${status.label}</span>
               </div>
               <div class="target-summary-progress" aria-hidden="true">
                 <div class="target-summary-track"><i></i></div>
@@ -4011,7 +4914,7 @@
               </div>
               <div class="target-badges">
                 <span class="pill priority">${priorityLabel(target.priority)}</span>
-                <span class="pill ${status.tone}">${status.label}</span>
+                <span class="goal-delta ${status.tone}">${status.label}</span>
                 <button class="ghost target-toggle" type="button" data-action="toggle-target" data-toggle-role="full" data-id="${target.id}" aria-expanded="true" aria-controls="target-body-${target.id}" aria-label="Collapse ${escapeHtml(target.name)}">
                   ${chevronIcon()}
                 </button>
@@ -4311,11 +5214,15 @@
       const expectedByNow = target.amount * (elapsedDays / totalDays);
       const behind = Math.max(0, expectedByNow - saved);
       const extra = behind / periodsUntil(target.dueDate, cadence);
+      // Signed distance from the straight-line pace: positive means ahead.
+      // `behind` stays clamped because existing callers rely on that.
+      const delta = saved - expectedByNow;
 
       return {
         status: behind > 0 ? "behind" : "on-track",
         behind,
-        extra
+        extra,
+        delta
       };
     }
 
@@ -4425,8 +5332,101 @@
       return new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(date);
     }
 
+    // Local date parts, not toISOString() — that converts to UTC first, so a
+    // deposit logged in the evening east of UTC (or the early hours west of it)
+    // gets filed under the wrong day, and at a month boundary the wrong month.
+    // Everything else here treats dates as local midnight, including the
+    // monthly buckets in savingsHistory().
     function isoDate(date) {
-      return date.toISOString().slice(0, 10);
+      const d = date instanceof Date ? date : new Date(date);
+      if (Number.isNaN(d.getTime())) return "";
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    // ================================================================
+    // SAVINGS HISTORY ENGINE
+    // One monthly aggregation of every deposit across every goal. The
+    // Insights view renders it; the Pace Score and streak features read
+    // the same buckets rather than recomputing them. Local-time month
+    // keys throughout — toISOString() would shift late-evening deposits
+    // into the next month for anyone east of UTC.
+    // ================================================================
+    function monthKey(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function savingsHistory(monthsBack) {
+      const span = Math.max(1, Number(monthsBack) || 12);
+      const buckets = [];
+      const index = new Map();
+
+      // Seed every month in the window so gaps render as real zeroes
+      // rather than silently collapsing the timeline.
+      const cursor = new Date(today.getFullYear(), today.getMonth(), 1);
+      for (let i = span - 1; i >= 0; i--) {
+        const d = new Date(cursor.getFullYear(), cursor.getMonth() - i, 1);
+        const bucket = { key: monthKey(d), date: d, total: 0, count: 0 };
+        buckets.push(bucket);
+        index.set(bucket.key, bucket);
+      }
+
+      let allTime = 0;
+      let earliest = null;
+      state.targets.forEach((target) => {
+        (target.deposits || []).forEach((dep) => {
+          const amount = Number(dep.amount) || 0;
+          if (amount <= 0) return;
+          const d = parseDate(dep.date);
+          if (Number.isNaN(d.getTime())) return;
+          allTime += amount;
+          if (!earliest || d < earliest) earliest = d;
+          const bucket = index.get(monthKey(d));
+          if (bucket) { bucket.total += amount; bucket.count += 1; }
+        });
+      });
+
+      const withActivity = buckets.filter((b) => b.total > 0);
+      const best = withActivity.reduce((a, b) => (b.total > (a ? a.total : 0) ? b : a), null);
+
+      // Average over months actually elapsed since the first deposit, not the
+      // full window — otherwise a new user's average is diluted by months that
+      // existed before they ever started.
+      const activeSpan = earliest
+        ? Math.max(1, (today.getFullYear() - earliest.getFullYear()) * 12 + (today.getMonth() - earliest.getMonth()) + 1)
+        : 0;
+      const average = activeSpan ? allTime / activeSpan : 0;
+
+      let running = 0;
+      const cumulative = buckets.map((b) => { running += b.total; return { key: b.key, date: b.date, total: running }; });
+
+      return {
+        buckets,
+        cumulative,
+        allTime,
+        best,
+        average,
+        activeMonths: withActivity.length,
+        streak: saveStreak(buckets),
+        peak: buckets.reduce((max, b) => Math.max(max, b.total), 0)
+      };
+    }
+
+    // Consecutive months ending at the current one, counted backwards. The
+    // current month is not yet over, so an empty current month does not break a
+    // run — it just doesn't extend it. One missed month is forgiven; the intent
+    // is to encourage returning, not to punish a bad month.
+    function saveStreak(buckets) {
+      let streak = 0;
+      let skips = 0;
+      for (let i = buckets.length - 1; i >= 0; i--) {
+        const active = buckets[i].total > 0;
+        const isCurrentMonth = i === buckets.length - 1;
+        if (active) { streak += 1; continue; }
+        if (isCurrentMonth) continue;
+        if (skips === 0) { skips = 1; continue; }
+        break;
+      }
+      return streak;
     }
 
     function makeId() {
@@ -4826,7 +5826,7 @@
       }
 
       const pLabel = { need: "Need", want: "Want", maybe: "Maybe later" };
-      const pClass = { need: "sl-need", want: "sl-want", maybe: "sl-maybe" };
+      const pClass = { need: "need", want: "want", maybe: "maybe" };
 
       const visibleItems = slShowAll ? items : items.slice(0, SL_VISIBLE_LIMIT);
       const moreHtml = items.length > SL_VISIBLE_LIMIT
@@ -4835,31 +5835,71 @@
 
       slEl.items.innerHTML = visibleItems.map(item => {
         const label = pLabel[item.priority] || "Want";
-        const cls   = pClass[item.priority] || "sl-want";
-        const catHtml  = item.category ? `<span class="sl-badge sl-cat">${escapeHtml(item.category)}</span>` : "";
+        const prio  = pClass[item.priority] || "want";
+        const catHtml  = item.category ? `<span>${escapeHtml(item.category)}</span>` : "";
         const noteHtml = item.note ? `<div class="sl-note">${escapeHtml(item.note)}</div>` : "";
         const linkHtml = item.link
           ? `<a class="sl-link" href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>View product</a>`
           : "";
-        return `<div class="sl-item${item.purchased ? " sl-purchased" : ""}">
+        return `<div class="sl-item p-${prio}${item.purchased ? " sl-purchased" : ""}">
         <input type="checkbox" class="sl-check" data-sl-check="${item.id}" ${item.purchased ? "checked" : ""} aria-label="Mark ${escapeHtml(item.name)} as purchased">
-        <div class="sl-item-body">
-          <div class="sl-item-top">
-            <span class="sl-item-name">${escapeHtml(item.name)}</span>
-            <span class="sl-price">${money(item.price)}</span>
-          </div>
-          <div class="sl-meta">
-            ${catHtml}<span class="sl-badge ${cls}">${label}</span><span class="sl-added">Added ${formatShortDate(item.addedAt)}</span>
-          </div>
-          ${noteHtml}${linkHtml}
+        <span class="sl-item-name">${escapeHtml(item.name)}</span>
+        <span class="sl-price">${money(item.price)}</span>
+        <div class="sl-meta">
+          ${catHtml}<span class="sl-prio">${label}</span><span>${formatShortDate(item.addedAt)}</span>
         </div>
         <div class="sl-item-btns">
           <button class="sl-btn" data-sl-action="edit" data-sl-id="${item.id}" aria-label="Edit ${escapeHtml(item.name)}" type="button">Edit</button>
           <button class="sl-btn sl-remove" data-sl-action="delete" data-sl-id="${item.id}" aria-label="Remove ${escapeHtml(item.name)}" type="button">Remove</button>
         </div>
+        ${noteHtml}${linkHtml}
       </div>`;
       }).join("") + moreHtml;
     }
+
+    // === SECTION VIEWS ===
+    // Every view stays in the DOM; only visibility changes. render() therefore
+    // keeps updating off-screen views and nothing has to be re-wired on switch.
+    const VIEW_KEY = "pacepot.view";
+    const VALID_VIEWS = ["dashboard", "goals", "savelist", "insights", "money"];
+
+    function setView(name, opts) {
+      if (!VALID_VIEWS.includes(name)) name = "dashboard";
+      document.querySelectorAll("[data-view]").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.view === name);
+      });
+      document.querySelectorAll("[data-view-btn]").forEach((btn) => {
+        const on = btn.dataset.viewBtn === name;
+        if (on) btn.setAttribute("aria-current", "page");
+        else btn.removeAttribute("aria-current");
+      });
+      try { localStorage.setItem(VIEW_KEY, name); } catch (e) {}
+      if (!opts || !opts.silent) {
+        window.scrollTo({ top: 0, behavior: "instant" in document.documentElement.style ? "instant" : "auto" });
+      }
+      trackAppEvent("view_" + name);
+    }
+    window.__setView = setView;
+
+    document.querySelectorAll("[data-view-btn]").forEach((btn) => {
+      btn.addEventListener("click", () => setView(btn.dataset.viewBtn));
+    });
+
+    const openBudgetFromView = document.getElementById("openBudgetFromView");
+    if (openBudgetFromView) {
+      openBudgetFromView.addEventListener("click", () => {
+        els.sidebarEl.classList.remove("sidebar-closed");
+        if (els.sidebarToggle) {
+          els.sidebarToggle.setAttribute("aria-expanded", "true");
+          if (els.sidebarToggleLabel) els.sidebarToggleLabel.textContent = "Hide";
+        }
+      });
+    }
+
+    try {
+      const saved = localStorage.getItem(VIEW_KEY);
+      if (saved) setView(saved, { silent: true });
+    } catch (e) {}
 
     initOnboarding();
     render();
@@ -4976,15 +6016,15 @@
         { id:   'safeToSpend', psel: '.summary',
           title: 'Safe to spend',
           body:  "After bills and savings, this is what's left for everyday life. Keep it positive.",
-          pos: 'below', drawer: 'close' },
-        { sel:  'section.panel',
+          pos: 'below', drawer: 'close', view: 'dashboard' },
+        { sel:  '[data-view="goals"] section.panel',
           title: 'Add more savings goals',
           body:  "Your first goal is already set. Add more anytime: holidays, emergencies, a car, anything you're saving toward.",
-          pos: 'above', drawer: null },
+          pos: 'above', drawer: null, view: 'goals' },
         { sel:  '.targets-zone',
           title: 'Your goals live here',
           body:  'Track progress, log deposits, and see your monthly pace for each goal. You\'re all set.',
-          pos: 'above', drawer: null, last: true }
+          pos: 'above', drawer: null, view: 'goals', last: true }
       ];
 
       var D = {
@@ -5083,6 +6123,12 @@
         cur = n;
         var step   = STEPS[n];
         var drawer = document.getElementById('sidebarEl');
+
+        // A step whose target lives in another section must switch to it first,
+        // or the element is display:none and measures as a zero-size rect.
+        if (step.view && typeof window.__setView === 'function') {
+          window.__setView(step.view, { silent: true });
+        }
 
         function activate() {
           hideTour();
@@ -5288,6 +6334,63 @@
         }
         animId = running ? requestAnimationFrame(tick) : null;
       }
+    })();
+
+    /* Cursor-lit grid. The light eases toward the pointer rather than snapping
+       to it, which is what makes it read as polished instead of twitchy. The
+       rAF loop only runs while the light is still catching up, so an idle
+       cursor costs nothing. */
+    (function initGridGlow() {
+      var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+      if (!fine.matches) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var el = document.getElementById('gridGlow');
+      if (!el) return;
+
+      // Coordinates live on <html> so every lit layer can read them — the app
+      // overlay and the landing page's own layer stay in step for free.
+      var root = document.documentElement;
+      var tx = 0, ty = 0, cx = 0, cy = 0, raf = null, lit = false;
+      var EASE = 0.14;
+
+      function put(x, y) {
+        root.style.setProperty('--gx', x.toFixed(1) + 'px');
+        root.style.setProperty('--gy', y.toFixed(1) + 'px');
+      }
+
+      function loop() {
+        cx += (tx - cx) * EASE;
+        cy += (ty - cy) * EASE;
+        put(cx, cy);
+        if (Math.abs(tx - cx) > 0.4 || Math.abs(ty - cy) > 0.4) {
+          raf = requestAnimationFrame(loop);
+        } else {
+          raf = null;
+        }
+      }
+
+      window.addEventListener('pointermove', function (e) {
+        if (e.pointerType && e.pointerType !== 'mouse') return;
+        tx = e.clientX;
+        ty = e.clientY;
+        if (!lit) {
+          // Start the light where the cursor already is, so it fades up in
+          // place instead of flying in from the last known position.
+          lit = true; cx = tx; cy = ty;
+          put(cx, cy);
+          root.classList.add('grid-lit');
+        }
+        if (!raf) raf = requestAnimationFrame(loop);
+      }, { passive: true });
+
+      function douse() {
+        lit = false;
+        root.classList.remove('grid-lit');
+        if (raf) { cancelAnimationFrame(raf); raf = null; }
+      }
+      document.addEventListener('mouseleave', douse);
+      window.addEventListener('blur', douse);
     })();
   </script>
 </body>
