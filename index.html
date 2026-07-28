@@ -101,12 +101,17 @@
       --faint:       #496070;
 
       /* Glass surfaces */
-      --surface:        rgba(255,255,255,.055);
-      --surface-2:      rgba(255,255,255,.03);
-      --surface-3:      rgba(255,255,255,.075);
-      --panel:          rgba(255,255,255,.055);
-      --panel-soft:     rgba(255,255,255,.03);
-      --field:          rgba(255,255,255,.08);
+      /* Opaque, not translucent white. These are the exact colours the old
+         rgba tints composited to over the page ground, so cards look the same
+         — but the ground (and the cursor-lit grid) no longer shows through
+         them. Translucent surfaces are why the glow appeared to wash over
+         every card on the page. */
+      --surface:        #151925;
+      --surface-2:      #0e131f;
+      --surface-3:      #1a1e29;
+      --panel:          #151925;
+      --panel-soft:     #0e131f;
+      --field:          #1b1f2b;
 
       /* Borders */
       --border:        rgba(255,255,255,.08);
@@ -286,6 +291,62 @@
 
     /* Views hold content at a sane measure — width buys columns inside a view,
        it never strands a lone panel in a wide empty band. */
+    /* ============================================================
+       PACE SCORE
+       ============================================================ */
+    .score-block {
+      display: grid; grid-template-columns: minmax(190px, 240px) minmax(0,1fr); gap: clamp(18px, 3vw, 36px);
+      align-items: center; margin-bottom: 24px; padding: 22px clamp(18px, 2.4vw, 28px);
+      background: var(--surface); border: 1px solid var(--border-mid); border-radius: var(--radius);
+    }
+    .score-dial-wrap { position: relative; }
+    .score-dial { display: block; width: 100%; height: auto; color: var(--accent-strong); }
+    .score-arc { transition: stroke-dasharray 520ms var(--ease); }
+    .score-readout { position: absolute; left: 0; right: 0; bottom: 4%; text-align: center; }
+    .score-readout strong {
+      display: block; font-size: clamp(2.4rem, 5vw, 3.1rem); font-weight: 900;
+      letter-spacing: -.05em; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums;
+    }
+    .score-readout span {
+      display: block; margin-top: 4px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .64rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-strong);
+    }
+    .score-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+    .score-head h3 { font-size: 1.05rem; font-weight: 800; letter-spacing: -.02em; margin: 0; }
+    .score-delta {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .64rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--faint);
+    }
+    .score-delta.is-up { color: var(--accent-strong); }
+    .score-delta.is-down { color: var(--amber); }
+    .score-note { color: var(--muted); font-size: .88rem; line-height: 1.55; margin-bottom: 16px; }
+    .score-parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 14px 20px; }
+    .score-part { min-width: 0; }
+    .score-part-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .score-part-head span:first-child { font-size: .78rem; font-weight: 600; color: var(--ink-soft); }
+    .score-part-num { font-size: .78rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .score-part-num i { font-style: normal; color: var(--faint); font-weight: 600; }
+    .score-part-track { height: 3px; background: var(--surface-3); }
+    .score-part-fill { height: 100%; background: var(--accent); transition: width 420ms var(--ease); }
+    .score-foot { margin-top: 16px; color: var(--faint); font-size: .76rem; line-height: 1.5; }
+    @media (max-width: 720px) {
+      .score-block { grid-template-columns: minmax(0,1fr); }
+      .score-dial-wrap { max-width: 260px; margin: 0 auto; }
+    }
+
+    /* ---- Milestones ---- */
+    .ms-row { display: grid; grid-template-columns: auto minmax(0,1fr) minmax(70px, 110px); gap: 14px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .ms-row:last-child { border-bottom: 0; }
+    .ms-mark { width: 9px; height: 9px; border: 1.5px solid var(--border-strong); flex-shrink: 0; }
+    .ms-row.is-done .ms-mark { background: var(--accent); border-color: var(--accent); }
+    .ms-main strong { display: block; font-size: .86rem; font-weight: 700; color: var(--ink); }
+    .ms-row:not(.is-done) .ms-main strong { color: var(--ink-soft); }
+    .ms-main span { display: block; margin-top: 2px; font-size: .74rem; color: var(--muted); }
+    .ms-track { height: 3px; background: var(--surface-3); }
+    .ms-fill { height: 100%; background: var(--accent); transition: width 380ms var(--ease); }
+    .ms-row.is-done .ms-fill { background: var(--accent-strong); }
+
     /* ============================================================
        INSIGHTS
        ============================================================ */
@@ -735,7 +796,8 @@
     .summary-strip .summary--hero {
       border-color: rgba(16,185,129,.28);
       border-width: 1.5px;
-      background: linear-gradient(140deg, rgba(16,185,129,.13) 0%, rgba(16,185,129,.07) 45%, rgba(16,185,129,.03) 100%);
+      /* Opaque base under the tint, so the lit grid stops showing through. */
+      background: linear-gradient(140deg, rgba(16,185,129,.13) 0%, rgba(16,185,129,.07) 45%, rgba(16,185,129,.03) 100%), #080d19;
       padding: 24px 22px;
       min-height: 118px;
       box-shadow: 0 0 0 1px rgba(16,185,129,.12) inset, 0 6px 28px rgba(16,185,129,.08);
@@ -2289,6 +2351,8 @@
       </div>
     </div>
 
+    <section class="score-block" id="paceScoreHost" aria-label="Pace score"></section>
+
     <section class="plan-guidance" aria-label="Next best step">
       <div>
         <strong id="nextStepTitle">Start with your monthly money</strong>
@@ -2512,6 +2576,14 @@
       <p>Everything you have put aside, across every goal, month by month.</p>
     </div>
     <div id="insightsBody"></div>
+
+    <section class="ins-panel" id="milestonePanel" hidden>
+      <div class="ins-panel-head">
+        <h4>Milestones</h4>
+        <span class="ins-panel-note" id="milestoneCount"></span>
+      </div>
+      <div id="milestoneBody"></div>
+    </section>
 
     <section class="ins-panel" id="forecastPanel" hidden>
       <div class="ins-panel-head">
@@ -4075,6 +4147,103 @@
     }
 
     // ================================================================
+    // PACE SCORE
+    // A live 0-100 reading of how your saving is going, built only from
+    // things you actually control. Deliberately NOT a credit score: it
+    // measures behaviour, not creditworthiness, and nothing external can
+    // push it down. Reads savingsHistory() rather than recomputing.
+    // ================================================================
+    const SCORE_BANDS = [
+      { min: 85, label: "Excellent", note: "You are ahead of where you need to be." },
+      { min: 70, label: "Strong",    note: "Comfortably on track." },
+      { min: 50, label: "Steady",    note: "Holding a decent rhythm." },
+      { min: 30, label: "Building",  note: "Getting going. Consistency is what moves this most." },
+      { min: 0,  label: "Just started", note: "Log a deposit and this starts to climb." }
+    ];
+
+    function paceScore() {
+      const history = savingsHistory(12);
+      const budget = budgetTotals();
+      const active = state.targets.filter((t) => remainingFor(t) > 0);
+
+      // 1. Consistency (0-35) — did you save in recent months?
+      const recent = history.buckets.slice(-6, -1); // 5 complete months
+      const monthsSaved = recent.filter((b) => b.total > 0).length;
+      const consistency = recent.length ? (monthsSaved / recent.length) * 35 : 0;
+
+      // 2. On-pace (0-35) — how close are your goals to their required pace?
+      let onPace = 35;
+      if (active.length) {
+        const ratios = active.map((t) => {
+          const remaining = remainingFor(t);
+          if (remaining <= 0) return 1;
+          const rec = recoveryPlan(t, "month");
+          // 1 = level or ahead, 0 = the entire balance is behind
+          return Math.max(0, 1 - Math.min(1, rec.behind / remaining));
+        });
+        onPace = (ratios.reduce((a, b) => a + b, 0) / ratios.length) * 35;
+      }
+
+      // 3. Momentum (0-20) — this month plus the recent run, against your own
+      // average. The current month MUST be in this window: measuring only
+      // completed months meant saving today raised your average while leaving
+      // the measured window untouched, so a deposit pushed momentum *down*.
+      let momentum = 10;
+      const current = history.buckets[history.buckets.length - 1];
+      const priorMonths = history.buckets.slice(-4, -1);
+      const priorAvg = priorMonths.length
+        ? priorMonths.reduce((sum, b) => sum + b.total, 0) / priorMonths.length
+        : 0;
+      const baseline = history.average || priorAvg;
+      if (baseline > 0) {
+        const thisMonth = current ? current.total : 0;
+        momentum = Math.max(0, Math.min(20, ((thisMonth + priorAvg) / (2 * baseline)) * 10));
+      }
+
+      // 4. Headroom (0-10) — is the plan affordable, or is it fiction?
+      let headroom = 0;
+      if (budget.resources > 0) {
+        headroom = budget.safeToSpend >= 0 ? 10 : Math.max(0, 10 + (budget.safeToSpend / budget.resources) * 40);
+      }
+
+      const parts = [
+        { key: "consistency", label: "Consistency", value: consistency, max: 35, hint: "Months you saved something" },
+        { key: "onpace",      label: "On pace",     value: onPace,      max: 35, hint: "How close your goals are to their pace" },
+        { key: "momentum",    label: "Momentum",    value: momentum,    max: 20, hint: "Recent months vs your average" },
+        { key: "headroom",    label: "Headroom",    value: headroom,    max: 10, hint: "Whether the plan fits your budget" }
+      ];
+
+      const score = Math.max(0, Math.min(100, Math.round(parts.reduce((sum, p) => sum + p.value, 0))));
+      const band = SCORE_BANDS.find((b) => score >= b.min) || SCORE_BANDS[SCORE_BANDS.length - 1];
+
+      return { score, band, parts, history };
+    }
+
+    // Last seen score, so the dial can show movement. Stored separately from
+    // planner data so it never rides along in a backup export.
+    const SCORE_KEY = "pacepot.lastScore";
+
+    function scoreDelta(score) {
+      try {
+        const raw = JSON.parse(localStorage.getItem(SCORE_KEY) || "null");
+        const key = monthKey(today);
+        if (!raw || typeof raw.score !== "number") {
+          localStorage.setItem(SCORE_KEY, JSON.stringify({ score, key }));
+          return null;
+        }
+        // Roll the baseline forward once a month, so the delta reads as
+        // "since last month" rather than "since you last opened the tab".
+        if (raw.key !== key) {
+          localStorage.setItem(SCORE_KEY, JSON.stringify({ score, key }));
+          return score - raw.score;
+        }
+        return score - raw.score;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // ================================================================
     // FORECAST
     // Projects each goal from the pace it has actually been saved at,
     // not from the pace it was planned at — the planned figure is a
@@ -4178,6 +4347,139 @@
       }).join("") + `<div class="fc-legend"><span class="fc-legend-due"></span> deadline</div>`;
     }
 
+    // A measured arc with real graduations — the pace rule bent round a
+    // corner — rather than the usual donut gauge.
+    function scoreDialSvg(score) {
+      const R = 78, CX = 100, CY = 96;
+      const pt = (deg, r) => {
+        const rad = (deg * Math.PI) / 180;
+        return [CX + r * Math.cos(rad), CY - r * Math.sin(rad)];
+      };
+
+      let ticks = "";
+      for (let i = 0; i <= 20; i++) {
+        const major = i % 5 === 0;
+        const deg = 180 - (i / 20) * 180;
+        const [x1, y1] = pt(deg, R + 5);
+        const [x2, y2] = pt(deg, R + (major ? 14 : 9));
+        ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="currentColor" stroke-width="${major ? 1.6 : 1}" opacity="${major ? .5 : .26}"/>`;
+      }
+
+      const arcLen = Math.PI * R;
+      const filled = (Math.max(0, Math.min(100, score)) / 100) * arcLen;
+      const [mx, my] = pt(180 - (score / 100) * 180, R);
+
+      return `
+        <svg class="score-dial" viewBox="0 0 200 118" role="img" aria-label="Pace score ${score} out of 100">
+          <g class="score-ticks">${ticks}</g>
+          <path d="M ${CX - R} ${CY} A ${R} ${R} 0 0 1 ${CX + R} ${CY}" fill="none" stroke="var(--surface-3)" stroke-width="7"/>
+          <path d="M ${CX - R} ${CY} A ${R} ${R} 0 0 1 ${CX + R} ${CY}" fill="none" stroke="var(--accent)" stroke-width="7"
+                stroke-dasharray="${filled.toFixed(1)} ${arcLen.toFixed(1)}" stroke-linecap="butt" class="score-arc"/>
+          <circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="4.5" fill="var(--accent-strong)" stroke="#070c18" stroke-width="2.5"/>
+        </svg>`;
+    }
+
+    function renderPaceScore() {
+      const host = document.getElementById("paceScoreHost");
+      if (!host) return;
+
+      const hasData = state.targets.length > 0;
+      if (!hasData) { host.hidden = true; host.innerHTML = ""; return; }
+      host.hidden = false;
+
+      const { score, band, parts } = paceScore();
+      const delta = scoreDelta(score);
+
+      const deltaHtml = delta === null || delta === 0
+        ? `<span class="score-delta is-flat">No change yet</span>`
+        : `<span class="score-delta ${delta > 0 ? "is-up" : "is-down"}">${delta > 0 ? "+" : MINUS}${Math.abs(delta)} since you last checked</span>`;
+
+      const bars = parts.map((p) => `
+        <div class="score-part" title="${p.hint}">
+          <div class="score-part-head">
+            <span>${p.label}</span>
+            <span class="score-part-num">${Math.round(p.value)}<i>/${p.max}</i></span>
+          </div>
+          <div class="score-part-track"><div class="score-part-fill" style="width:${(p.value / p.max) * 100}%"></div></div>
+        </div>`).join("");
+
+      host.innerHTML = `
+        <div class="score-dial-wrap">
+          ${scoreDialSvg(score)}
+          <div class="score-readout">
+            <strong>${score}</strong>
+            <span>${band.label}</span>
+          </div>
+        </div>
+        <div class="score-detail">
+          <div class="score-head">
+            <h3>Pace score</h3>
+            ${deltaHtml}
+          </div>
+          <p class="score-note">${band.note}</p>
+          <div class="score-parts">${bars}</div>
+          <p class="score-foot">Built only from what you control — saving regularly, keeping goals near their pace, and a plan that fits your budget.</p>
+        </div>`;
+    }
+
+    // ================================================================
+    // MILESTONES
+    // Small, concrete things to reach for. Every one is derived from
+    // real data — nothing is awarded for opening the app.
+    // ================================================================
+    function milestones() {
+      const h = savingsHistory(12);
+      const saved = h.allTime;
+      const completed = state.targets.filter((t) => isComplete(t)).length;
+      const list = [];
+
+      const amounts = [100, 500, 1000, 2500, 5000, 10000];
+      const nextAmount = amounts.find((a) => saved < a);
+      amounts.forEach((a) => {
+        if (saved >= a || a === nextAmount) {
+          list.push({ label: `${money(a)} saved`, done: saved >= a, progress: Math.min(1, saved / a), detail: `${money(Math.round(saved))} so far` });
+        }
+      });
+
+      const streaks = [3, 6, 12];
+      const nextStreak = streaks.find((s) => h.streak < s);
+      streaks.forEach((s) => {
+        if (h.streak >= s || s === nextStreak) {
+          list.push({ label: `${s}-month streak`, done: h.streak >= s, progress: Math.min(1, h.streak / s), detail: `${h.streak} month${h.streak === 1 ? "" : "s"} running` });
+        }
+      });
+
+      if (state.targets.length) {
+        list.push({ label: "First goal finished", done: completed >= 1, progress: completed >= 1 ? 1 : 0, detail: completed ? `${completed} finished` : "None finished yet" });
+      }
+
+      return list;
+    }
+
+    function renderMilestones() {
+      const panel = document.getElementById("milestonePanel");
+      const host = document.getElementById("milestoneBody");
+      const count = document.getElementById("milestoneCount");
+      if (!panel || !host) return;
+
+      const list = milestones();
+      panel.hidden = !list.length;
+      if (!list.length) { host.innerHTML = ""; return; }
+
+      const done = list.filter((m) => m.done).length;
+      if (count) count.textContent = `${done} of ${list.length} reached`;
+
+      host.innerHTML = list.map((m) => `
+        <div class="ms-row${m.done ? " is-done" : ""}">
+          <span class="ms-mark" aria-hidden="true"></span>
+          <div class="ms-main">
+            <strong>${m.label}</strong>
+            <span>${m.detail}</span>
+          </div>
+          <div class="ms-track"><div class="ms-fill" style="width:${Math.round(m.progress * 100)}%"></div></div>
+        </div>`).join("");
+    }
+
     // Counts sit in the rail so a hidden section still tells you what is in it.
     function renderRailCounts() {
       const goalEl = document.getElementById("railGoalCount");
@@ -4209,7 +4511,9 @@
       renderInvestments(savedTotal, investmentTotal, budget);
       renderAllocation(budget);
       renderNextStep(budget, paceTotal);
+      renderPaceScore();
       renderInsights();
+      renderMilestones();
       renderForecast();
       renderRailCounts();
       els.availableAmount.textContent = money(available);
