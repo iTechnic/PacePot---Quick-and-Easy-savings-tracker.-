@@ -1,5 +1,5 @@
 /* ============================================================
-   PacePot SEO pages — dark glass design v3.0
+   PacePot SEO pages — flat, ruled (v4.0 pace rule)
    Matches the main app (index.html) design system exactly.
    ============================================================ */
 
@@ -53,9 +53,11 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--bg);
+  /* Squared paper, not gradient blobs — see the pace rule note above. */
   background-image:
-    radial-gradient(ellipse at 70% -10%, rgba(16,185,129,.09) 0%, transparent 50%),
-    radial-gradient(ellipse at 10% 80%,  rgba(16,185,129,.05) 0%, transparent 40%);
+    repeating-linear-gradient(90deg, rgba(255,255,255,.016) 0 1px, transparent 1px 88px),
+    repeating-linear-gradient(180deg, rgba(255,255,255,.016) 0 1px, transparent 1px 88px);
+  background-attachment: fixed;
   min-height: 100vh;
 }
 
@@ -85,11 +87,9 @@ ul, ol { padding-left: 20px; }
   padding: 0 clamp(16px,3vw,32px);
   height: 60px;
   margin-bottom: 24px;
-  background: rgba(7,12,24,.82);
-  backdrop-filter: blur(22px) saturate(1.4);
-  -webkit-backdrop-filter: blur(22px) saturate(1.4);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 2px 20px rgba(0,0,0,.35);
+  /* Solid, with the datum line beneath it — not a frosted glass bar. */
+  background: #070c18;
+  border-bottom: 1px solid rgba(255,255,255,.10);
 }
 
 .brand {
@@ -140,36 +140,46 @@ ul, ol { padding-left: 20px; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   padding: clamp(28px,5vw,52px);
   margin-bottom: 18px;
 }
 
+/* ------------------------------------------------------------------
+   THE PACE RULE — this site's signature device.
+   Section labels are read off a ruler: a short tick scale, the label,
+   then the datum line running out to the edge. Deliberately flat and
+   drawn in pure CSS. Replaces the pill-and-glowing-dot kicker.
+   ------------------------------------------------------------------ */
 .kicker {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 3px 12px;
-  background: var(--accent-soft);
-  border: 1px solid rgba(16,185,129,.25);
-  border-radius: var(--radius-full);
+  gap: 11px;
   color: var(--accent-strong);
-  font-size: .7rem;
-  font-weight: 800;
-  letter-spacing: .09em;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .16em;
   text-transform: uppercase;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
+/* Tick scale: minor graduations, like the leading edge of a ruler. */
 .kicker::before {
   content: "";
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
-  flex-shrink: 0;
+  flex: none;
+  width: 38px;
+  height: 8px;
+  background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 7px);
+  opacity: .55;
+}
+
+/* The datum line itself, running to the end of the measure. */
+.kicker::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: .16;
 }
 
 h1 {
@@ -195,8 +205,6 @@ h1 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   padding: clamp(22px,4vw,36px);
   margin-bottom: 18px;
 }
@@ -461,4 +469,34 @@ h3 {
 @media (max-width: 480px) {
   .tools-grid { grid-template-columns: 1fr; }
   .nav a:not(:first-child) { display: none; }
+}
+
+/* ------------------------------------------------------------------
+   CURSOR-LIT GRID
+   The same 88px ground grid drawn in the accent colour, revealed only
+   through a soft radial mask that follows the pointer. Both layers are
+   viewport-anchored so the lit lines land exactly on the dim ones.
+   Driven by grid-glow.js, which sets --gx/--gy on <html>.
+   ------------------------------------------------------------------ */
+.grid-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 500ms var(--ease);
+  background:
+    repeating-linear-gradient(90deg, var(--accent) 0 1px, transparent 1px 88px),
+    repeating-linear-gradient(180deg, var(--accent) 0 1px, transparent 1px 88px);
+  -webkit-mask-image: radial-gradient(circle 165px at var(--gx, -400px) var(--gy, -400px), #000 0%, rgba(0,0,0,.5) 46%, transparent 76%);
+          mask-image: radial-gradient(circle 165px at var(--gx, -400px) var(--gy, -400px), #000 0%, rgba(0,0,0,.5) 46%, transparent 76%);
+}
+
+.grid-lit .grid-glow { opacity: .28; }
+
+/* Page content sits above the lit layer. */
+.page, .topbar { position: relative; z-index: 1; }
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .grid-glow { display: none; }
 }
