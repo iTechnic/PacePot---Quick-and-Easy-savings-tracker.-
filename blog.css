@@ -1,5 +1,5 @@
 /* ============================================================
-   PacePot blog styles — dark glass v3.0
+   PacePot blog styles — flat, ruled (v4.0 pace rule)
    Extends seo-page.css. Load order: seo-page.css → blog.css
    ============================================================ */
 
@@ -9,8 +9,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   padding: clamp(22px,4vw,36px);
   margin-bottom: 18px;
   display: grid;
@@ -80,8 +78,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   padding: clamp(22px,4vw,44px);
   margin-bottom: 18px;
 }
