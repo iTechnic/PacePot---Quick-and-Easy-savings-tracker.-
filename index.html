@@ -176,6 +176,10 @@
       --shell-max:   1080px;
       --shell-pad:   32px;
       --sidebar-w:   300px;
+      /* The header height, in one place. Four rules subtract it (shell and
+         body min-height, rail sticky offset, rail max-height); when it was
+         hardcoded, changing the bar left all four two pixels out. */
+      --header-h:    58px;
     }
 
     /* Shell width ladder. Each step hands the layout more room so the grids
@@ -209,10 +213,19 @@
     .app-shell {
       display: block;
       /* Header is a sibling above this, so subtract it — otherwise short
-         sections gain a phantom 60px and scroll for no reason. */
-      min-height: calc(100dvh - 60px);
+         sections gain a phantom header's worth of height and scroll for no
+         reason. */
+      min-height: calc(100dvh - var(--header-h));
+      /* Deliberately NO z-index. A z-index here makes this a stacking context,
+         and anything inside that needs to overlay the header or a backdrop is
+         then trapped below it however high its own z-index goes. That is
+         exactly what broke the budget drawer: it asked for 100 and still came
+         up dimmed, blurred and unclickable under a backdrop at 99. Positioned
+         with auto is enough to stay above the lit grid (z 0), which is earlier
+         in the document.
+         Site ladder: grid 0 -> app content -> header 90 -> modals 120-130 ->
+         toast 140 -> tour 500 -> onboarding 9999. */
       position: relative;
-      z-index: 1;
     }
 
     /* ============================================================
@@ -250,13 +263,13 @@
        ============================================================ */
     /* Full-height column so the footer can be pushed to the bottom rather than
        floating wherever the current section happens to end. */
-    .app-body { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: stretch; min-height: calc(100dvh - 60px); }
+    .app-body { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: stretch; min-height: calc(100dvh - var(--header-h)); }
 
     .rail {
-      position: sticky; top: 60px; align-self: start;
+      position: sticky; top: var(--header-h); align-self: start;
       display: flex; flex-direction: column; gap: 2px;
       width: 208px; padding: 22px 12px 22px clamp(10px, 2vw, 22px);
-      max-height: calc(100dvh - 60px); overflow-y: auto;
+      max-height: calc(100dvh - var(--header-h)); overflow-y: auto;
     }
     .rail-label {
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -497,7 +510,7 @@
     @media (max-width: 900px) {
       .app-body { grid-template-columns: minmax(0,1fr); }
       .rail {
-        position: sticky; top: 60px; z-index: 12;
+        position: sticky; top: var(--header-h); z-index: 12;
         flex-direction: row; width: auto; max-height: none; overflow-x: auto; overflow-y: hidden;
         gap: 4px; padding: 10px clamp(14px, 4vw, 22px);
         background: #070c18; border-bottom: 1px solid var(--border);
@@ -507,114 +520,9 @@
       .rail-btn[aria-current="page"]::before { left: 0; right: 0; top: auto; bottom: -10px; width: auto; height: 2px; margin-left: 0; }
     }
 
-    /* ============================================================
-       SIDEBAR - DARK
-       ============================================================ */
-    aside {
-      background: linear-gradient(170deg, #06101d 0%, #0b1929 35%, #0e2038 65%, #091626 100%);
-      border-left: 1px solid rgba(255,255,255,.06);
-      padding: 0;
-      position: fixed;
-      right: 0;
-      top: 0;
-      height: 100dvh;
-      width: 360px;
-      z-index: 100;
-      overflow-y: auto;
-      overflow-x: hidden;
-      scrollbar-gutter: stable;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255,255,255,.1) transparent;
-      transform: translateX(0);
-      transition: transform 240ms cubic-bezier(0.16,1,0.3,1);
-      --ink: #e8f0f8;
-      --muted: #7a95ac;
-      --faint: #4e6477;
-      --border: rgba(255,255,255,.08);
-      --border-mid: rgba(255,255,255,.12);
-      --border-strong: rgba(255,255,255,.16);
-      --line: rgba(255,255,255,.08);
-      --line-bright: rgba(255,255,255,.04);
-      --silver: rgba(255,255,255,.28);
-      --silver-strong: rgba(255,255,255,.42);
-      --panel: rgba(255,255,255,.07);
-      --panel-soft: rgba(255,255,255,.04);
-      --surface: rgba(255,255,255,.07);
-      --surface-2: rgba(255,255,255,.04);
-      --field: rgba(255,255,255,.08);
-      --accent: #10b981;
-      --accent-strong: #34d399;
-      --accent-soft: rgba(16,185,129,.18);
-      --accent-mid: rgba(52,211,153,.35);
-      --green: #34d399;
-      --green-soft: rgba(52,211,153,.15);
-      --red: #f87171;
-      --amber: #fbbf24;
-      --amber-soft: rgba(251,191,36,.14);
-      --blue: #60a5fa;
-      --blue-soft: rgba(96,165,250,.14);
-      --button-ink: #0f172a;
-      --shadow-soft: 0 2px 10px rgba(0,0,0,.35);
-      --shadow: 0 4px 18px rgba(0,0,0,.4);
-      --shadow-lift: 0 8px 28px rgba(0,0,0,.45);
-      --shadow-xs: 0 1px 4px rgba(0,0,0,.3);
-      color: var(--ink);
-    }
-    aside::-webkit-scrollbar { width: 3px; }
-    aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
-    aside.sidebar-closed { transform: translateX(calc(100% + 10px)); }
-
-    .sidebar-inner { padding: 0 0 38px; }
-
     h1 { font-size: 1.3rem; font-weight: 900; letter-spacing: -.025em; line-height: 1.2; margin: 0; }
     .brand-kicker { display: block; font-size: .64rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; opacity: .9; }
     .subtle { color: var(--muted); font-size: .84rem; line-height: 1.5; margin: 3px 0 0; }
-
-    /* Mobile sidebar toggle */
-    .sidebar-toggle-btn {
-      display: none;
-      width: 100%;
-      min-height: 40px;
-      margin-bottom: 20px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-strong);
-      background: rgba(255,255,255,.06);
-      color: var(--ink);
-      cursor: pointer;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 9px 14px;
-      font-size: .86rem;
-      font-weight: 700;
-      transition: background var(--motion-fast) var(--ease);
-      box-shadow: none;
-    }
-    .sidebar-toggle-btn:hover { background: rgba(255,255,255,.1); transform: none; box-shadow: none; }
-    .sidebar-toggle-btn .toggle-icon {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      color: var(--muted);
-      font-size: .8rem;
-      font-weight: 600;
-    }
-    .sidebar-toggle-btn .toggle-chevron {
-      width: 8px; height: 8px;
-      border-right: 2px solid currentColor;
-      border-bottom: 2px solid currentColor;
-      transform: rotate(45deg);
-      transition: transform var(--motion) var(--ease);
-      margin-top: -2px;
-    }
-    aside.sidebar-closed .sidebar-toggle-btn .toggle-chevron { transform: rotate(-135deg); margin-top: 2px; }
-    .sidebar-toggle-count { color: var(--accent-strong); font-size: .78rem; font-weight: 700; }
-
-    /* The collapsible body of the sidebar */
-    .sidebar-body {
-      padding: 12px 22px 0;
-      transition: max-height 280ms var(--ease), opacity 200ms var(--ease);
-    }
 
     /* ============================================================
        SECTION TITLES
@@ -622,27 +530,16 @@
     .section-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 22px 0 10px; }
     h2 { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; color: var(--muted); margin: 0; }
 
-    /* ============================================================
-       SIDEBAR FORM ELEMENTS
-       ============================================================ */
-    aside label { display: grid; gap: 6px; color: var(--ink); font-size: .83rem; font-weight: 600; margin-bottom: 12px; }
-    aside input, aside select {
-      width: 100%;
-      background: var(--field);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      color: var(--ink);
-      outline: none;
-      min-height: 42px;
-      transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
-    }
-    aside input::placeholder { color: var(--faint); opacity: 1; }
-    aside select option { background: #1e293b; color: #f1f5f9; }
-    aside input:hover, aside select:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.1); }
-    aside input:focus, aside select:focus { border-color: rgba(16,185,129,.6); background: rgba(255,255,255,.1); box-shadow: 0 0 0 3px rgba(16,185,129,.18); }
-
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    /* A field row lines up the FIELDS, not the labels. Bottom-aligned, so a
+       label that wraps to two lines cannot shunt its own input out of line
+       with its neighbour's. Label margins are zeroed because the row's gap
+       and the parent's gap are the only spacing that should count — a stray
+       margin on one cell makes it stretch taller than the other, and grid
+       then spreads that slack across BOTH of its rows, so the field drops a
+       few pixels and grows. That is exactly what knocked Type/Value out of
+       line once already. */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
+    .field-row > label { margin-bottom: 0; }
     .field-row.three { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
 
 
@@ -651,36 +548,40 @@
     /* ============================================================
        BUDGET LIST PANEL
        ============================================================ */
-    .budget-list-panel { margin-top: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: rgba(255,255,255,.04); overflow: hidden; }
+    .budget-list-panel { overflow: hidden; }
     .budget-list-toggle {
-      width: 100%; min-height: 44px; border: 0; border-radius: 0; padding: 11px 13px;
-      display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; align-items: start;
+      width: 100%; min-height: 52px; border: 0; border-radius: 0; padding: 15px 20px;
+      display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; align-items: center;
       background: transparent; color: var(--ink); box-shadow: none; text-align: left; cursor: pointer;
       transition: background var(--motion-fast) var(--ease);
     }
-    .budget-list-toggle:hover { background: rgba(255,255,255,.04); transform: none; box-shadow: none; }
-    .budget-list-toggle strong { overflow-wrap: anywhere; font-weight: 700; font-size: .86rem; }
-    .budget-list-count { color: var(--muted); font-size: .74rem; font-weight: 600; margin-top: 2px; overflow-wrap: anywhere; }
+    .budget-list-toggle:hover { background: var(--surface-2); transform: none; box-shadow: none; }
+    .budget-list-toggle strong { overflow-wrap: anywhere; font-weight: 700; font-size: .92rem; }
+    .budget-list-count { color: var(--muted); font-size: .76rem; font-weight: 600; margin-top: 2px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
     .budget-list-summary { display: grid; gap: 2px; min-width: 0; }
     .budget-list-toggle::after {
       content: ""; width: 8px; height: 8px;
       border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
-      transform: rotate(45deg); transition: transform var(--motion) var(--ease); margin-top: -1px; flex-shrink: 0;
+      transform: rotate(45deg); transition: transform var(--motion) var(--ease); margin-top: -3px; flex-shrink: 0;
     }
     .budget-list-panel.collapsed .budget-list-toggle::after { transform: rotate(-45deg); margin-top: 3px; }
+    /* No height cap any more — the list is on a full-width page, not in a
+       360px drawer, so it lays out in columns instead of scrolling. */
     .budget-list-shell {
-      max-height: 300px; overflow: auto; padding: 8px; border-top: 1px solid var(--border);
-      transition: max-height 240ms var(--ease), padding 200ms var(--ease), opacity 160ms var(--ease);
+      padding: 4px 20px 20px; border-top: 1px solid var(--border);
+      transition: padding 200ms var(--ease), opacity 160ms var(--ease);
     }
     .budget-list-panel.collapsed .budget-list-shell { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; overflow: hidden; border-top-width: 0; }
-    .budget-list { display: grid; gap: 6px; }
+    .budget-list { display: grid; gap: 18px; align-items: start; }
+    @media (min-width: 760px) { .budget-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); } }
     .budget-item {
       display: grid; grid-template-columns: minmax(0,1fr) auto auto auto; gap: 7px; align-items: center;
-      padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius-xs);
-      background: rgba(255,255,255,.05); min-width: 0;
-      transition: background var(--motion-fast) var(--ease);
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-xs);
+      background: var(--surface-2); min-width: 0;
+      transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
     }
-    .budget-item:hover { background: rgba(255,255,255,.09); }
+    .budget-item + .budget-item { margin-top: 6px; }
+    .budget-item:hover { background: var(--field); border-color: var(--border-mid); }
     .budget-item > div:first-child { min-width: 0; }
     .budget-item strong { display: block; font-size: .84rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
     .budget-item > div:first-child span { display: block; color: var(--muted); font-size: .74rem; margin-top: 1px; }
@@ -689,29 +590,17 @@
     .budget-item.outgoing .amount { color: var(--red); }
 
     /* ============================================================
-       METRIC / QUICK VIEW
+       BUDGET SPLIT LEGEND
+       The split itself is a measured rule — see .bsplit in the budget page
+       block. These are the readings under it.
        ============================================================ */
-    .metric { display: grid; gap: 5px; padding: 18px 16px; background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.22); border-radius: var(--radius-sm); margin-top: 14px; color: var(--muted); font-size: .82rem; }
-    .metric strong { font-size: 2.3rem; line-height: 1; color: var(--accent-strong); font-weight: 900; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
-
-    /* ============================================================
-       BUDGET PIE CHART
-       ============================================================ */
-    .budget-chart {
-      display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 14px; align-items: center;
-      margin-top: 14px; padding: 13px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-      background: rgba(255,255,255,.04);
+    .legend-row {
+      display: flex; justify-content: space-between; gap: 8px; color: var(--muted); align-items: baseline;
+      padding-bottom: 7px; border-bottom: 1px solid var(--line);
     }
-    .pie {
-      width: 92px; aspect-ratio: 1; border-radius: 50%;
-      background: conic-gradient(var(--red) 0 var(--outgoing-slice,0%), var(--green) var(--outgoing-slice,0%) var(--planned-slice,0%), rgba(255,255,255,.1) var(--planned-slice,0%) 100%);
-      display: grid; place-items: center; box-shadow: 0 4px 16px rgba(0,0,0,.3);
-    }
-    .pie::after { content: ""; width: 50px; aspect-ratio: 1; border-radius: 50%; background: #0a1628; border: 1px solid rgba(255,255,255,.05); }
-    .chart-legend { display: grid; gap: 7px; font-size: .8rem; }
-    .legend-row { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); align-items: center; }
-    .legend-row strong { color: var(--ink); font-weight: 700; white-space: nowrap; font-size: .82rem; }
-    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; background: var(--green); flex-shrink: 0; }
+    .legend-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .legend-row strong { color: var(--ink); font-weight: 700; white-space: nowrap; font-size: .92rem; font-variant-numeric: tabular-nums; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; background: var(--green); flex-shrink: 0; }
     .dot.outgoing { background: var(--red); }
     .dot.planned { background: var(--green); }
     .dot.leftover { background: rgba(255,255,255,.15); }
@@ -1193,14 +1082,15 @@
     /* ============================================================
        TOAST
        ============================================================ */
-    .toast { position: fixed; right: 20px; bottom: 20px; background: #0f172a; color: #fff; border-radius: var(--radius-sm); padding: 11px 16px; box-shadow: 0 8px 32px rgba(15,23,42,.22); transform: translateY(16px); opacity: 0; pointer-events: none; transition: transform 200ms var(--ease), opacity 200ms var(--ease); max-width: min(340px,calc(100vw - 40px)); font-size: .86rem; font-weight: 600; z-index: 40; }
+    .toast { position: fixed; right: 20px; bottom: 20px; background: #0f172a; color: #fff; border-radius: var(--radius-sm); padding: 11px 16px; box-shadow: 0 8px 32px rgba(15,23,42,.22); transform: translateY(16px); opacity: 0; pointer-events: none; transition: transform 200ms var(--ease), opacity 200ms var(--ease); max-width: min(340px,calc(100vw - 40px)); font-size: .86rem; font-weight: 600; z-index: 140; }
     .toast.show { transform: translateY(0); opacity: 1; }
 
     /* ============================================================
        MODALS - BASE
        ============================================================ */
+    /* Modals sit above everything in the app shell, including the header. */
     .modal {
-      position: fixed; inset: 0; z-index: 25; display: none; align-items: center; justify-content: center;
+      position: fixed; inset: 0; z-index: 125; display: none; align-items: center; justify-content: center;
       padding: 20px; background: rgba(10,18,32,.58); backdrop-filter: blur(6px);
     }
     .modal.show { display: flex; }
@@ -1235,7 +1125,7 @@
     /* ============================================================
        HISTORY + HELP MODALS (preserve existing structure)
        ============================================================ */
-    .history-modal { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(10,18,32,.58); backdrop-filter: blur(6px); }
+    .history-modal { position: fixed; inset: 0; z-index: 120; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(10,18,32,.58); backdrop-filter: blur(6px); }
     .history-modal.show { display: flex; }
     .history-panel { width: min(520px,100%); max-height: min(680px,calc(100vh - 40px)); display: grid; grid-template-rows: auto minmax(0,1fr); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); overflow: hidden; animation: modalIn 180ms var(--ease); }
     .help-panel { width: min(720px,100%); }
@@ -1263,7 +1153,7 @@
     /* ============================================================
        CELEBRATION MODAL
        ============================================================ */
-    .celebration-modal { position: fixed; inset: 0; z-index: 30; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(10,18,32,.6); backdrop-filter: blur(8px); }
+    .celebration-modal { position: fixed; inset: 0; z-index: 130; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(10,18,32,.6); backdrop-filter: blur(8px); }
     .celebration-modal.show { display: flex; }
     .celebration-panel { width: min(480px,100%); position: relative; overflow: hidden; padding: 36px 28px 32px; text-align: center; background: var(--surface); border: 1px solid rgba(16,185,129,.2); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl), 0 0 60px rgba(16,185,129,.08); animation: modalIn 200ms var(--ease); }
     .celebration-ring-wrap { position: relative; width: 100px; height: 100px; margin: 0 auto 20px; }
@@ -1310,10 +1200,9 @@
       z-index: 90;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 0 28px;
-      height: 60px;
+      gap: clamp(10px, 2vw, 24px);
+      padding: 0 clamp(16px, 2.2vw, 28px);
+      height: var(--header-h);
       /* Solid, with the datum line beneath it — not a frosted glass bar. */
       background: #070c18;
       border-bottom: 1px solid rgba(255,255,255,.10);
@@ -1321,167 +1210,341 @@
     .app-brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       flex-shrink: 0;
+      text-decoration: none;
     }
+    .brand-logo { display: block; width: 26px; height: 26px; }
     .brand-name-text {
-      font-size: 1.05rem;
-      font-weight: 900;
+      font-size: 1rem;
+      font-weight: 800;
       letter-spacing: -.03em;
+      line-height: 1;
       color: var(--ink);
     }
-    .app-nav {
-      display: flex;
-      gap: 2px;
+
+    /* ONE datum for everything in the bar. The old row ran 32px, 36px and
+       41px controls side by side at three type sizes, so tops and bottoms
+       staggered even though every centre lined up — that is what read as
+       crooked. Height and font are set once here and never overridden. */
+    .app-nav a,
+    .support-link,
+    .hmenu-btn {
+      display: inline-flex;
       align-items: center;
-    }
-    .app-nav a {
-      padding: 6px 13px;
+      justify-content: center;
+      height: 34px;
+      min-height: 34px;
+      padding: 0 13px;
       border-radius: var(--radius-sm);
-      color: var(--muted);
-      font-size: .87rem;
+      font-size: .84rem;
       font-weight: 600;
+      line-height: 1;
+      white-space: nowrap;
       text-decoration: none;
-      transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+      box-shadow: none;
+      transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
     }
+    .app-nav a:hover, .support-link:hover, .hmenu-btn:hover { transform: none; box-shadow: none; }
+
+    .app-nav { display: flex; gap: 2px; align-items: center; }
+    .app-nav a { color: var(--muted); }
     .app-nav a:hover { color: var(--ink); background: var(--surface-2); }
+
+    /* Pushed right; the nav stays with the brand rather than floating in a
+       centre that shifts every time a control changes width. */
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       flex-shrink: 0;
+      margin-left: auto;
     }
-    .budget-open-btn {
-      min-height: 36px;
-      padding: 7px 15px;
-      background: var(--accent);
-      color: #fff;
-      border: 0;
-      border-radius: var(--radius-sm);
-      font-size: .84rem;
+
+    /* The single accent in the bar. */
+    .support-link {
+      color: var(--accent-strong);
+      background: transparent;
+      border: 1px solid var(--accent-mid);
       font-weight: 700;
+    }
+    .support-link:hover { background: var(--accent-soft); color: var(--accent-strong); border-color: var(--accent-strong); }
+    .support-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* ------------------------------------------------------------------
+       HEADER MENU
+       Tour, help, backup and the destructive Clear all live in here now.
+       Clear is separated and red, so an irreversible action is never one
+       stray click away from Backup.
+       ------------------------------------------------------------------ */
+    .hmenu { position: relative; flex-shrink: 0; }
+    /* This is the only way into backup, help, the tour and clear, so it has
+       to read as a control rather than three faint dots on a near-black bar.
+       The app's own dark surfaces are all too close to the bar to separate:
+       --surface measures 1.11:1 against it and --field 1.19:1, which is why
+       the button vanished. #2e3548 is 1.6:1 — plainly a button, still quiet
+       enough that "Support PacePot" keeps the only accent at rest. */
+    .hmenu-btn {
+      width: 40px;
+      padding: 0;
+      color: var(--ink);
+      background: #2e3548;
+      border: 1px solid var(--silver-strong);
       cursor: pointer;
-      white-space: nowrap;
-      box-shadow: 0 2px 12px rgba(16,185,129,.3);
-      transition: background var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
     }
-    .budget-open-btn:hover { background: #0ea572; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(16,185,129,.4); }
+    .hmenu-btn svg { width: 20px; height: 20px; }
+    .hmenu-btn:hover,
+    .hmenu-btn:focus-visible,
+    .hmenu-btn[aria-expanded="true"] {
+      color: var(--accent-strong);
+      background: var(--surface-2);
+      border-color: var(--accent-mid);
+    }
+    /* Open state reads as pressed, and connects to the panel below it. */
+    .hmenu-btn[aria-expanded="true"] { background: var(--accent-soft); }
 
-    /* ============================================================
-       DRAWER BACKDROP
-       ============================================================ */
-    .drawer-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 99;
-      background: rgba(10,18,32,.42);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 240ms cubic-bezier(0.16,1,0.3,1);
+    .hmenu-panel {
+      position: absolute;
+      top: calc(100% + 9px);
+      right: 0;
+      min-width: 218px;
+      padding: 6px;
+      display: grid;
+      gap: 1px;
+      background: var(--panel);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lift);
+      animation: detailsIn 140ms var(--ease);
     }
-    body:has(aside:not(.sidebar-closed)) .drawer-backdrop {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    /* `display: grid` above would beat the hidden attribute's UA rule. */
+    .hmenu-panel[hidden] { display: none; }
 
-    /* ============================================================
-       DRAWER HEADER (inside aside)
-       ============================================================ */
-    .drawer-header {
+    .hmenu-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 20px 22px 14px;
-      border-bottom: 1px solid var(--border);
+      /* The base button rule centres its contents, which centred each row as
+         a unit — the icons landed at five different offsets and the column
+         read as ragged. `text-align` cannot fix that; flex alignment can.
+         With every icon 16px and the gap fixed, this lines up icons AND
+         labels in one go. */
+      justify-content: flex-start;
+      gap: 11px;
+      width: 100%;
+      min-height: 38px;
+      padding: 0 12px;
+      background: transparent;
+      border: 0;
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: .85rem;
+      font-weight: 600;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: none;
+      transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
     }
-    /* ------------------------------------------------------------------
-       BUDGET DRAWER GROUPS
-       The drawer used to be one undifferentiated column of fields. It now
-       answers three separate questions in order — what comes in, what goes
-       in and out, what you set aside — then shows the result with weight.
-       ------------------------------------------------------------------ */
-    .bgroup { padding: 0 0 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
-    .bgroup:last-of-type { border-bottom: 0; }
-    .bgroup-label {
+    .hmenu-item:hover { background: var(--surface-2); transform: none; box-shadow: none; }
+    /* Shown exactly where .app-nav is hidden — same breakpoint, below. */
+    .hmenu-nav-only { display: none; }
+    .hmenu-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); }
+    .hmenu-item:hover svg { color: var(--accent-strong); }
+    .hmenu-item--danger { color: var(--red); }
+    .hmenu-item--danger svg { color: var(--red); }
+    .hmenu-item--danger:hover { background: rgba(248,113,113,.12); color: var(--red); }
+    .hmenu-item--danger:hover svg { color: var(--red); }
+    .hmenu-sep { height: 1px; background: var(--border); margin: 5px 9px; }
+
+    /* ============================================================
+       BUDGET PAGE (Money setup)
+       The budget is a section of the app, not a fly-out. Its shape is the
+       shape of the question: the answer first, then the three inputs that
+       feed it, then the itemised detail.
+       ============================================================ */
+    .budget-page { display: block; margin-bottom: 18px; }
+
+    /* --- The answer, given the weight of a hero ------------------- */
+    .bhero {
+      display: grid; grid-template-columns: minmax(0,1fr); gap: 22px;
+      padding: 24px; margin-bottom: 18px;
+      border: 1px solid rgba(16,185,129,.26); border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(16,185,129,.10) 0%, rgba(16,185,129,.03) 46%, transparent 100%),
+        var(--surface);
+    }
+    @media (min-width: 860px) { .bhero { grid-template-columns: minmax(0,.85fr) minmax(0,1fr); gap: 34px; align-items: center; } }
+
+    .bhero-label {
+      display: block;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .63rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--accent-strong); margin-bottom: 8px;
+    }
+    .bhero-figure strong {
+      display: block;
+      font-size: clamp(2.4rem, 5.2vw, 3.4rem); line-height: 1;
+      font-weight: 800; letter-spacing: -.045em;
+      color: var(--accent-strong); font-variant-numeric: tabular-nums;
+    }
+    .bhero-advice { color: var(--muted); font-size: .85rem; line-height: 1.5; margin: 14px 0 0; max-width: 46ch; }
+
+    /* --- The split, read off a rule rather than a donut ------------
+       Drives off the same --outgoing-slice / --planned-slice custom
+       properties the old pie used, so renderBudget() needs no change.
+       The ::after layer lays graduations over it: the pace-rule language
+       the rest of v4.0 uses (see the score arc), not a generic chart. */
+    .bhero-split { display: grid; gap: 14px; min-width: 0; }
+    /* Registered so the segments slide when a figure changes instead of
+       jumping. Unregistered custom properties are not animatable, so the
+       transition below would otherwise be dead CSS. Inherited, because the
+       ::before markers read the same two values off the parent. */
+    @property --outgoing-slice { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
+    @property --planned-slice  { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
+    .bsplit {
+      position: relative; height: 44px; border-radius: var(--radius-xs); overflow: hidden;
+      border: 1px solid var(--border-mid);
+      background: linear-gradient(90deg,
+        var(--red) 0 var(--outgoing-slice, 0%),
+        var(--green) var(--outgoing-slice, 0%) var(--planned-slice, 0%),
+        rgba(255,255,255,.07) var(--planned-slice, 0%) 100%);
+      transition: --outgoing-slice 420ms var(--ease), --planned-slice 420ms var(--ease);
+    }
+    .bsplit::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(90deg,
+        rgba(0,0,0,.30) 0 1px, transparent 1px 10%);
+    }
+    /* The two boundaries the eye actually needs: where outgoings end and
+       where goals end. Both slices are measured from 0, so the band between
+       them is the difference — not the planned slice itself. */
+    .bsplit::before {
+      content: ""; position: absolute; top: 0; bottom: 0; z-index: 1; pointer-events: none;
+      left: var(--outgoing-slice, 0%);
+      width: max(0px, calc(var(--planned-slice, 0%) - var(--outgoing-slice, 0%)));
+      border-left: 1px solid rgba(255,255,255,.55);
+      border-right: 1px solid rgba(255,255,255,.55);
+    }
+    .chart-legend { display: grid; gap: 8px; font-size: .82rem; }
+
+    /* --- The three inputs ----------------------------------------- */
+    .bgrid {
+      display: grid; gap: 14px; margin-bottom: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    }
+    .bcard {
+      display: flex; flex-direction: column;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow-xs); padding: 18px 20px 20px;
+      transition: border-color var(--motion) var(--ease);
+    }
+    .bcard:focus-within { border-color: var(--accent-mid); }
+    .bcard-label {
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
       font-size: .63rem; font-weight: 600; letter-spacing: .13em; text-transform: uppercase;
-      color: var(--accent-strong); margin-bottom: 13px;
+      color: var(--accent-strong); margin-bottom: 15px;
       display: flex; align-items: center; gap: 10px;
     }
-    .bgroup-label::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .16; }
+    .bcard-label::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .18; }
+    /* Direct child only — a bare `label:last-of-type` also matched the second
+       label inside a .field-row and stripped its margin, unbalancing the row. */
+    .bcard > label:last-of-type { margin-bottom: 0; }
+    .bcard .budget-add label { margin-bottom: 0; }
+    .bcard-note { color: var(--muted); font-size: .78rem; line-height: 1.5; margin: 12px 0 0; }
+    .bcard .budget-add { margin-top: 0; padding-top: 0; border-top: 0; }
 
-    /* The result: the one number the form exists to produce. */
-    .bresult {
-      padding: 16px 16px 14px; margin-bottom: 20px;
-      border: 1px solid rgba(16,185,129,.28); border-radius: var(--radius);
-      background: rgba(16,185,129,.07);
-    }
-    .bresult-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-    .bresult-label {
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-      font-size: .63rem; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; color: var(--accent-strong);
-    }
-    .bresult-head strong { font-size: 1.5rem; font-weight: 800; letter-spacing: -.035em; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
-    .bresult .subtle { margin-top: 12px; font-size: .8rem; }
+    /* Items get the full page width, so more screen becomes more columns
+       rather than a taller scroller — same rule as the goals grid. */
+    .bcard--items { padding: 0; overflow: hidden; margin-bottom: 14px; }
 
     /* Set-once settings, folded away from the monthly workflow. */
-    .bgroup-quiet { border-bottom: 0; padding-bottom: 0; }
-    .bgroup-quiet > summary {
-      list-style: none; cursor: pointer; padding: 11px 0;
-      font-size: .82rem; font-weight: 600; color: var(--muted);
-      display: flex; align-items: center; justify-content: space-between;
-      border-top: 1px solid var(--border);
-    }
-    .bgroup-quiet > summary::-webkit-details-marker { display: none; }
-    .bgroup-quiet > summary::after { content: "+"; font-size: 1rem; color: var(--faint); }
-    .bgroup-quiet[open] > summary::after { content: "\2212"; }
-    .bgroup-quiet > summary:hover { color: var(--ink); }
-    .bgroup-body { padding-top: 6px; }
+    .bquiet { margin-bottom: 0; }
+    .bquiet .field-row { gap: 14px; }
+    .bquiet label { margin-bottom: 0; }
+    .bquiet .details-body { display: grid; gap: 16px; }
+    .currency-field { max-width: 320px; }
 
-    /* Split in/out groups inside the item list. */
-    .budget-group + .budget-group { margin-top: 14px; }
+    /* ------------------------------------------------------------------
+       ACCOUNT BALANCE — OPT-IN AND DATED
+       A balance PacePot cannot read is only true on the day it is typed.
+       It is off by default, and when it is on it shows its own age rather
+       than passing a months-old figure off as today's.
+       ------------------------------------------------------------------ */
+    .opt-row {
+      display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 13px;
+      align-items: start; margin-bottom: 0; cursor: pointer;
+      padding: 15px 17px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      transition: border-color var(--motion) var(--ease), background var(--motion) var(--ease);
+    }
+    .opt-row:hover { border-color: var(--border-mid); }
+    /* On/off has to be legible from across the panel, not just from the tick.
+       Same accent tint the hero tiles and focused cards use. */
+    .opt-row:has(:checked) { border-color: var(--accent-mid); background: var(--accent-soft); }
+    .opt-row .check-box { width: 18px; height: 18px; margin-top: 1px; }
+
+    .opt-copy { display: grid; gap: 5px; min-width: 0; }
+    .opt-copy strong { font-size: .88rem; font-weight: 700; }
+    .opt-note { color: var(--muted); font-size: .78rem; font-weight: 400; line-height: 1.55; }
+
+    /* State in the pace-rule idiom the rest of v4.0 reads in — a monospace
+       graduation, not a toy switch. */
+    .opt-state {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .6rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--faint); padding-top: 3px; white-space: nowrap;
+    }
+    .opt-row:has(:checked) .opt-state { color: var(--accent-strong); }
+    .opt-state::after { content: "Off"; }
+    .opt-row:has(:checked) .opt-state::after { content: "Tracking"; }
+    /* On a phone the badge stole 53px from a 221px column and pushed the
+       explanation to seven lines. It drops under the copy instead. */
+    @media (max-width: 560px) {
+      .opt-row { grid-template-columns: auto minmax(0,1fr); }
+      .opt-state { grid-column: 2; padding-top: 2px; }
+    }
+
+    .balance-field { display: grid; gap: 9px; max-width: 320px; }
+    .balance-stamp {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .7rem; color: var(--faint); line-height: 1.5;
+    }
+    .balance-stamp .is-stale { color: var(--amber); }
+
+    /* The tile is where the number gets mistaken for a live balance, so the
+       age lives there too — and the figure is visibly demoted once it is
+       too old to stand behind. */
+    .summary-note {
+      margin-top: 7px;
+      display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .62rem; letter-spacing: .04em; color: var(--faint); line-height: 1.4;
+    }
+    .summary.is-stale .value { color: var(--muted); }
+    .summary.is-stale .summary-note { color: var(--amber); }
+    .note-action {
+      min-height: 0; padding: 2px 8px;
+      background: transparent; border: 1px solid currentColor; border-radius: var(--radius-xs);
+      color: inherit; font: inherit; font-size: .62rem; letter-spacing: .04em;
+      cursor: pointer; box-shadow: none;
+    }
+    .note-action:hover { background: var(--amber-soft); transform: none; box-shadow: none; }
+    /* 20px is fine to click and hopeless to tap. */
+    @media (hover: none), (pointer: coarse) {
+      .note-action { min-height: 32px; padding: 6px 14px; }
+    }
+
+    /* Split in/out groups inside the item list. Spacing comes from the
+       .budget-list grid gap, so the groups sit side by side when there is
+       room and stack cleanly when there is not. */
     .budget-group-head {
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
-      margin-bottom: 7px; padding-bottom: 5px; border-bottom: 1px solid var(--border);
+      margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
       font-size: .62rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--faint);
     }
     .budget-group-total { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-
-    .drawer-kicker {
-      display: block;
-      font-size: .7rem;
-      font-weight: 700;
-      letter-spacing: .11em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 2px;
-    }
-    .drawer-count {
-      display: block;
-      font-size: .8rem;
-      font-weight: 600;
-      color: var(--muted);
-    }
-    .drawer-close-btn {
-      width: 36px; height: 36px; min-height: 36px;
-      padding: 0;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: var(--radius-sm);
-      color: var(--muted);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: none;
-      transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
-    }
-    .drawer-close-btn:hover { background: rgba(255,255,255,.16); color: #fff; transform: none; box-shadow: none; }
 
     /* ============================================================
        KEYFRAMES
@@ -1495,7 +1558,11 @@
     @media (max-width: 1100px) {
       .workspace { grid-template-columns: 1fr; }
       .summary-strip { grid-template-columns: repeat(4,minmax(0,1fr)); }
+      /* The bar drops the site nav here; the header menu picks it up. Keep
+         these two rules on the same breakpoint or the links vanish entirely. */
       .app-nav { display: none; }
+      a.hmenu-item.hmenu-nav-only { display: flex; }
+      .hmenu-sep.hmenu-nav-only { display: block; }
     }
 
     @media (max-width: 900px) {
@@ -1519,11 +1586,12 @@
       .deposit-row label { grid-column: 1 / -1; }
       .deposit-row input { grid-column: 1 / 3; }
       .field-row, .field-row.three { grid-template-columns: 1fr; }
-      .budget-chart { grid-template-columns: 1fr; }
       .site-footer { display: grid; }
       .targets-heading { gap: 8px; }
-      .app-header { padding: 0 18px; height: 54px; gap: 10px; }
-      aside { width: 100vw; max-width: 360px; }
+      /* Set the variable, not the height — the rail's sticky offset and the
+         shell's min-height both read it. */
+      :root { --header-h: 54px; }
+      .app-header { padding: 0 18px; gap: 10px; }
     }
 
     @media (max-width: 480px) {
@@ -1532,8 +1600,10 @@
       .target-grid { grid-template-columns: 1fr; }
       .deposit-row { grid-template-columns: 1fr auto auto auto auto; }
       .deposit-row input { grid-column: 1; }
-      .header-actions .support-link, .header-actions .ghost:not(.budget-open-btn) { display: none; }
-      .budget-open-btn { font-size: .8rem; padding: 6px 11px; }
+      /* The menu stays — it is the only route to backup, tour and help on a
+         phone. Support drops out; it is the one thing with a home elsewhere. */
+      .header-actions .support-link { display: none; }
+      .app-nav a { padding: 0 9px; font-size: .8rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1990,15 +2060,21 @@
     .sl-item:hover { border-color: var(--border-mid); background: var(--surface-3); }
     .sl-item.sl-purchased { opacity: .45; }
     .sl-item.sl-purchased .sl-item-name { text-decoration: line-through; }
-    .sl-check {
-      grid-area: check; align-self: start; margin-top: 2px;
+    /* One checkbox for the whole app. The save list had the only styled one;
+       the definition lives here under a neutral name so nothing else has to
+       fall back to a raw native control that ignores the dark theme. */
+    .check-box, .sl-check {
       width: 16px; height: 16px; appearance: none; -webkit-appearance: none;
       border: 1.5px solid var(--border-strong); border-radius: 2px; background: var(--field);
-      cursor: pointer; display: grid; place-content: center;
-      transition: background var(--motion-fast), border-color var(--motion-fast); min-height: unset; padding: 0;
+      cursor: pointer; display: grid; place-content: center; flex-shrink: 0;
+      transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease);
+      min-height: unset; padding: 0;
     }
-    .sl-check:checked { background: var(--accent); border-color: var(--accent); }
-    .sl-check:checked::after { content:''; width: 5px; height: 9px; border: 2px solid #fff; border-top: 0; border-left: 0; transform: rotate(45deg) translate(-.5px, -1px); }
+    .check-box:hover, .sl-check:hover { border-color: var(--accent-mid); }
+    .check-box:checked, .sl-check:checked { background: var(--accent); border-color: var(--accent); }
+    .check-box:checked::after, .sl-check:checked::after { content:''; width: 5px; height: 9px; border: 2px solid #fff; border-top: 0; border-left: 0; transform: rotate(45deg) translate(-.5px, -1px); }
+    .check-box:focus-visible, .sl-check:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .sl-check { grid-area: check; align-self: start; margin-top: 2px; }
     .sl-item-name { grid-area: name; font-weight: 700; font-size: .93rem; color: var(--ink); line-height: 1.3; overflow-wrap: anywhere; }
     .sl-price {
       grid-area: price; font-size: 1.18rem; font-weight: 800; color: var(--ink);
@@ -2238,9 +2314,17 @@
   </div>
 </div>
 
+<!-- ============================================================
+     APP HEADER
+     Seven controls used to sit in the right cluster at four different
+     heights (32 / 36 / 41px) and three type sizes, with a destructive
+     "Clear" the same weight as routine actions and two competing green
+     treatments side by side. It is now brand, nav, one accent, one menu —
+     every control on the same 34px datum.
+     ============================================================ -->
 <header class="app-header">
   <a href="/" class="app-brand">
-    <img src="/logo-icon.png" alt="PacePot" class="brand-logo" width="34" height="34">
+    <img src="/logo-icon.png" alt="PacePot" class="brand-logo" width="26" height="26">
     <span class="brand-name-text">PacePot</span>
   </a>
   <nav class="app-nav" aria-label="Main navigation">
@@ -2248,130 +2332,56 @@
     <a href="/blog">Guides</a>
   </nav>
   <div class="header-actions">
-    <button id="budgetDrawerOpen" class="budget-open-btn" type="button">Monthly budget</button>
-    <a class="support-link" href="https://buymeacoffee.com/pacepot" target="_blank" rel="noopener noreferrer" title="Support PacePot">Support PacePot</a>
-    <button class="ghost icon-btn" id="helpBtn" type="button" title="Open help"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v1M12 11v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-    <button class="ghost small-btn" id="tourBtn" type="button" title="Take the guided tour">Tour</button>
-    <button class="ghost small-btn" id="importBtn" type="button" title="Import a backup">Import</button>
-    <button class="ghost small-btn" id="backupBtn" type="button" title="Download a backup">Backup</button>
-    <button class="ghost small-btn danger" id="resetBtn" type="button" title="Clear all saved data">Clear</button>
+    <a class="support-link" href="https://buymeacoffee.com/pacepot" target="_blank" rel="noopener noreferrer">Support PacePot</a>
+    <div class="hmenu">
+      <button class="hmenu-btn" id="headerMenuBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="headerMenu" aria-label="More actions" title="More actions">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/></svg>
+      </button>
+      <div class="hmenu-panel" id="headerMenu" role="menu" aria-labelledby="headerMenuBtn" hidden>
+        <!-- Only below 1100px, where .app-nav is hidden. Without these the
+             site nav is simply unreachable from the app on a phone. -->
+        <a class="hmenu-item hmenu-nav-only" href="/calculators" role="menuitem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 7h8M8 12h1m3 0h1m3 0h1M8 16h1m3 0h1m3 0h1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Calculators
+        </a>
+        <a class="hmenu-item hmenu-nav-only" href="/blog" role="menuitem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4h9l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 4v5h5M8 13h8M8 17h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Guides
+        </a>
+        <div class="hmenu-sep hmenu-nav-only" role="separator"></div>
+
+        <button class="hmenu-item" id="tourBtn" type="button" role="menuitem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 8v8l8 5 8-5V8l-8-5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Guided tour
+        </button>
+        <button class="hmenu-item" id="helpBtn" type="button" role="menuitem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v1M12 11v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Help
+        </button>
+
+        <div class="hmenu-sep" role="separator"></div>
+
+        <button class="hmenu-item" id="importBtn" type="button" role="menuitem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15V3m0 12-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Import backup
+        </button>
+        <button class="hmenu-item" id="backupBtn" type="button" role="menuitem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download backup
+        </button>
+
+        <div class="hmenu-sep" role="separator"></div>
+
+        <button class="hmenu-item hmenu-item--danger" id="resetBtn" type="button" role="menuitem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2m-8 3 .7 9h8.6l.7-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Clear all data
+        </button>
+      </div>
+    </div>
   </div>
 </header>
 
-<div class="drawer-backdrop" id="drawerBackdrop"></div>
-
 <div class="app-shell">
-
-  <!-- ============================================================
-       SIDEBAR (right-side drawer)
-       ============================================================ -->
-  <aside id="sidebarEl" class="sidebar-closed">
-    <div class="sidebar-inner">
-      <div class="drawer-header">
-        <div>
-          <span class="drawer-kicker">Monthly budget</span>
-          <span class="drawer-count" id="sidebarToggleCount"></span>
-        </div>
-        <button class="drawer-close-btn" id="sidebarToggle" type="button" aria-expanded="false" aria-controls="sidebarBody" aria-label="Close budget drawer">
-          <span id="sidebarToggleLabel" hidden>Hide</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-
-      <div class="sidebar-body" id="sidebarBody">
-        <form id="budgetForm">
-          <div class="bgroup">
-            <div class="bgroup-label">Money in</div>
-            <label>
-              Salary <span class="field-hint">monthly, after tax</span>
-              <input id="salary" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
-            </label>
-          </div>
-
-          <div class="bgroup">
-            <div class="bgroup-label">Everything else in and out</div>
-          <div class="budget-add">
-            <div class="field-row">
-              <label>
-                Type
-                <select id="budgetType">
-                  <option value="income">Income</option>
-                  <option value="outgoing">Outgoing</option>
-                </select>
-              </label>
-              <label>
-                Value
-                <input id="budgetValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="450">
-              </label>
-            </div>
-            <label>
-              Name
-              <input id="budgetName" type="text" maxlength="40" placeholder="Rent, salary top-up, subscriptions">
-            </label>
-            <button type="button" id="addBudgetItem">Add item</button>
-          </div>
-          <div class="budget-list-panel" id="budgetListPanel">
-            <button class="budget-list-toggle" id="budgetListToggle" type="button" aria-expanded="true" aria-controls="budgetListShell">
-              <span class="budget-list-summary">
-                <strong>Your items</strong>
-                <span class="budget-list-count" id="budgetListCount">0 items</span>
-              </span>
-            </button>
-            <div class="budget-list-shell" id="budgetListShell">
-              <div class="budget-list" id="budgetList"></div>
-            </div>
-          </div>
-          </div>
-
-          <div class="bgroup">
-            <div class="bgroup-label">Savings pot</div>
-            <label>
-              Planned monthly savings pot <span class="field-hint">what you aim to set aside</span>
-              <input id="savingsPot" type="number" min="0" step="0.01" inputmode="decimal" placeholder="300">
-            </label>
-          </div>
-
-          <!-- The answer the whole form exists to produce, given its own weight. -->
-          <div class="bresult">
-            <div class="bresult-head">
-              <span class="bresult-label">Estimated left each month</span>
-              <strong id="availableAmount">&pound;0</strong>
-            </div>
-            <div class="budget-chart" id="budgetChart">
-              <div class="pie" id="budgetPie" aria-label="Monthly money split chart"></div>
-              <div class="chart-legend">
-                <div class="legend-row"><span><i class="dot outgoing"></i>Outgoings</span><strong id="totalOutgoings">&pound;0</strong></div>
-                <div class="legend-row"><span><i class="dot planned"></i>Goals</span><strong id="plannedSavings">&pound;0</strong></div>
-                <div class="legend-row"><span><i class="dot leftover"></i>Left over</span><strong id="totalAvailable">&pound;0</strong></div>
-              </div>
-            </div>
-            <p class="subtle" id="budgetAdvice">Add salary, income and outgoings to see what saving pace is realistic.</p>
-          </div>
-
-          <!-- Set-once settings, kept out of the way of the monthly workflow. -->
-          <details class="bgroup bgroup-quiet">
-            <summary>Account &amp; currency</summary>
-            <div class="bgroup-body">
-              <label>
-                Current account balance
-                <input id="accountBalance" type="number" min="0" step="0.01" inputmode="decimal" placeholder="1200">
-              </label>
-              <label>
-                Currency
-                <select id="currency">
-                  <option value="GBP">GBP (Pound)</option>
-                  <option value="USD">USD (Dollar)</option>
-                  <option value="EUR">EUR (Euro)</option>
-                  <option value="CAD">CAD (Canadian dollar)</option>
-                  <option value="AUD">AUD (Australian dollar)</option>
-                </select>
-              </label>
-            </div>
-          </details>
-        </form>
-      </div>
-    </div>
-  </aside>
 
   <!-- ============================================================
        MAIN
@@ -2383,7 +2393,7 @@
     <button class="rail-btn" type="button" data-view-btn="goals">Goals <span class="rail-count" id="railGoalCount"></span></button>
     <button class="rail-btn" type="button" data-view-btn="savelist">Save list <span class="rail-count" id="railSaveCount"></span></button>
     <button class="rail-btn" type="button" data-view-btn="insights">Insights <span class="rail-count" id="railStreakCount"></span></button>
-    <button class="rail-btn" type="button" data-view-btn="money">Money setup</button>
+    <button class="rail-btn" type="button" data-view-btn="money">Money setup <span class="rail-count" id="railBudgetCount"></span></button>
   </nav>
 
   <main>
@@ -2425,7 +2435,9 @@
       <div class="summary summary--compact"><div class="label">Saved so far</div><div class="value" id="savedTotal">&pound;0</div></div>
       <div class="summary summary--compact"><div class="label">Still needed</div><div class="value" id="remainingTotal">&pound;0</div></div>
       <div class="summary summary--compact" id="goalsOnPaceCard"><div class="label">Goals on pace</div><div class="value" id="goalsOnPaceValue">&mdash;</div></div>
-      <div class="summary summary--compact" id="accountCushionCard" hidden><div class="label">Left in account</div><div class="value" id="accountCushion">&pound;0</div></div>
+      <!-- "Left in account" read as a live bank figure. It is arithmetic on a
+           snapshot the user typed, so it says so, and says how old it is. -->
+      <div class="summary summary--compact" id="accountCushionCard" hidden><div class="label">Left after plan</div><div class="value" id="accountCushion">&pound;0</div><div class="summary-note" id="accountCushionNote"></div></div>
       <div class="summary summary--compact" id="netWorthCard" hidden><div class="label">Tracked net worth</div><div class="value" id="netWorthTotal">&pound;0</div></div>
       <span id="targetCount" hidden></span>
     </section>
@@ -2660,11 +2672,138 @@
       <p>What comes in, what goes out, and what is safe to put aside. Long-term pots are tracked separately so they never inflate your monthly spending money.</p>
     </div>
 
-    <section class="panel money-open-panel">
-      <h4>Monthly budget</h4>
-      <p class="subtle">Your income, regular outgoings and savings pot drive every figure in PacePot.</p>
-      <button type="button" id="openBudgetFromView">Open budget</button>
-    </section>
+    <!-- ------------------------------------------------------------------
+         The budget used to live in a 360px fly-out drawer, which was a
+         pre-v4.0 pattern: it left this whole section as an empty page with
+         one "Open budget" button, and it stacked a backdrop over its own
+         fields. It is now the page. Reading order is the order of the
+         question: here is the answer, here is what feeds it, here is the
+         detail.
+         ------------------------------------------------------------------ -->
+    <form id="budgetForm" class="budget-page">
+
+      <!-- The one number the whole form exists to produce. -->
+      <section class="bhero" aria-label="Monthly result">
+        <div class="bhero-figure">
+          <span class="bhero-label">Estimated left each month</span>
+          <strong id="availableAmount">&pound;0</strong>
+          <p class="bhero-advice" id="budgetAdvice">Add salary, income and outgoings to see what saving pace is realistic.</p>
+        </div>
+
+        <!-- Same --outgoing-slice / --planned-slice custom properties the pie
+             used, so renderBudget() is untouched — but read off a measured
+             rule instead of a donut, which is the v4.0 language. -->
+        <div class="bhero-split" id="budgetChart">
+          <div class="bsplit" id="budgetPie" role="img" aria-label="How each month's money splits between outgoings, goals and what is left"></div>
+          <div class="chart-legend">
+            <div class="legend-row"><span><i class="dot outgoing"></i>Outgoings</span><strong id="totalOutgoings">&pound;0</strong></div>
+            <div class="legend-row"><span><i class="dot planned"></i>Goals</span><strong id="plannedSavings">&pound;0</strong></div>
+            <div class="legend-row"><span><i class="dot leftover"></i>Left over</span><strong id="totalAvailable">&pound;0</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- What feeds it. Three separate questions, three separate cards. -->
+      <div class="bgrid">
+        <section class="bcard">
+          <div class="bcard-label">Money in</div>
+          <label>
+            Salary <span class="field-hint">monthly, after tax</span>
+            <input id="salary" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
+          </label>
+          <p class="bcard-note">Anything else that comes in — a side income, a top-up — goes in as an item.</p>
+        </section>
+
+        <section class="bcard">
+          <div class="bcard-label">Add an item</div>
+          <div class="budget-add">
+            <div class="field-row">
+              <label>
+                Type
+                <select id="budgetType">
+                  <option value="income">Income</option>
+                  <option value="outgoing">Outgoing</option>
+                </select>
+              </label>
+              <label>
+                Value
+                <input id="budgetValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="450">
+              </label>
+            </div>
+            <label>
+              Name
+              <input id="budgetName" type="text" maxlength="40" placeholder="Rent, salary top-up, subscriptions">
+            </label>
+            <button type="button" id="addBudgetItem">Add item</button>
+          </div>
+        </section>
+
+        <section class="bcard">
+          <div class="bcard-label">Savings pot</div>
+          <label>
+            Planned monthly savings pot <span class="field-hint">what you aim to set aside</span>
+            <input id="savingsPot" type="number" min="0" step="0.01" inputmode="decimal" placeholder="300">
+          </label>
+          <p class="bcard-note">This is the ceiling PacePot splits across your goals. It never has to be everything you have left.</p>
+        </section>
+      </div>
+
+      <!-- The detail. Full width, so extra screen becomes more columns of
+           items rather than a taller scroller (same rule as the goals grid). -->
+      <section class="bcard bcard--items budget-list-panel" id="budgetListPanel">
+        <button class="budget-list-toggle" id="budgetListToggle" type="button" aria-expanded="true" aria-controls="budgetListShell">
+          <span class="budget-list-summary">
+            <strong>Your items</strong>
+            <span class="budget-list-count" id="budgetListCount">0 items</span>
+          </span>
+        </button>
+        <div class="budget-list-shell" id="budgetListShell">
+          <div class="budget-list" id="budgetList"></div>
+        </div>
+      </section>
+
+      <!-- Set-once settings, folded away from the monthly workflow. -->
+      <details class="panel bquiet" id="accountDetails">
+        <summary>
+          <span>Account &amp; currency</span>
+          <span class="details-cue"></span>
+        </summary>
+        <div class="details-body">
+          <!-- Opt-in, because a hand-typed balance is only true on the day it
+               is typed, and most people will not come back to correct it. -->
+          <label class="opt-row" for="trackBalance">
+            <input type="checkbox" class="check-box" id="trackBalance">
+            <span class="opt-copy">
+              <strong>Track my account balance</strong>
+              <span class="opt-note">PacePot has no connection to your bank. This is a figure you type in yourself, so it only stays right for as long as you keep it up to date. Leave it off and nothing here depends on it.</span>
+            </span>
+            <span class="opt-state" aria-hidden="true"></span>
+          </label>
+
+          <div class="balance-field" id="balanceField" hidden>
+            <label>
+              Account balance snapshot
+              <input id="accountBalance" type="number" min="0" step="0.01" inputmode="decimal" placeholder="1200">
+            </label>
+            <div class="balance-stamp">
+              <span id="balanceStamp"></span>
+              <button class="ghost small-btn" type="button" id="balanceConfirm" hidden>Still correct</button>
+            </div>
+          </div>
+
+          <label class="currency-field">
+            Currency
+            <select id="currency">
+              <option value="GBP">GBP (Pound)</option>
+              <option value="USD">USD (Dollar)</option>
+              <option value="EUR">EUR (Euro)</option>
+              <option value="CAD">CAD (Canadian dollar)</option>
+              <option value="AUD">AUD (Australian dollar)</option>
+            </select>
+          </label>
+        </div>
+      </details>
+    </form>
 
     <details class="panel" id="investmentPanel">
       <summary>
@@ -2704,7 +2843,7 @@
 
     <footer class="site-footer">
       <div>
-        <strong>PacePot v4.0</strong>. Savings targets that fit real life.
+        <strong>PacePot v4.1</strong>. Savings targets that fit real life.
         <span>Your data stays in this browser unless you export a backup. Created by Maks Wittenbeck, 2026.</span>
       </div>
       <div class="footer-links" aria-label="PacePot information links">
@@ -3247,6 +3386,12 @@
       safeToSpend: document.querySelector("#safeToSpend"),
       accountCushion: document.querySelector("#accountCushion"),
       accountCushionCard: document.querySelector("#accountCushionCard"),
+      accountCushionNote: document.querySelector("#accountCushionNote"),
+      accountDetails: document.querySelector("#accountDetails"),
+      trackBalance: document.querySelector("#trackBalance"),
+      balanceField: document.querySelector("#balanceField"),
+      balanceStamp: document.querySelector("#balanceStamp"),
+      balanceConfirm: document.querySelector("#balanceConfirm"),
       savedTotal: document.querySelector("#savedTotal"),
       remainingTotal: document.querySelector("#remainingTotal"),
       targetCount: document.querySelector("#targetCount"),
@@ -3349,12 +3494,7 @@
       editDepositNote: document.querySelector("#editDepositNote"),
       filterAll: document.querySelector("#filterAll"),
       filterActive: document.querySelector("#filterActive"),
-      filterDone: document.querySelector("#filterDone"),
-      sidebarEl: document.querySelector("#sidebarEl"),
-      sidebarToggle: document.querySelector("#sidebarToggle"),
-      sidebarBody: document.querySelector("#sidebarBody"),
-      sidebarToggleCount: document.querySelector("#sidebarToggleCount"),
-      sidebarToggleLabel: document.querySelector("#sidebarToggleLabel")
+      filterDone: document.querySelector("#filterDone")
     };
 
     els.salary.value = state.salary || "";
@@ -3604,6 +3744,67 @@
         showToast("Tour script not ready — please refresh the page.");
       }
     });
+
+    /* ------------------------------------------------------------------
+       Header overflow menu. Lives in this script block on purpose: Opera GX
+       silently skips later standalone <script> blocks on this page, and the
+       menu is now the only route to backup, import, tour, help and clear.
+       ------------------------------------------------------------------ */
+    (() => {
+      const menuBtn = document.getElementById("headerMenuBtn");
+      const menu = document.getElementById("headerMenu");
+      if (!menuBtn || !menu) return;
+
+      const isOpen = () => !menu.hidden;
+      const open = () => {
+        menu.hidden = false;
+        menuBtn.setAttribute("aria-expanded", "true");
+        const first = menu.querySelector(".hmenu-item");
+        if (first) first.focus();
+      };
+      const close = ({ restoreFocus = false } = {}) => {
+        if (!isOpen()) return;
+        menu.hidden = true;
+        menuBtn.setAttribute("aria-expanded", "false");
+        if (restoreFocus) menuBtn.focus();
+      };
+
+      menuBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        isOpen() ? close() : open();
+      });
+
+      // Every item does something and then the menu should be out of the way,
+      // including the ones that open a modal over it.
+      menu.addEventListener("click", (event) => {
+        if (event.target.closest(".hmenu-item")) close();
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!isOpen()) return;
+        if (!event.target.closest(".hmenu")) close();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && isOpen()) {
+          event.stopPropagation();
+          close({ restoreFocus: true });
+        }
+      });
+
+      // Arrow keys and Tab-out, so the menu is usable without a mouse.
+      menu.addEventListener("keydown", (event) => {
+        const items = [...menu.querySelectorAll(".hmenu-item")];
+        const index = items.indexOf(document.activeElement);
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const next = event.key === "ArrowDown" ? index + 1 : index - 1;
+          items[(next + items.length) % items.length].focus();
+        } else if (event.key === "Tab" && index === items.length - 1 && !event.shiftKey) {
+          close();
+        }
+      });
+    })();
     els.helpClose.addEventListener("click", closeHelp);
     els.helpModal.addEventListener("click", (event) => {
       if (event.target === els.helpModal) closeHelp();
@@ -3645,6 +3846,8 @@
         () => {
           state.salary = "";
           state.accountBalance = "";
+          state.trackAccountBalance = false;
+          state.accountBalanceUpdated = "";
           state.budgetItems = [];
           state.budgetListCollapsed = false;
           state.investments = [];
@@ -3658,6 +3861,26 @@
           saveAndRender("All planner data cleared.");
         }
       );
+    });
+
+    // Switching tracking off keeps the number — it just stops counting, so
+    // turning it back on does not mean typing it in again.
+    els.trackBalance.addEventListener("change", () => {
+      state.trackAccountBalance = els.trackBalance.checked;
+      saveAndRender();
+      if (state.trackAccountBalance) window.setTimeout(() => els.accountBalance.focus(), 60);
+    });
+
+    // For a balance that is still right — confirms the date without making
+    // someone retype the same figure to clear the stale flag.
+    els.balanceConfirm.addEventListener("click", () => {
+      if (!Number(state.accountBalance || 0)) return;
+      stampBalanceChecked();
+      saveAndRender("Balance confirmed as of today.");
+    });
+
+    els.accountCushionCard.addEventListener("click", (event) => {
+      if (event.target.closest("[data-balance-update]")) gotoSetupStep("balance");
     });
 
     els.importBtn.addEventListener("click", () => els.importFile.click());
@@ -3847,15 +4070,6 @@
     els.filterActive.addEventListener("click", () => setFilter("active"));
     els.filterDone.addEventListener("click", () => setFilter("done"));
 
-    // Mobile sidebar toggle
-    if (els.sidebarToggle) {
-      els.sidebarToggle.addEventListener("click", () => {
-        const closed = els.sidebarEl.classList.toggle("sidebar-closed");
-        els.sidebarToggle.setAttribute("aria-expanded", String(!closed));
-        if (els.sidebarToggleLabel) els.sidebarToggleLabel.textContent = closed ? "Show" : "Hide";
-      });
-    }
-
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeHistory();
@@ -4020,6 +4234,8 @@
             () => {
               state.salary = restored.salary;
               state.accountBalance = restored.accountBalance;
+              state.trackAccountBalance = restored.trackAccountBalance;
+              state.accountBalanceUpdated = restored.accountBalanceUpdated;
               state.savingsPot = restored.savingsPot;
               state.currency = restored.currency;
               state.budgetItems = restored.budgetItems;
@@ -4050,7 +4266,14 @@
 
     function updateBudget() {
       state.salary = toMoney(els.salary.value);
-      state.accountBalance = toMoney(els.accountBalance.value);
+      // Editing the balance IS the act of checking it, so the clock restarts —
+      // but only on a real change, or every unrelated keystroke elsewhere in
+      // the form would silently mark a months-old figure as fresh.
+      const nextBalance = toMoney(els.accountBalance.value);
+      if (nextBalance !== Number(state.accountBalance || 0)) {
+        state.accountBalance = nextBalance;
+        stampBalanceChecked();
+      }
       state.savingsPot = toMoney(els.savingsPot.value);
       state.currency = els.currency.value;
       trackAppEvent("main_calculator_used");
@@ -4485,10 +4708,6 @@
     // Sends you to the right place with the right field ready, rather than
     // describing where to click and leaving you to find it.
     function gotoSetupStep(action) {
-      const openDrawer = () => {
-        els.sidebarEl.classList.remove("sidebar-closed");
-        if (els.sidebarToggle) els.sidebarToggle.setAttribute("aria-expanded", "true");
-      };
       const focus = (el) => {
         if (!el) return;
         window.setTimeout(() => {
@@ -4497,9 +4716,17 @@
         }, 320);
       };
 
-      if (action === "salary") { openDrawer(); focus(document.getElementById("salary")); return; }
-      if (action === "outgoings") { openDrawer(); focus(document.getElementById("budgetName")); return; }
-      if (action === "pot") { openDrawer(); focus(document.getElementById("savingsPot")); return; }
+      if (action === "salary") { setView("money"); focus(document.getElementById("salary")); return; }
+      if (action === "outgoings") { setView("money"); focus(document.getElementById("budgetName")); return; }
+      if (action === "pot") { setView("money"); focus(document.getElementById("savingsPot")); return; }
+      if (action === "balance") {
+        setView("money");
+        // The field lives inside a collapsed <details>; focusing something
+        // still folded away would look like nothing happened.
+        if (els.accountDetails) els.accountDetails.open = true;
+        focus(els.accountBalance);
+        return;
+      }
       if (action === "goal") { setView("goals"); focus(document.getElementById("targetName")); return; }
       if (action === "deposit") {
         setView("goals");
@@ -4659,6 +4886,10 @@
         const streak = savingsHistory(12).streak;
         streakEl.textContent = streak > 1 ? `${streak}mo` : "";
       }
+      const budgetEl = document.getElementById("railBudgetCount");
+      if (budgetEl) {
+        budgetEl.textContent = state.budgetItems.length ? String(state.budgetItems.length) : "";
+      }
     }
 
     function render() {
@@ -4684,7 +4915,7 @@
       els.topOutgoing.textContent = money(budget.outgoings);
       els.safeToSpend.textContent = money(budget.safeToSpend);
       els.accountCushion.textContent = money(budget.accountCushion);
-      els.accountCushionCard.hidden = !Number(state.accountBalance || 0);
+      els.accountCushionCard.hidden = !trackedBalance();
       els.savedTotal.textContent = money(savedTotal);
       els.remainingTotal.textContent = money(remainingTotal);
       els.targetCount.textContent = state.targets.length;
@@ -4702,7 +4933,8 @@
         els.goalsOnPaceCard.classList.toggle("pace-good", onPace === activeTargets.length);
         els.goalsOnPaceCard.classList.toggle("pace-warn", onPace < activeTargets.length);
       }
-      els.netWorthTotal.textContent = money(Number(state.accountBalance || 0) + savedTotal + investmentTotal);
+      els.netWorthTotal.textContent = money(trackedBalance() + savedTotal + investmentTotal);
+      renderAccountBalance();
 
       if (!state.salary && !state.budgetItems.length) {
         els.budgetAdvice.textContent = "Add salary, income and outgoings to see what saving pace is realistic.";
@@ -4718,12 +4950,6 @@
 
       renderFinanceAlert(budget);
       els.targetBulkActions.hidden = state.targets.length < 2;
-
-      // Update sidebar toggle count
-      if (els.sidebarToggleCount) {
-        const itemCount = state.budgetItems.length;
-        els.sidebarToggleCount.textContent = itemCount ? `${itemCount} item${itemCount === 1 ? "" : "s"}` : "";
-      }
 
       // Render filtered targets
       const visible = getFilteredTargets();
@@ -4781,6 +5007,100 @@
       els.planGuidance.hidden = fullySet;
     }
 
+    // ================================================================
+    // ACCOUNT BALANCE FRESHNESS
+    // The balance feeds three things that all look authoritative — the
+    // "left after plan" tile, tracked net worth, and the "balance fully
+    // used" alert. It is hand-typed and cannot refresh itself, so it
+    // carries the date it was last set and stops being trusted after a
+    // month. A missing date means unknown age, which is treated as stale:
+    // better to ask than to present a figure of unknown vintage as today's.
+    // ================================================================
+    const BALANCE_STALE_DAYS = 30;
+
+    // Every calculation reads the balance through here, so switching
+    // tracking off removes it from the maths as well as from the screen.
+    function trackedBalance() {
+      return state.trackAccountBalance ? Number(state.accountBalance || 0) : 0;
+    }
+
+    function balanceAgeDays() {
+      if (!state.accountBalanceUpdated) return null;
+      const then = parseDate(state.accountBalanceUpdated);
+      if (Number.isNaN(then.getTime())) return null;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      then.setHours(0, 0, 0, 0);
+      return Math.max(0, Math.round((now - then) / 86400000));
+    }
+
+    function balanceIsStale() {
+      if (!trackedBalance()) return false;
+      const age = balanceAgeDays();
+      return age === null || age >= BALANCE_STALE_DAYS;
+    }
+
+    // Bare span ("30 days", "2 months"), so callers can put it after "is" and
+    // before "old" as well as after "checked" and before "ago".
+    function balanceAgeSpan() {
+      const age = balanceAgeDays();
+      if (age === null) return "";
+      if (age < 31) return `${age} day${age === 1 ? "" : "s"}`;
+      const months = Math.round(age / 30.44);
+      return `${months} month${months === 1 ? "" : "s"}`;
+    }
+
+    function balanceAgeLabel() {
+      const age = balanceAgeDays();
+      if (age === null) return "date unknown";
+      if (age === 0) return "checked today";
+      if (age === 1) return "checked yesterday";
+      return `checked ${balanceAgeSpan()} ago`;
+    }
+
+    function stampBalanceChecked() {
+      state.accountBalanceUpdated = isoDate(new Date());
+    }
+
+    function renderAccountBalance() {
+      if (!els.trackBalance) return;
+      const on = Boolean(state.trackAccountBalance);
+      const value = Number(state.accountBalance || 0);
+      const stale = balanceIsStale();
+
+      els.trackBalance.checked = on;
+      els.balanceField.hidden = !on;
+
+      if (els.balanceStamp) {
+        els.balanceStamp.textContent = !value
+          ? "Not set yet."
+          : state.accountBalanceUpdated
+            ? `Snapshot from ${shortDate(state.accountBalanceUpdated)} — ${balanceAgeLabel()}.`
+            : "Saved before PacePot started dating this — confirm it is still right.";
+        els.balanceStamp.classList.toggle("is-stale", stale);
+      }
+      // Only offered when there is something to confirm and it has gone off,
+      // so the common case is a plain date with no button shouting at it.
+      if (els.balanceConfirm) els.balanceConfirm.hidden = !(on && value && stale);
+
+      // The tile carries the same truth, because that is where the number
+      // actually gets read and mistaken for a live balance.
+      els.accountCushionCard.classList.toggle("is-stale", stale);
+      if (els.accountCushionNote) {
+        els.accountCushionNote.innerHTML = !value
+          ? ""
+          : stale
+            ? `${escapeHtml(state.accountBalanceUpdated ? `Snapshot is ${balanceAgeSpan()} old` : "Snapshot age unknown")} <button type="button" class="note-action" data-balance-update>Update</button>`
+            : `From your ${escapeHtml(shortDate(state.accountBalanceUpdated))} snapshot`;
+      }
+    }
+
+    function shortDate(value) {
+      const d = parseDate(value);
+      if (Number.isNaN(d.getTime())) return "";
+      return d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+    }
+
     function budgetTotals() {
       const extraIncome = state.budgetItems
         .filter((item) => item.type === "income")
@@ -4794,7 +5114,7 @@
       const requestedSavingsPot = Number(state.savingsPot || 0);
       const safeToSpend = Math.max(0, resources - outgoings - savingsPot);
       const overspend = Math.max(0, outgoings + requestedSavingsPot - resources);
-      const accountCushion = Math.max(0, Number(state.accountBalance || 0) + resources - outgoings - savingsPot);
+      const accountCushion = Math.max(0, trackedBalance() + resources - outgoings - savingsPot);
       return {
         extraIncome,
         outgoings,
@@ -4817,8 +5137,10 @@
         messages.push(`Your outgoings plus planned goal savings are ${money(budget.overspend)} higher than your monthly income.`);
       }
 
-      if (state.accountBalance && budget.accountCushion <= 0) {
-        messages.push("Your current account balance would be fully used by this month's plan.");
+      // Only warn off a balance we are still willing to trust — a figure of
+      // unknown or month-plus vintage is not grounds for an alert.
+      if (trackedBalance() && !balanceIsStale() && budget.accountCushion <= 0) {
+        messages.push("Your account balance snapshot would be fully used by this month's plan.");
       }
 
       if (!messages.length) {
@@ -4917,7 +5239,7 @@
         </div>
         <div class="mini-stat">
           <span>Tracked net worth</span>
-          <strong>${money(Number(state.accountBalance || 0) + savedTotal + investmentTotal)}</strong>
+          <strong>${money(trackedBalance() + savedTotal + investmentTotal)}</strong>
         </div>
         ${state.investments.map((item) => {
           const days = Math.floor((today - new Date(item.updatedAt || isoDate(today))) / 86400000);
@@ -5944,7 +6266,7 @@
         const parsed = JSON.parse(localStorage.getItem(storeKey));
         return normalizePlannerData(parsed);
       } catch {
-        return { salary: 0, accountBalance: 0, savingsPot: 0, budgetListCollapsed: false, budgetItems: [], investments: [], currency: "GBP", targets: [], saveList: [] };
+        return { salary: 0, accountBalance: 0, trackAccountBalance: false, accountBalanceUpdated: "", savingsPot: 0, budgetListCollapsed: false, budgetItems: [], investments: [], currency: "GBP", targets: [], saveList: [] };
       }
     }
 
@@ -5966,6 +6288,16 @@
       return {
         salary: toMoney(parsed?.salary),
         accountBalance: toMoney(parsed?.accountBalance),
+        /* Opt-in, and off by default. PacePot cannot read a bank, so this is a
+           number the user types and then forgets — presenting it as a current
+           figure months later is a lie the app tells on their behalf.
+           Migration: anyone who already had a balance keeps it switched on,
+           but with NO date, so the dashboard asks them to confirm it rather
+           than inventing a freshness it cannot know. */
+        trackAccountBalance: parsed?.trackAccountBalance === undefined
+          ? toMoney(parsed?.accountBalance) > 0
+          : Boolean(parsed.trackAccountBalance),
+        accountBalanceUpdated: validDateValue(parsed?.accountBalanceUpdated) || "",
         savingsPot: toMoney(parsed?.savingsPot),
         budgetListCollapsed: Boolean(parsed?.budgetListCollapsed),
         budgetItems,
@@ -6352,17 +6684,6 @@
       btn.addEventListener("click", () => setView(btn.dataset.viewBtn));
     });
 
-    const openBudgetFromView = document.getElementById("openBudgetFromView");
-    if (openBudgetFromView) {
-      openBudgetFromView.addEventListener("click", () => {
-        els.sidebarEl.classList.remove("sidebar-closed");
-        if (els.sidebarToggle) {
-          els.sidebarToggle.setAttribute("aria-expanded", "true");
-          if (els.sidebarToggleLabel) els.sidebarToggleLabel.textContent = "Hide";
-        }
-      });
-    }
-
     try {
       const saved = localStorage.getItem(VIEW_KEY);
       if (saved) setView(saved, { silent: true });
@@ -6465,34 +6786,38 @@
       };
 
       var STEPS = [
-        { id:  'budgetDrawerOpen',
+        { sel: '[data-view-btn="money"]',
           title: 'Start with your budget',
           body:  'Tell PacePot what you earn and spend each month. It makes your saving pace realistic.',
-          pos: 'below', drawer: null },
+          pos: 'below' },
         { id:  'salary',
           title: 'Your take-home pay',
           body:  'Enter your monthly income after tax. This is the foundation of everything PacePot calculates.',
-          pos: 'below', drawer: 'open' },
+          pos: 'below', view: 'money' },
         { sel:  '.budget-add',
           title: 'Add your outgoings',
           body:  'Rent, bills, subscriptions, anything that leaves each month. The fuller the picture, the better.',
-          pos: 'below', drawer: null },
+          pos: 'below', view: 'money' },
         { id:   'savingsPot',
           title: 'Your savings pot',
           body:  'The total to set aside each month. PacePot will suggest how to split it across your goals.',
-          pos: 'above', drawer: null },
+          pos: 'above', view: 'money' },
+        { sel:  '.bhero',
+          title: 'What that leaves you',
+          body:  'The split reads left to right: outgoings, then what goes to goals, then what is left. Change a figure above and it moves.',
+          pos: 'above', view: 'money' },
         { id:   'safeToSpend', psel: '.summary',
           title: 'Safe to spend',
           body:  "After bills and savings, this is what's left for everyday life. Keep it positive.",
-          pos: 'below', drawer: 'close', view: 'dashboard' },
+          pos: 'below', view: 'dashboard' },
         { sel:  '[data-view="goals"] section.panel',
           title: 'Add more savings goals',
           body:  "Your first goal is already set. Add more anytime: holidays, emergencies, a car, anything you're saving toward.",
-          pos: 'above', drawer: null, view: 'goals' },
+          pos: 'above', view: 'goals' },
         { sel:  '.targets-zone',
           title: 'Your goals live here',
           body:  'Track progress, log deposits, and see your monthly pace for each goal. You\'re all set.',
-          pos: 'above', drawer: null, view: 'goals', last: true }
+          pos: 'above', view: 'goals', last: true }
       ];
 
       // The tour's markup sits AFTER this script block in the document, so
@@ -6607,8 +6932,7 @@
       function goTo(n) {
         if (n >= STEPS.length) { endTour(); return; }
         cur = n;
-        var step   = STEPS[n];
-        var drawer = document.getElementById('sidebarEl');
+        var step = STEPS[n];
 
         // A step whose target lives in another section must switch to it first,
         // or the element is display:none and measures as a zero-size rect.
@@ -6635,19 +6959,7 @@
           }, 450);
         }
 
-        if (step.drawer === 'open' && drawer) {
-          drawer.classList.remove('sidebar-closed');
-          var tog = document.getElementById('sidebarToggle');
-          if (tog) tog.setAttribute('aria-expanded', 'true');
-          setTimeout(activate, 270);
-        } else if (step.drawer === 'close' && drawer) {
-          drawer.classList.add('sidebar-closed');
-          var tog = document.getElementById('sidebarToggle');
-          if (tog) tog.setAttribute('aria-expanded', 'false');
-          setTimeout(activate, 270);
-        } else {
-          activate();
-        }
+        activate();
       }
 
       function endTour() {
@@ -6698,30 +7010,6 @@
         posTip(r, STEPS[cur].pos);
       });
 
-    })();
-  </script>
-  <script>
-    (function () {
-      var drawer = document.getElementById('sidebarEl');
-      var openBtn = document.getElementById('budgetDrawerOpen');
-      var backdrop = document.getElementById('drawerBackdrop');
-      function openDrawer() {
-        if (!drawer) return;
-        drawer.classList.remove('sidebar-closed');
-        var t = document.getElementById('sidebarToggle');
-        if (t) t.setAttribute('aria-expanded', 'true');
-      }
-      function closeDrawer() {
-        if (!drawer) return;
-        drawer.classList.add('sidebar-closed');
-        var t = document.getElementById('sidebarToggle');
-        if (t) t.setAttribute('aria-expanded', 'false');
-      }
-      if (openBtn) openBtn.addEventListener('click', openDrawer);
-      if (backdrop) backdrop.addEventListener('click', closeDrawer);
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && drawer && !drawer.classList.contains('sidebar-closed')) closeDrawer();
-      });
     })();
   </script>
 
