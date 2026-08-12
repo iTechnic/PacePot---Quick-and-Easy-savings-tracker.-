@@ -2060,8 +2060,25 @@
     .sl-date-result { font-size: .88rem; font-weight: 700; color: var(--accent-strong); white-space: nowrap; }
     /* stretch, not start — items in a row have different content (a note, a
        product link, neither), so `start` left every row with ragged bottoms
-       once the list was expanded. Cards now share a row height. */
-    .sl-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 8px; margin-bottom: 14px; align-items: stretch; }
+       once the list was expanded. Cards now share a row height.
+       Column count comes from --sl-cols, set by layoutSaveListGrid() from the
+       item count, so the cards never leave a stranded orphan. The auto-fill
+       fallback only applies before the first layout pass runs. */
+    .sl-items {
+      display: grid;
+      /* Defaults to 1, never auto-fill: repeat(auto-fill, minmax(0,1fr)) is
+         invalid — auto-fill needs an intrinsic minimum to count repetitions.
+         One column is the safe degradation if the layout pass never runs. */
+      --sl-cols: 1;
+      grid-template-columns: repeat(var(--sl-cols), minmax(0, 1fr));
+      gap: 8px; margin-bottom: 14px; align-items: stretch;
+    }
+    /* Reveal for cards that were hidden behind "show all". */
+    @keyframes slReveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .sl-item.sl-revealed { animation: slReveal 260ms var(--ease) both; animation-delay: var(--sl-delay, 0ms); }
+    @media (prefers-reduced-motion: reduce) {
+      .sl-item.sl-revealed { animation: none; }
+    }
     /* ------------------------------------------------------------------
        SAVE LIST ITEM — rebuilt for hierarchy. The price is the number you
        actually scan for, so it dominates. Priority is a graduation down the
@@ -6483,6 +6500,120 @@
     let slShowAll = false;
     const SL_VISIBLE_LIMIT = 5;
 
+    /* ------------------------------------------------------------------
+       SAVE LIST GRID — column count follows the item count.
+       auto-fill just packs as many columns as fit, which leaves a single
+       stranded card whenever the count does not divide evenly: 3 items
+       became 2 + 1, 5 became 2 + 2 + 1. The lone card with dead space
+       beside it is what read as broken.
+       Instead: pick the column count that divides the items most evenly
+       within the width available, then let a last-row remainder stretch
+       to fill rather than sit orphaned.
+       ------------------------------------------------------------------ */
+    const SL_MIN_CARD = 300;   // below this a card cannot hold name + price + buttons
+    const SL_MAX_COLS = 3;     // beyond 3 the cards get too narrow to read
+
+    function bestColumnCount(itemCount, availableWidth) {
+      const fits = Math.max(1, Math.min(SL_MAX_COLS, Math.floor(availableWidth / SL_MIN_CARD)));
+      if (itemCount <= 1) return 1;
+      // Few enough for a single clean row — use exactly that many columns so
+      // they sit as one balanced band rather than a row plus a gap.
+      if (itemCount <= fits) return itemCount;
+
+      // Ranked: fewest rows, then the fullest last row, then most columns.
+      // Row count leads because a "perfect" division that costs an extra row
+      // is not an improvement — 8 items want 3+3+2, not four rows of two.
+      // The fullest-last-row tie-break is what turns 4 items into a 2x2
+      // square instead of 3+1 with a stranded card.
+      // Higher is better on each element, compared left to right.
+      const beats = (a, b) => {
+        for (let i = 0; i < a.length; i++) {
+          if (a[i] !== b[i]) return a[i] > b[i];
+        }
+        return false;
+      };
+
+      let best = fits;
+      let bestKey = null;
+      // Never below 2 columns unless the viewport genuinely only fits one:
+      // a single tall stack is not "balanced", it is just a different problem.
+      for (let cols = fits; cols >= Math.min(2, fits); cols--) {
+        const rows = Math.ceil(itemCount / cols);
+        const lastRow = itemCount % cols === 0 ? cols : itemCount % cols;
+        const key = [-rows, lastRow, cols];
+        if (!bestKey || beats(key, bestKey)) { bestKey = key; best = cols; }
+      }
+      return best;
+    }
+
+    function layoutSaveListGrid() {
+      const grid = slEl.items;
+      if (!grid) return;
+
+      // Measured BEFORE anything is reset. Every view stays in the DOM and
+      // render() updates them all, so this runs while the save list is
+      // display:none — where clientWidth is 0. Clearing first and bailing
+      // would throw away a good layout every time the list re-rendered from
+      // another section; bailing first keeps it until the view is revealed.
+      const width = grid.clientWidth || grid.getBoundingClientRect().width;
+      if (width < 1) return;
+
+      const cards = [...grid.querySelectorAll(".sl-item")];
+      grid.style.removeProperty("--sl-cols");
+      cards.forEach((c) => c.style.removeProperty("grid-column"));
+      if (!cards.length) return;
+
+      const cols = bestColumnCount(cards.length, width);
+      grid.style.setProperty("--sl-cols", String(cols));
+
+      // A last row holding exactly one card of a multi-row grid is the orphan
+      // case — let it run the full width so it reads as deliberate.
+      const remainder = cards.length % cols;
+      if (cols > 1 && cards.length > cols && remainder === 1) {
+        cards[cards.length - 1].style.gridColumn = `1 / -1`;
+      }
+    }
+
+    // Height is animated rather than the list simply jumping. The card reveal
+    // is a CSS class so it never runs when the user asks for reduced motion.
+    let slHeightAnim = null;
+
+    function animateSaveListResize(mutate) {
+      const grid = slEl.items;
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!grid || reduce) { mutate(); return; }
+
+      // A toggle mid-flight would otherwise measure a height that is itself
+      // being animated, and the two animations would fight over the property.
+      if (slHeightAnim) { slHeightAnim.cancel(); slHeightAnim = null; }
+
+      const before = grid.getBoundingClientRect().height;
+      mutate();
+      const after = grid.getBoundingClientRect().height;
+      if (Math.abs(after - before) < 1) return;
+
+      const DURATION = 340;
+      grid.style.overflow = "hidden";
+      const anim = grid.animate(
+        [{ height: `${before}px` }, { height: `${after}px` }],
+        { duration: DURATION, easing: "cubic-bezier(0.16,1,0.3,1)" }
+      );
+      slHeightAnim = anim;
+
+      // Only the animation that is still the current one may clean up, so a
+      // cancelled predecessor cannot strip overflow from its replacement.
+      const clear = () => {
+        if (slHeightAnim !== anim) return;
+        slHeightAnim = null;
+        grid.style.removeProperty("overflow");
+      };
+      // Promise plus timer: animation events are not dispatched at all while
+      // the page is not being rendered (a backgrounded tab), and a list left
+      // permanently overflow:hidden is not a state worth risking on an event.
+      anim.finished.then(clear).catch(clear);
+      setTimeout(clear, DURATION + 80);
+    }
+
     const slEl = {
       addBtn:        document.getElementById("slAddBtn"),
       formWrap:      document.getElementById("slFormWrap"),
@@ -6556,11 +6687,21 @@
       saveAndRender("Added to save list.");
     });
 
+    // The best column count depends on the width available, so it has to be
+    // recomputed when that changes — not just when the list re-renders.
+    let slResizeTimer = 0;
+    window.addEventListener("resize", () => {
+      clearTimeout(slResizeTimer);
+      slResizeTimer = setTimeout(layoutSaveListGrid, 120);
+    });
+
     slEl.items.addEventListener("click", (e) => {
       const moreBtn = e.target.closest("[data-sl-more]");
       if (moreBtn) {
-        slShowAll = !slShowAll;
-        renderSaveList();
+        animateSaveListResize(() => {
+          slShowAll = !slShowAll;
+          renderSaveList();
+        });
         return;
       }
       const checkEl = e.target.closest("[data-sl-check]");
@@ -6753,6 +6894,19 @@
         ${noteHtml}${linkHtml}
       </div>`;
       }).join("") + moreHtml;
+
+      // Cards that were not on screen a moment ago fade up; the ones already
+      // there stay put, so expanding reads as growth rather than a reshuffle.
+      if (slShowAll && visibleItems.length > SL_VISIBLE_LIMIT) {
+        [...slEl.items.querySelectorAll(".sl-item")]
+          .slice(SL_VISIBLE_LIMIT)
+          .forEach((card, i) => {
+            card.classList.add("sl-revealed");
+            card.style.setProperty("--sl-delay", `${Math.min(i * 32, 160)}ms`);
+          });
+      }
+
+      layoutSaveListGrid();
     }
 
     // === SECTION VIEWS ===
@@ -6772,6 +6926,10 @@
         else btn.removeAttribute("aria-current");
       });
       try { localStorage.setItem(VIEW_KEY, name); } catch (e) {}
+      // The save list grid cannot measure itself while its view is hidden, so
+      // any render that happened from another section left the column count
+      // stale. Now that it has a width, lay it out.
+      if (name === "savelist") layoutSaveListGrid();
       if (!opts || !opts.silent) {
         window.scrollTo({ top: 0, behavior: "instant" in document.documentElement.style ? "instant" : "auto" });
       }
