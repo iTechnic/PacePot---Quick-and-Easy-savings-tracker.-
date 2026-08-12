@@ -2058,20 +2058,16 @@
     .sl-date-row label { font-size: .78rem; color: var(--muted); font-weight: 600; white-space: nowrap; }
     .sl-date-row input[type=date] { font-size: .83rem; padding: 5px 9px; border-radius: var(--radius-xs); border: 1px solid var(--border-mid); background: var(--field); color: var(--ink); }
     .sl-date-result { font-size: .88rem; font-weight: 700; color: var(--accent-strong); white-space: nowrap; }
-    /* stretch, not start — items in a row have different content (a note, a
-       product link, neither), so `start` left every row with ragged bottoms
-       once the list was expanded. Cards now share a row height.
-       Column count comes from --sl-cols, set by layoutSaveListGrid() from the
-       item count, so the cards never leave a stranded orphan. The auto-fill
-       fallback only applies before the first layout pass runs. */
+    /* Flex, not grid. A grid has fixed column tracks, so whatever does not
+       divide evenly leaves a hole in the last row — 5 cards across 3 columns
+       sat as 3 + 2 with dead space beside the pair. Flex items on a short row
+       grow to fill it instead, so a gap is impossible at any count or width,
+       and no column-count arithmetic is needed to arrange them.
+       align-items: stretch keeps cards in the same row the same height —
+       without it, one card carrying a note stands taller than its neighbours. */
     .sl-items {
-      display: grid;
-      /* Defaults to 1, never auto-fill: repeat(auto-fill, minmax(0,1fr)) is
-         invalid — auto-fill needs an intrinsic minimum to count repetitions.
-         One column is the safe degradation if the layout pass never runs. */
-      --sl-cols: 1;
-      grid-template-columns: repeat(var(--sl-cols), minmax(0, 1fr));
-      gap: 8px; margin-bottom: 14px; align-items: stretch;
+      display: flex; flex-wrap: wrap; align-items: stretch;
+      gap: 8px; margin-bottom: 14px;
     }
     /* Reveal for cards that were hidden behind "show all". */
     @keyframes slReveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -2087,6 +2083,10 @@
        ------------------------------------------------------------------ */
     .sl-item {
       position: relative;
+      /* Basis is the narrowest a card can usefully be (name + price + two
+         buttons); grow lets a short last row fill the width. min-width: 0 so
+         a long item name cannot push the card past its share. */
+      flex: 1 1 300px; min-width: 0;
       background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
       padding: 15px 16px 14px 19px;
       display: grid;
@@ -2155,13 +2155,14 @@
     .sl-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; min-height: 28px; padding: 4px 10px; border-radius: var(--radius-xs); font-size: .76rem; font-weight: 600; letter-spacing: 0; transition: color var(--motion-fast), background var(--motion-fast), border-color var(--motion-fast); box-shadow: none; transform: none; }
     .sl-btn:hover { color: var(--ink); background: var(--surface-3); border-color: var(--border-strong); transform: none; box-shadow: none; }
     .sl-btn.sl-remove:hover { color: var(--red); border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); }
-    /* Spans the grid — it is a control for the whole list, and without this it
-       sat stranded in one column with the rest of the row empty beside it. */
-    .sl-more-btn { grid-column: 1 / -1; width: 100%; min-height: 34px; background: var(--surface); border: 1px dashed var(--border-mid); color: var(--muted); font-size: .8rem; font-weight: 600; letter-spacing: 0; border-radius: var(--radius-sm); box-shadow: none; }
+    /* Takes a row to itself — it is a control for the whole list, and without
+       this it packs onto the end of the last row of cards. flex-basis, not
+       grid-column, now the container is flex. */
+    .sl-more-btn { flex: 0 0 100%; width: 100%; min-height: 34px; background: var(--surface); border: 1px dashed var(--border-mid); color: var(--muted); font-size: .8rem; font-weight: 600; letter-spacing: 0; border-radius: var(--radius-sm); box-shadow: none; }
     .sl-more-btn:hover { color: var(--ink); background: var(--surface-2); border-color: var(--border-strong); transform: none; box-shadow: none; }
     /* Empty states must span every column, or they sit stranded in one narrow
        cell with the rest of the grid empty beside them. */
-    .sl-empty { grid-column: 1 / -1; text-align: center; padding: 34px 16px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+    .sl-empty { flex: 1 1 100%; text-align: center; padding: 34px 16px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
     .sl-empty strong { font-size: .94rem; color: var(--ink-soft); display: block; }
     .sl-empty p { font-size: .83rem; margin-top: 4px; }
     .sl-goal-wrap { padding-top: 2px; display: flex; justify-content: center; }
@@ -6500,80 +6501,6 @@
     let slShowAll = false;
     const SL_VISIBLE_LIMIT = 5;
 
-    /* ------------------------------------------------------------------
-       SAVE LIST GRID — column count follows the item count.
-       auto-fill just packs as many columns as fit, which leaves a single
-       stranded card whenever the count does not divide evenly: 3 items
-       became 2 + 1, 5 became 2 + 2 + 1. The lone card with dead space
-       beside it is what read as broken.
-       Instead: pick the column count that divides the items most evenly
-       within the width available, then let a last-row remainder stretch
-       to fill rather than sit orphaned.
-       ------------------------------------------------------------------ */
-    const SL_MIN_CARD = 300;   // below this a card cannot hold name + price + buttons
-    const SL_MAX_COLS = 3;     // beyond 3 the cards get too narrow to read
-
-    function bestColumnCount(itemCount, availableWidth) {
-      const fits = Math.max(1, Math.min(SL_MAX_COLS, Math.floor(availableWidth / SL_MIN_CARD)));
-      if (itemCount <= 1) return 1;
-      // Few enough for a single clean row — use exactly that many columns so
-      // they sit as one balanced band rather than a row plus a gap.
-      if (itemCount <= fits) return itemCount;
-
-      // Ranked: fewest rows, then the fullest last row, then most columns.
-      // Row count leads because a "perfect" division that costs an extra row
-      // is not an improvement — 8 items want 3+3+2, not four rows of two.
-      // The fullest-last-row tie-break is what turns 4 items into a 2x2
-      // square instead of 3+1 with a stranded card.
-      // Higher is better on each element, compared left to right.
-      const beats = (a, b) => {
-        for (let i = 0; i < a.length; i++) {
-          if (a[i] !== b[i]) return a[i] > b[i];
-        }
-        return false;
-      };
-
-      let best = fits;
-      let bestKey = null;
-      // Never below 2 columns unless the viewport genuinely only fits one:
-      // a single tall stack is not "balanced", it is just a different problem.
-      for (let cols = fits; cols >= Math.min(2, fits); cols--) {
-        const rows = Math.ceil(itemCount / cols);
-        const lastRow = itemCount % cols === 0 ? cols : itemCount % cols;
-        const key = [-rows, lastRow, cols];
-        if (!bestKey || beats(key, bestKey)) { bestKey = key; best = cols; }
-      }
-      return best;
-    }
-
-    function layoutSaveListGrid() {
-      const grid = slEl.items;
-      if (!grid) return;
-
-      // Measured BEFORE anything is reset. Every view stays in the DOM and
-      // render() updates them all, so this runs while the save list is
-      // display:none — where clientWidth is 0. Clearing first and bailing
-      // would throw away a good layout every time the list re-rendered from
-      // another section; bailing first keeps it until the view is revealed.
-      const width = grid.clientWidth || grid.getBoundingClientRect().width;
-      if (width < 1) return;
-
-      const cards = [...grid.querySelectorAll(".sl-item")];
-      grid.style.removeProperty("--sl-cols");
-      cards.forEach((c) => c.style.removeProperty("grid-column"));
-      if (!cards.length) return;
-
-      const cols = bestColumnCount(cards.length, width);
-      grid.style.setProperty("--sl-cols", String(cols));
-
-      // A last row holding exactly one card of a multi-row grid is the orphan
-      // case — let it run the full width so it reads as deliberate.
-      const remainder = cards.length % cols;
-      if (cols > 1 && cards.length > cols && remainder === 1) {
-        cards[cards.length - 1].style.gridColumn = `1 / -1`;
-      }
-    }
-
     // Height is animated rather than the list simply jumping. The card reveal
     // is a CSS class so it never runs when the user asks for reduced motion.
     let slHeightAnim = null;
@@ -6685,14 +6612,6 @@
       slEl.addBtn.textContent = "+ Add item";
       trackAppEvent("save_list_item_added");
       saveAndRender("Added to save list.");
-    });
-
-    // The best column count depends on the width available, so it has to be
-    // recomputed when that changes — not just when the list re-renders.
-    let slResizeTimer = 0;
-    window.addEventListener("resize", () => {
-      clearTimeout(slResizeTimer);
-      slResizeTimer = setTimeout(layoutSaveListGrid, 120);
     });
 
     slEl.items.addEventListener("click", (e) => {
@@ -6905,8 +6824,6 @@
             card.style.setProperty("--sl-delay", `${Math.min(i * 32, 160)}ms`);
           });
       }
-
-      layoutSaveListGrid();
     }
 
     // === SECTION VIEWS ===
@@ -6926,10 +6843,6 @@
         else btn.removeAttribute("aria-current");
       });
       try { localStorage.setItem(VIEW_KEY, name); } catch (e) {}
-      // The save list grid cannot measure itself while its view is hidden, so
-      // any render that happened from another section left the column count
-      // stale. Now that it has a width, lay it out.
-      if (name === "savelist") layoutSaveListGrid();
       if (!opts || !opts.silent) {
         window.scrollTo({ top: 0, behavior: "instant" in document.documentElement.style ? "instant" : "auto" });
       }
