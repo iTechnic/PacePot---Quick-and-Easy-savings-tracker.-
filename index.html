@@ -266,16 +266,27 @@
     .app-body { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: stretch; min-height: calc(100dvh - var(--header-h)); }
 
     .rail {
+      /* One variable for the inset, because the active graduation has to sit
+         exactly in this padding — it used to be a hardcoded -11px that would
+         silently drift the moment the padding changed. */
+      --rail-inset: 11px;
       position: sticky; top: var(--header-h); align-self: start;
-      display: flex; flex-direction: column; gap: 2px;
-      width: 208px; padding: 22px 12px 22px clamp(10px, 2vw, 22px);
+      display: flex; flex-direction: column; gap: 3px;
+      width: 212px; padding: 24px var(--rail-inset) 24px clamp(10px, 2vw, 22px);
       max-height: calc(100dvh - var(--header-h)); overflow-y: auto;
+      /* A datum down the edge, the same hairline language as the header rule.
+         Without it the rail and the content floated as one undivided field. */
+      border-right: 1px solid var(--border);
     }
     .rail-label {
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-      font-size: .62rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
-      color: var(--faint); padding: 0 10px; margin-bottom: 8px;
+      font-size: .6rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+      color: var(--faint); padding: 0 var(--rail-inset); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 9px;
     }
+    /* Runs the label out to the rule, so the heading reads as a measured
+       graduation rather than a floating word. */
+    .rail-label::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .22; }
     .rail-btn {
       position: relative;
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
@@ -286,11 +297,14 @@
       transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
     }
     .rail-btn:hover { background: var(--surface-2); color: var(--ink); transform: none; box-shadow: none; }
-    /* The active section is marked with a graduation, matching the pace rule. */
-    .rail-btn[aria-current="page"] { background: var(--surface-3); color: var(--ink); }
+    /* The active section is marked with a graduation, matching the pace rule.
+       Full-height and accent-lit, so the eye finds the current section from the
+       mark rather than from a low-contrast background tint. */
+    .rail-btn[aria-current="page"] { background: var(--surface-3); color: var(--ink); font-weight: 700; }
     .rail-btn[aria-current="page"]::before {
-      content: ""; position: absolute; left: -11px;
-      top: 9px; bottom: 9px; width: 2px; background: var(--accent);
+      content: ""; position: absolute; left: calc(var(--rail-inset) * -1);
+      top: 0; bottom: 0; width: 2px; background: var(--accent);
+      box-shadow: 0 0 10px rgba(16,185,129,.45);
     }
     .rail-count {
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -513,7 +527,8 @@
         position: sticky; top: var(--header-h); z-index: 12;
         flex-direction: row; width: auto; max-height: none; overflow-x: auto; overflow-y: hidden;
         gap: 4px; padding: 10px clamp(14px, 4vw, 22px);
-        background: #070c18; border-bottom: 1px solid var(--border);
+        /* Horizontal strip here, so the edge rule moves to the bottom. */
+        background: #070c18; border-right: 0; border-bottom: 1px solid var(--border);
       }
       .rail-label { display: none; }
       .rail-btn { width: auto; white-space: nowrap; min-height: 40px; justify-content: flex-start; }
@@ -1084,6 +1099,17 @@
        ============================================================ */
     .toast { position: fixed; right: 20px; bottom: 20px; background: #0f172a; color: #fff; border-radius: var(--radius-sm); padding: 11px 16px; box-shadow: 0 8px 32px rgba(15,23,42,.22); transform: translateY(16px); opacity: 0; pointer-events: none; transition: transform 200ms var(--ease), opacity 200ms var(--ease); max-width: min(340px,calc(100vw - 40px)); font-size: .86rem; font-weight: 600; z-index: 140; }
     .toast.show { transform: translateY(0); opacity: 1; }
+    /* The toast itself stays pointer-events: none so it never blocks a click on
+       whatever it is covering — the action re-enables them for itself only. */
+    .toast-action {
+      pointer-events: auto;
+      margin-left: 14px; min-height: 0; padding: 4px 11px;
+      background: transparent; border: 1px solid var(--accent-mid); border-radius: var(--radius-xs);
+      color: var(--accent-strong); font-size: .78rem; font-weight: 700; letter-spacing: 0;
+      cursor: pointer; box-shadow: none; vertical-align: baseline;
+    }
+    .toast-action:hover { background: var(--accent-soft); border-color: var(--accent-strong); transform: none; box-shadow: none; }
+    @media (hover: none), (pointer: coarse) { .toast-action { min-height: 32px; padding: 7px 14px; } }
 
     /* ============================================================
        MODALS - BASE
@@ -2032,7 +2058,10 @@
     .sl-date-row label { font-size: .78rem; color: var(--muted); font-weight: 600; white-space: nowrap; }
     .sl-date-row input[type=date] { font-size: .83rem; padding: 5px 9px; border-radius: var(--radius-xs); border: 1px solid var(--border-mid); background: var(--field); color: var(--ink); }
     .sl-date-result { font-size: .88rem; font-weight: 700; color: var(--accent-strong); white-space: nowrap; }
-    .sl-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 8px; margin-bottom: 14px; align-items: start; }
+    /* stretch, not start — items in a row have different content (a note, a
+       product link, neither), so `start` left every row with ragged bottoms
+       once the list was expanded. Cards now share a row height. */
+    .sl-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 8px; margin-bottom: 14px; align-items: stretch; }
     /* ------------------------------------------------------------------
        SAVE LIST ITEM — rebuilt for hierarchy. The price is the number you
        actually scan for, so it dominates. Priority is a graduation down the
@@ -2047,6 +2076,11 @@
       grid-template-columns: auto minmax(0,1fr) auto;
       grid-template-areas: "check name price" "check meta actions" "check note note" "check link link";
       column-gap: 12px; row-gap: 5px; align-items: baseline;
+      /* The card is now stretched to its row, and a grid spreads leftover
+         height across every auto row by default — which would drift the name
+         away from the price. Pin the rows to the top and let the slack fall
+         to the bottom of the card instead. */
+      align-content: start;
       transition: border-color var(--motion-fast), background var(--motion-fast);
     }
     /* Priority as a graduation on the edge, weighted like a scale mark. */
@@ -2104,7 +2138,9 @@
     .sl-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; min-height: 28px; padding: 4px 10px; border-radius: var(--radius-xs); font-size: .76rem; font-weight: 600; letter-spacing: 0; transition: color var(--motion-fast), background var(--motion-fast), border-color var(--motion-fast); box-shadow: none; transform: none; }
     .sl-btn:hover { color: var(--ink); background: var(--surface-3); border-color: var(--border-strong); transform: none; box-shadow: none; }
     .sl-btn.sl-remove:hover { color: var(--red); border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); }
-    .sl-more-btn { width: 100%; min-height: 34px; background: var(--surface); border: 1px dashed var(--border-mid); color: var(--muted); font-size: .8rem; font-weight: 600; letter-spacing: 0; border-radius: var(--radius-sm); box-shadow: none; }
+    /* Spans the grid — it is a control for the whole list, and without this it
+       sat stranded in one column with the rest of the row empty beside it. */
+    .sl-more-btn { grid-column: 1 / -1; width: 100%; min-height: 34px; background: var(--surface); border: 1px dashed var(--border-mid); color: var(--muted); font-size: .8rem; font-weight: 600; letter-spacing: 0; border-radius: var(--radius-sm); box-shadow: none; }
     .sl-more-btn:hover { color: var(--ink); background: var(--surface-2); border-color: var(--border-strong); transform: none; box-shadow: none; }
     /* Empty states must span every column, or they sit stranded in one narrow
        cell with the rest of the grid empty beside them. */
@@ -2843,7 +2879,7 @@
 
     <footer class="site-footer">
       <div>
-        <strong>PacePot v4.1</strong>. Savings targets that fit real life.
+        <strong>PacePot v4</strong>. Savings targets that fit real life.
         <span>Your data stays in this browser unless you export a backup. Created by Maks Wittenbeck, 2026.</span>
       </div>
       <div class="footer-links" aria-label="PacePot information links">
@@ -4330,10 +4366,13 @@
       els.targetName.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    function customConfirm(title, message, okLabel, callback) {
+    function customConfirm(title, message, okLabel, callback, opts) {
       els.confirmHeading.textContent = title;
       els.confirmMessage.textContent = message;
       els.confirmOk.textContent = okLabel || "Confirm";
+      // Always reassigned, never left as the previous caller set it — a custom
+      // label that leaked into the next confirm would be worse than no option.
+      els.confirmCancel.textContent = (opts && opts.cancelLabel) || "Cancel";
       confirmCallback = callback;
       openModal(els.confirmModal);
       els.confirmOk.focus();
@@ -5406,27 +5445,38 @@
       }
 
       const total = suggestions.reduce((sum, item) => sum + item.amount, 0);
+      // Naming the goals and amounts, not just a total — this writes a real
+      // deposit to every goal at once, and "£600 across 2 goals" does not tell
+      // you enough to spot a wrong split before it lands in your history.
+      const breakdown = suggestions
+        .map(({ target, amount }) => `${target.name} ${money(Math.round(amount * 100) / 100)}`)
+        .join(" · ");
       customConfirm(
         "Apply this split?",
-        `This will add ${money(total)} across ${suggestions.length} goal${suggestions.length === 1 ? "" : "s"}, dated today.`,
+        `${breakdown}. That is ${money(total)} in total, dated today. You can undo it straight after.`,
         "Apply",
         () => {
           const completed = [];
+          const applied = [];
           suggestions.forEach(({ target, amount }) => {
             const wasComplete = isComplete(target);
-            target.deposits.unshift({
+            const deposit = {
               id: makeId(),
               amount: Math.round(amount * 100) / 100,
               date: isoDate(today),
               note: "Split across goals"
-            });
+            };
+            target.deposits.unshift(deposit);
+            applied.push({ targetId: target.id, depositId: deposit.id });
             if (!wasComplete && isComplete(target)) completed.push(target);
           });
 
           // Edits applied to real deposits — clear the staging area so the next
           // split is suggested fresh rather than reusing stale numbers.
           allocationOverrides.clear();
-          saveAndRender("Split applied across your goals.");
+          lastAppliedSplit = applied;
+          saveAndRender();
+          showToast("Split applied across your goals.", { actionLabel: "Undo", onAction: undoLastSplit });
           if (completed.length) openCelebration(completed[0]);
         }
       );
@@ -6387,11 +6437,45 @@
     }
 
     let toastTimer;
-    function showToast(message) {
+    function showToast(message, opts) {
       els.toast.textContent = message;
+      // An offered action needs longer than a plain confirmation to be read,
+      // reached and clicked — 3s is not enough to undo anything.
+      let life = 3000;
+      if (opts && opts.actionLabel && typeof opts.onAction === "function") {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "toast-action";
+        btn.textContent = opts.actionLabel;
+        btn.addEventListener("click", () => {
+          els.toast.classList.remove("show");
+          clearTimeout(toastTimer);
+          opts.onAction();
+        });
+        els.toast.appendChild(btn);
+        life = 9000;
+      }
       els.toast.classList.add("show");
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 3000);
+      toastTimer = setTimeout(() => els.toast.classList.remove("show"), life);
+    }
+
+    // Set by applySuggestedAllocation. Session-only on purpose: an undo offered
+    // after a reload would be a promise the toast is no longer around to keep.
+    let lastAppliedSplit = null;
+
+    function undoLastSplit() {
+      if (!lastAppliedSplit || !lastAppliedSplit.length) return;
+      let removed = 0;
+      lastAppliedSplit.forEach(({ targetId, depositId }) => {
+        const target = state.targets.find((t) => t.id === targetId);
+        if (!target) return;
+        const before = target.deposits.length;
+        target.deposits = target.deposits.filter((d) => d.id !== depositId);
+        removed += before - target.deposits.length;
+      });
+      lastAppliedSplit = null;
+      saveAndRender(removed ? "Split undone." : "That split has already been changed.");
     }
 
     // === SAVE LIST ===
@@ -6487,6 +6571,21 @@
           if (item.purchased) trackAppEvent("save_list_item_completed");
           persistState();
           renderSaveList();
+          // Bought things clutter a list of things you are saving FOR, so ask
+          // once, right here, instead of leaving a struck-through row behind.
+          // Only on the way in — unticking is already the way to undo.
+          if (item.purchased) {
+            customConfirm(
+              `Bought "${item.name}"?`,
+              "You can take it off the save list now, or keep it ticked to hold on to the record.",
+              "Remove it",
+              () => {
+                state.saveList = state.saveList.filter(i => i.id !== item.id);
+                saveAndRender("Item removed from your save list.");
+              },
+              { cancelLabel: "Keep it" }
+            );
+          }
         }
         return;
       }
