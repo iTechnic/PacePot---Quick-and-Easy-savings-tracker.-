@@ -16,12 +16,18 @@
   --muted:         #7694ad;
   --faint:         #496070;
 
-  --surface:       rgba(255,255,255,.055);
-  --surface-2:     rgba(255,255,255,.03);
-  --surface-3:     rgba(255,255,255,.075);
-  --panel:         rgba(255,255,255,.055);
-  --panel-soft:    rgba(255,255,255,.03);
-  --field:         rgba(255,255,255,.08);
+  /* Opaque, not translucent white — these are the exact colours the old rgba
+     tints composited to over the page ground, so cards look the same, but the
+     ground and the cursor-lit grid no longer show THROUGH them. The app fixed
+     this in v4.0 and these pages were left on the old values, so the glow
+     washed over every card on all 21 of them. Keep in step with the :root
+     block in index.html. */
+  --surface:       #151925;
+  --surface-2:     #0e131f;
+  --surface-3:     #1a1e29;
+  --panel:         #151925;
+  --panel-soft:    #0e131f;
+  --field:         #1b1f2b;
 
   --border:        rgba(255,255,255,.08);
   --border-mid:    rgba(255,255,255,.12);
@@ -29,15 +35,21 @@
   --line:          rgba(255,255,255,.08);
 
   --silver:        rgba(255,255,255,.3);
+  --silver-strong: rgba(255,255,255,.46);
 
   --accent:        #10b981;
   --accent-strong: #34d399;
-  --accent-soft:   rgba(16,185,129,.14);
-  --accent-mid:    rgba(52,211,153,.3);
+  --accent-soft:   rgba(16,185,129,.16);
+  --accent-mid:    rgba(52,211,153,.35);
+  --accent-subtle: rgba(16,185,129,.07);
 
-  --red:           #ef4444;
+  --amber:         #fbbf24;
+  --red:           #f87171;
+  /* Matches the app bar, and the topbar reads it rather than hardcoding 60px. */
+  --header-h:      58px;
   --radius:        12px;
   --radius-sm:     8px;
+  --radius-xs:     6px;
   --radius-full:   999px;
   --ease:          cubic-bezier(0.16,1,0.3,1);
   --motion:        220ms;
@@ -85,7 +97,7 @@ ul, ol { padding-left: 20px; }
   align-items: center;
   gap: 16px;
   padding: 0 clamp(16px,3vw,32px);
-  height: 60px;
+  height: var(--header-h);
   margin-bottom: 24px;
   /* Solid, with the datum line beneath it — not a frosted glass bar. */
   background: #070c18;
@@ -462,13 +474,28 @@ h3 {
 @media (max-width: 760px) {
   .page { width: min(100% - 24px, 1060px); padding-bottom: 40px; }
   .grid { grid-template-columns: 1fr; }
-  .topbar { padding: 0 16px; height: 54px; margin-bottom: 16px; }
+  :root { --header-h: 54px; }
+  .topbar { padding: 0 16px; margin-bottom: 16px; }
   .hero, .section, .cta { padding: 20px; }
 }
 
 @media (max-width: 480px) {
   .tools-grid { grid-template-columns: 1fr; }
-  .nav a:not(:first-child) { display: none; }
+  /* The nav used to be hidden outright here, which left Calculators and Guides
+     unreachable from every static page on a phone with nothing to replace them.
+     Letting it wrap instead pushed this sticky bar to 125px — 15% of the
+     screen, permanently. It scrolls sideways on one line instead, the same
+     treatment the app's rail gets below 900px. */
+  .topbar { gap: 10px; }
+  .nav {
+    flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+    gap: 2px; font-size: .82rem;
+    scrollbar-width: none; -ms-overflow-style: none;
+    /* Fades at the cut so a half-visible link reads as "more this way". */
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 18px), transparent 100%);
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a { padding: 6px 9px; flex-shrink: 0; }
 }
 
 /* ------------------------------------------------------------------
