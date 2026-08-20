@@ -45,6 +45,16 @@
         <header class="topbar"><a class="brand" href="/"><img src="/logo-icon.png" alt="PacePot" width="28" height="28" style="margin-right:8px; vertical-align:middle;">PacePot</a><nav class="nav"><a href="/">Open app</a><a href="/calculators">Calculators</a><a href="/blog">Guides</a></nav></header>
     <main>
       <section class="hero"><span class="kicker">Savings calculator</span><h1>Car Savings Calculator</h1><p class="intro">Saving for a car, a deposit, insurance, or a repair bill? This car savings calculator turns the total into a monthly amount you can actually plan around.</p><a class="button" href="/">Open the free PacePot calculator</a></section>
+      <section class="section calc">
+        <h2>How much to save each month for a car?</h2>
+        <div class="calc-inputs">
+          <label>Car price<div class="calc-iw"><span>&pound;</span><input id="c-price" type="number" min="0" step="250" placeholder="9000" oninput="calcCar()"></div></label>
+          <label>Saved or part-exchange<div class="calc-iw"><span>&pound;</span><input id="c-saved" type="number" min="0" step="250" placeholder="0" oninput="calcCar()"></div></label>
+          <label>Months until you buy<div class="calc-iw bare"><input id="c-months" type="number" min="0" step="1" max="120" placeholder="12" oninput="calcCar()"></div></label>
+        </div>
+        <div class="calc-result" id="c-res"><span class="calc-sub">Enter the car price and how long you have.</span></div>
+        <p class="calc-note">Remember insurance, road tax and the first service on top of the purchase price.</p>
+      </section>
       <div class="grid">
         <section class="section"><h2>How it works</h2><p>Enter the amount you want to save, what you already have, and when you want to reach the target. PacePot shows the monthly pace and lets you compare different what-if amounts.</p><ul><li>Create a car target.</li><li>Add saved amounts whenever you move money aside.</li><li>Track whether you are early, on track, or late.</li></ul></section>
         <section class="section"><h2>Practical examples</h2><div class="examples"><div class="example"><strong>&pound;3,000 car deposit</strong><p>Over 12 months, that is about &pound;250 per month from zero.</p></div><div class="example"><strong>&pound;1,200 repairs fund</strong><p>Saving &pound;100 per month builds this in roughly one year.</p></div><div class="example"><strong>Insurance renewal</strong><p>Set the renewal date as the deadline and track the monthly pace.</p></div></div></section>
@@ -54,6 +64,24 @@
     </main>
     <footer class="footer"><nav class="footer-nav"><a href="/">Open app</a><a href="/calculators">Calculators</a><a href="/blog">Guides</a><a href="/privacy">Privacy</a></nav><span>PacePot &middot; Free savings goal tracker</span></footer>
   </div>
+  <script>
+    function calcCar() {
+      var el = document.getElementById('c-res');
+      function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+      function gbp(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
+      function s(n) { return n === 1 ? '' : 's'; }
+      function prompt() { el.innerHTML = '<span class="calc-sub">Enter the car price and how long you have.</span>'; }
+      function done(msg) { el.innerHTML = '<div class="calc-num">All covered</div><div class="calc-sub">' + msg + '</div>'; }
+      function show(monthly, sub) {
+        el.innerHTML = '<div class="calc-num">' + gbp(Math.ceil(monthly)) + ' / month</div><div class="calc-sub">' + sub + '</div>';
+      }
+      var price = v('c-price'), saved = v('c-saved'), months = v('c-months');
+      if (!price || !months) return prompt();
+      var remaining = Math.max(0, price - saved);
+      if (!remaining) return done('Your ' + gbp(price) + ' car is already covered.');
+      show(remaining / months, 'to cover ' + gbp(price) + ' in ' + months + ' month' + s(months));
+    }
+  </script>
 <script src="/grid-glow.js" defer></script>
 </body>
 </html>

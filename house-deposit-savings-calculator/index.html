@@ -45,6 +45,17 @@
         <header class="topbar"><a class="brand" href="/"><img src="/logo-icon.png" alt="PacePot" width="28" height="28" style="margin-right:8px; vertical-align:middle;">PacePot</a><nav class="nav"><a href="/">Open app</a><a href="/calculators">Calculators</a><a href="/blog">Guides</a></nav></header>
     <main>
       <section class="hero"><span class="kicker">Savings calculator</span><h1>House Deposit Savings Calculator UK</h1><p class="intro">A house deposit is the biggest save most people ever take on. This house deposit savings calculator breaks the target into a monthly pace and tracks your progress. No account or bank connection needed.</p><a class="button" href="/">Open the free PacePot calculator</a></section>
+      <section class="section calc">
+        <h2>How much to save each month for a deposit?</h2>
+        <div class="calc-inputs">
+          <label>Property price<div class="calc-iw"><span>&pound;</span><input id="c-price" type="number" min="0" step="5000" placeholder="250000" oninput="calcDeposit()"></div></label>
+          <label>Deposit percentage<div class="calc-iw bare"><input id="c-pct" type="number" min="0" step="1" max="100" placeholder="10" oninput="calcDeposit()"></div></label>
+          <label>Already saved<div class="calc-iw"><span>&pound;</span><input id="c-saved" type="number" min="0" step="1000" placeholder="0" oninput="calcDeposit()"></div></label>
+          <label>Years until you buy<div class="calc-iw bare"><input id="c-years" type="number" min="0" step="1" max="40" placeholder="5" oninput="calcDeposit()"></div></label>
+        </div>
+        <div class="calc-result" id="c-res"><span class="calc-sub">Enter a property price and a timeframe above.</span></div>
+        <p class="calc-note">Budget for solicitor fees, surveys and moving costs as well — they commonly add a few thousand pounds on top of the deposit.</p>
+      </section>
       <div class="grid">
         <section class="section"><h2>How it works</h2><p>Add your deposit target, current savings, and the date you would like the money ready. PacePot calculates the monthly savings pace and keeps a simple history of contributions.</p><ul><li>Track your deposit target manually.</li><li>Compare higher or lower monthly saving amounts.</li><li>Keep emergency savings separate if needed.</li></ul></section>
         <section class="section"><h2>Practical examples</h2><div class="examples"><div class="example"><strong>&pound;20,000 target in 24 months</strong><p>From zero, that is about &pound;834 per month.</p></div><div class="example"><strong>&pound;15,000 target with &pound;5,000 saved</strong><p>You have &pound;10,000 left. Over 20 months, that is &pound;500 per month.</p></div><div class="example"><strong>Fees and moving costs</strong><p>Create a separate target if you want to track costs beyond the deposit itself.</p></div></div></section>
@@ -54,6 +65,25 @@
     </main>
     <footer class="footer"><nav class="footer-nav"><a href="/">Open app</a><a href="/calculators">Calculators</a><a href="/blog">Guides</a><a href="/privacy">Privacy</a></nav><span>PacePot &middot; Free savings goal tracker</span></footer>
   </div>
+  <script>
+    function calcDeposit() {
+      var el = document.getElementById('c-res');
+      function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+      function gbp(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
+      function s(n) { return n === 1 ? '' : 's'; }
+      function prompt() { el.innerHTML = '<span class="calc-sub">Enter a property price and a timeframe above.</span>'; }
+      function done(msg) { el.innerHTML = '<div class="calc-num">All covered</div><div class="calc-sub">' + msg + '</div>'; }
+      function show(monthly, sub) {
+        el.innerHTML = '<div class="calc-num">' + gbp(Math.ceil(monthly)) + ' / month</div><div class="calc-sub">' + sub + '</div>';
+      }
+      var price = v('c-price'), pct = v('c-pct'), saved = v('c-saved'), years = v('c-years');
+      if (!price || !pct || !years) return prompt();
+      var target = price * (pct / 100);
+      var remaining = Math.max(0, target - saved);
+      if (!remaining) return done('Your ' + gbp(target) + ' deposit is already covered.');
+      show(remaining / (years * 12), 'to reach a ' + gbp(target) + ' deposit (' + pct + '% of ' + gbp(price) + ') in ' + years + ' year' + s(years));
+    }
+  </script>
 <script src="/grid-glow.js" defer></script>
 </body>
 </html>

@@ -45,6 +45,16 @@
         <header class="topbar"><a class="brand" href="/"><img src="/logo-icon.png" alt="PacePot" width="28" height="28" style="margin-right:8px; vertical-align:middle;">PacePot</a><nav class="nav"><a href="/">Open app</a><a href="/calculators">Calculators</a><a href="/blog">Guides</a></nav></header>
     <main>
       <section class="hero"><span class="kicker">Savings calculator</span><h1>Wedding Savings Calculator</h1><p class="intro">This wedding savings calculator turns the total cost into a monthly amount to save. Track the whole budget in one go, or split it into smaller goals for the venue, outfits, and rings.</p><a class="button" href="/">Open the free PacePot calculator</a></section>
+      <section class="section calc">
+        <h2>How much to save each month for the wedding?</h2>
+        <div class="calc-inputs">
+          <label>Wedding budget<div class="calc-iw"><span>&pound;</span><input id="c-budget" type="number" min="0" step="500" placeholder="16000" oninput="calcWedding()"></div></label>
+          <label>Already saved<div class="calc-iw"><span>&pound;</span><input id="c-saved" type="number" min="0" step="500" placeholder="0" oninput="calcWedding()"></div></label>
+          <label>Months until the day<div class="calc-iw bare"><input id="c-months" type="number" min="0" step="1" max="120" placeholder="18" oninput="calcWedding()"></div></label>
+        </div>
+        <div class="calc-result" id="c-res"><span class="calc-sub">Enter your budget and how long you have.</span></div>
+        <p class="calc-note">Set the budget you actually want to spend rather than an average. The average UK wedding figure includes a lot of choices you may not want to make.</p>
+      </section>
       <div class="grid">
         <section class="section"><h2>How it works</h2><p>Add your wedding target, what you have already saved, and the date you need the money. PacePot shows the monthly pace and lets you add saving entries as you go.</p><ul><li>Track one overall wedding target.</li><li>Or create separate targets for venue, outfits, rings, and honeymoon.</li><li>Use what-if scenarios to see if saving more finishes earlier.</li></ul></section>
         <section class="section"><h2>Practical examples</h2><div class="examples"><div class="example"><strong>&pound;8,000 in 20 months</strong><p>From zero, that is about &pound;400 per month.</p></div><div class="example"><strong>&pound;5,000 left after deposits</strong><p>Over 10 months, that is about &pound;500 per month.</p></div><div class="example"><strong>Separate honeymoon target</strong><p>Create another target if you want honeymoon savings separate from wedding costs.</p></div></div></section>
@@ -54,6 +64,24 @@
     </main>
     <footer class="footer"><nav class="footer-nav"><a href="/">Open app</a><a href="/calculators">Calculators</a><a href="/blog">Guides</a><a href="/privacy">Privacy</a></nav><span>PacePot &middot; Free savings goal tracker</span></footer>
   </div>
+  <script>
+    function calcWedding() {
+      var el = document.getElementById('c-res');
+      function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+      function gbp(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
+      function s(n) { return n === 1 ? '' : 's'; }
+      function prompt() { el.innerHTML = '<span class="calc-sub">Enter your budget and how long you have.</span>'; }
+      function done(msg) { el.innerHTML = '<div class="calc-num">All covered</div><div class="calc-sub">' + msg + '</div>'; }
+      function show(monthly, sub) {
+        el.innerHTML = '<div class="calc-num">' + gbp(Math.ceil(monthly)) + ' / month</div><div class="calc-sub">' + sub + '</div>';
+      }
+      var budget = v('c-budget'), saved = v('c-saved'), months = v('c-months');
+      if (!budget || !months) return prompt();
+      var remaining = Math.max(0, budget - saved);
+      if (!remaining) return done('Your ' + gbp(budget) + ' budget is already covered.');
+      show(remaining / months, 'to cover ' + gbp(budget) + ' in ' + months + ' month' + s(months));
+    }
+  </script>
 <script src="/grid-glow.js" defer></script>
 </body>
 </html>

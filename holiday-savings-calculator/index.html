@@ -45,6 +45,16 @@
         <header class="topbar"><a class="brand" href="/"><img src="/logo-icon.png" alt="PacePot" width="28" height="28" style="margin-right:8px; vertical-align:middle;">PacePot</a><nav class="nav"><a href="/">Open app</a><a href="/calculators">Calculators</a><a href="/blog">Guides</a></nav></header>
     <main>
       <section class="hero"><span class="kicker">Savings calculator</span><h1>Holiday Savings Calculator UK</h1><p class="intro">Got a rough idea of what your next trip will cost? This holiday savings calculator works out how much to set aside each month so it's paid for before you fly. Flights, hotel, and spending money included.</p><a class="button" href="/">Open the free PacePot calculator</a></section>
+      <section class="section calc">
+        <h2>How much to save each month for your holiday?</h2>
+        <div class="calc-inputs">
+          <label>Total trip cost<div class="calc-iw"><span>&pound;</span><input id="c-cost" type="number" min="0" step="50" placeholder="1800" oninput="calcHoliday()"></div></label>
+          <label>Already saved<div class="calc-iw"><span>&pound;</span><input id="c-saved" type="number" min="0" step="50" placeholder="0" oninput="calcHoliday()"></div></label>
+          <label>Months until you go<div class="calc-iw bare"><input id="c-months" type="number" min="0" step="1" max="120" placeholder="8" oninput="calcHoliday()"></div></label>
+        </div>
+        <div class="calc-result" id="c-res"><span class="calc-sub">Enter your trip cost and how long you have.</span></div>
+        <p class="calc-note">Include flights, accommodation, food and spending money. Trips almost always cost more than the headline price.</p>
+      </section>
       <div class="grid">
         <section class="section"><h2>How it works</h2><p>PacePot takes your holiday target, subtracts what you have already saved, and shows the monthly pace needed to reach your date. You can add saving entries whenever you move money aside.</p><ul><li>Set one target for the whole trip.</li><li>Include flights, hotels, spending money, and extras.</li><li>Use what-if scenarios to compare monthly amounts.</li></ul></section>
         <section class="section"><h2>Practical examples</h2><div class="examples"><div class="example"><strong>&pound;1,200 trip in 6 months</strong><p>Save about &pound;200 per month if you are starting from &pound;0.</p></div><div class="example"><strong>&pound;900 trip with &pound;300 saved</strong><p>You have &pound;600 left. Over 4 months, that is about &pound;150 per month.</p></div><div class="example"><strong>Holiday spending money</strong><p>Create a separate PacePot target just for spending money if that helps you stay organised.</p></div></div></section>
@@ -54,6 +64,24 @@
     </main>
     <footer class="footer"><nav class="footer-nav"><a href="/">Open app</a><a href="/calculators">Calculators</a><a href="/blog">Guides</a><a href="/privacy">Privacy</a></nav><span>PacePot &middot; Free savings goal tracker</span></footer>
   </div>
+  <script>
+    function calcHoliday() {
+      var el = document.getElementById('c-res');
+      function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+      function gbp(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
+      function s(n) { return n === 1 ? '' : 's'; }
+      function prompt() { el.innerHTML = '<span class="calc-sub">Enter your trip cost and how long you have.</span>'; }
+      function done(msg) { el.innerHTML = '<div class="calc-num">All covered</div><div class="calc-sub">' + msg + '</div>'; }
+      function show(monthly, sub) {
+        el.innerHTML = '<div class="calc-num">' + gbp(Math.ceil(monthly)) + ' / month</div><div class="calc-sub">' + sub + '</div>';
+      }
+      var cost = v('c-cost'), saved = v('c-saved'), months = v('c-months');
+      if (!cost || !months) return prompt();
+      var remaining = Math.max(0, cost - saved);
+      if (!remaining) return done('Your ' + gbp(cost) + ' trip is already covered.');
+      show(remaining / months, 'to cover ' + gbp(cost) + ' in ' + months + ' month' + s(months));
+    }
+  </script>
 <script src="/grid-glow.js" defer></script>
 </body>
 </html>
