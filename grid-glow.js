@@ -1,5 +1,5 @@
 /* ============================================================
-   PacePot — cursor-lit grid (shared by the SEO, calculator and
+   PacePot, cursor-lit grid (shared by the SEO, calculator and
    blog pages). The app (index.html) carries its own copy inline,
    because that file's later <script> blocks have historically been
    skipped by Opera GX and its version is verified working.

@@ -4,7 +4,7 @@
    once the page adopted the app's width ladder. Rather than padding the
    card out with empty space, the space becomes navigation: a sticky list
    of the article's own headings, with the current one marked.
-   Progressive enhancement — the article reads fine without this file.
+   Progressive enhancement. The article reads fine without this file.
    ============================================================ */
 (function () {
   var body = document.querySelector('.article-body');
@@ -75,7 +75,7 @@
   article.classList.add('has-toc');
 
   /* Mark the section being read. Deliberately NOT "whichever heading is
-     currently intersecting a band" — between two headings no heading is in
+     currently intersecting a band". Between two headings none is inside
      the band, so the marker would blink off for most of the scroll. What is
      wanted is the last heading scrolled past, which stays marked until the
      next one arrives. */

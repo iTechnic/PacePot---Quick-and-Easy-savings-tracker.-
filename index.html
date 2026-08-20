@@ -103,7 +103,7 @@
       /* Glass surfaces */
       /* Opaque, not translucent white. These are the exact colours the old
          rgba tints composited to over the page ground, so cards look the same
-         — but the ground (and the cursor-lit grid) no longer shows through
+        , but the ground (and the cursor-lit grid) no longer shows through
          them. Translucent surfaces are why the glow appeared to wash over
          every card on the page. */
       --surface:        #151925;
@@ -170,7 +170,7 @@
       --motion-fast: 150ms;
       --ease:        cubic-bezier(0.16,1,0.3,1);
 
-      /* Fluid shell — the app widens with the screen instead of sitting in a
+      /* Fluid shell, the app widens with the screen instead of sitting in a
          fixed 1080px column. Extra width becomes extra COLUMNS (goals, stats,
          save list), not longer lines of text. */
       --shell-max:   1080px;
@@ -212,7 +212,7 @@
 
     .app-shell {
       display: block;
-      /* Header is a sibling above this, so subtract it — otherwise short
+      /* Header is a sibling above this, so subtract it, otherwise short
          sections gain a phantom header's worth of height and scroll for no
          reason. */
       min-height: calc(100dvh - var(--header-h));
@@ -233,7 +233,7 @@
        The same 88px ground grid drawn in accent green, revealed only
        through a soft radial mask that follows the pointer. Both layers
        are viewport-anchored, so the lit lines land exactly on the dim
-       ones. One element, one mask — no per-line DOM, no layout work.
+       ones. One element, one mask, no per-line DOM, no layout work.
        ============================================================ */
     .grid-glow, .landing-page::after {
       content: "";
@@ -258,7 +258,7 @@
        SECTION RAIL + VIEWS
        PacePot is a sectioned app, not one long page. Every section stays
        in the DOM and is shown/hidden with a class, so render() keeps
-       updating all of it regardless of which view is on screen — no
+       updating all of it regardless of which view is on screen, no
        rendering logic depends on visibility.
        ============================================================ */
     /* Full-height column so the footer can be pushed to the bottom rather than
@@ -267,7 +267,7 @@
 
     .rail {
       /* One variable for the inset, because the active graduation has to sit
-         exactly in this padding — it used to be a hardcoded -11px that would
+         exactly in this padding, it used to be a hardcoded -11px that would
          silently drift the moment the padding changed. */
       --rail-inset: 11px;
       position: sticky; top: var(--header-h); align-self: start;
@@ -316,7 +316,7 @@
     .view.is-active { display: block; animation: viewIn 180ms var(--ease) both; }
     @keyframes viewIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
-    /* Views hold content at a sane measure — width buys columns inside a view,
+    /* Views hold content at a sane measure, width buys columns inside a view,
        it never strands a lone panel in a wide empty band. */
     /* ============================================================
        CALIBRATION CHECKLIST
@@ -548,7 +548,7 @@
     /* A field row lines up the FIELDS, not the labels. Bottom-aligned, so a
        label that wraps to two lines cannot shunt its own input out of line
        with its neighbour's. Label margins are zeroed because the row's gap
-       and the parent's gap are the only spacing that should count — a stray
+       and the parent's gap are the only spacing that should count, a stray
        margin on one cell makes it stretch taller than the other, and grid
        then spreads that slack across BOTH of its rows, so the field drops a
        few pixels and grows. That is exactly what knocked Type/Value out of
@@ -580,7 +580,7 @@
       transform: rotate(45deg); transition: transform var(--motion) var(--ease); margin-top: -3px; flex-shrink: 0;
     }
     .budget-list-panel.collapsed .budget-list-toggle::after { transform: rotate(-45deg); margin-top: 3px; }
-    /* No height cap any more — the list is on a full-width page, not in a
+    /* No height cap any more, the list is on a full-width page, not in a
        360px drawer, so it lays out in columns instead of scrolling. */
     .budget-list-shell {
       padding: 4px 20px 20px; border-top: 1px solid var(--border);
@@ -606,7 +606,7 @@
 
     /* ============================================================
        BUDGET SPLIT LEGEND
-       The split itself is a measured rule — see .bsplit in the budget page
+       The split itself is a measured rule, see .bsplit in the budget page
        block. These are the readings under it.
        ============================================================ */
     .legend-row {
@@ -623,7 +623,7 @@
     /* ============================================================
        MAIN AREA
        ============================================================ */
-    /* width:100% + margin:0 (not `margin:0 auto`) — auto inline margins on a
+    /* width:100% + margin:0 (not `margin:0 auto`), auto inline margins on a
        grid item cancel stretch and shrink it to content width. */
     main { width: 100%; max-width: var(--shell-max); margin: 0; padding: clamp(28px, 3vw, 48px) var(--shell-pad) 48px; display: flex; flex-direction: column; }
 
@@ -724,7 +724,7 @@
     /* Hero metrics dominate the first row; secondary stats sit compact below */
     .summary-strip .summary--hero { grid-column: span 2; }
     /* Secondary stats stop being nine boxes competing with the two that matter.
-       They become readings hung under a shared rule — present when you look for
+       They become readings hung under a shared rule, present when you look for
        them, silent when you don't. */
     .summary--compact {
       background: none; border: 0; border-top: 1px solid var(--border-mid);
@@ -910,11 +910,11 @@
        grow taller than the row they save. So this deliberately caps at 2. */
     /* stretch, not start: expanded cards sharing a row match the tallest one,
        so they read as a set rather than a ragged edge. Collapsed cards opt out
-       below — otherwise a collapsed summary next to an expanded card would be
+       below, otherwise a collapsed summary next to an expanded card would be
        stretched into a mostly empty box. */
     .targets { display: grid; gap: 14px; grid-template-columns: minmax(0,1fr); align-items: stretch; }
     @media (min-width: 1600px) { .targets { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; } }
-    /* Each card sizes its own internals — see the @container rules after the
+    /* Each card sizes its own internals, see the @container rules after the
        target-card block below. */
     /* Column layout so the body fills a stretched card instead of leaving a
        gap at the bottom of the shorter one in a row. */
@@ -946,7 +946,7 @@
     .target-details { min-width: 0; }
 
     /* Card-level responsiveness. When goals sit in a multi-column grid each card
-       is too narrow for the side-by-side viz, so it stacks — independent of the
+       is too narrow for the side-by-side viz, so it stacks, independent of the
        viewport, so it stays correct at any column count. Must come after
        .target-full above to win on source order. */
     /* Only truly narrow cards stack. Measured: the two-up layout is ~240px
@@ -997,7 +997,7 @@
     .pill.warn { background: var(--amber-soft); color: var(--amber); }
     .pill.complete { background: rgba(5,150,105,.1); color: var(--accent-strong); border: 1px solid rgba(5,150,105,.2); }
     .pill.priority { background: var(--surface-3); color: var(--muted); border: 1px solid var(--border-mid); }
-    /* Goal position, stated as a signed distance from the pace — same device as
+    /* Goal position, stated as a signed distance from the pace, same device as
        the landing hero. Monospace so the figures line up down a column of
        goals, and the wording carries the meaning without relying on colour. */
     .goal-delta {
@@ -1100,7 +1100,7 @@
     .toast { position: fixed; right: 20px; bottom: 20px; background: #0f172a; color: #fff; border-radius: var(--radius-sm); padding: 11px 16px; box-shadow: 0 8px 32px rgba(15,23,42,.22); transform: translateY(16px); opacity: 0; pointer-events: none; transition: transform 200ms var(--ease), opacity 200ms var(--ease); max-width: min(340px,calc(100vw - 40px)); font-size: .86rem; font-weight: 600; z-index: 140; }
     .toast.show { transform: translateY(0); opacity: 1; }
     /* The toast itself stays pointer-events: none so it never blocks a click on
-       whatever it is covering — the action re-enables them for itself only. */
+       whatever it is covering, the action re-enables them for itself only. */
     .toast-action {
       pointer-events: auto;
       margin-left: 14px; min-height: 0; padding: 4px 11px;
@@ -1229,7 +1229,7 @@
       gap: clamp(10px, 2vw, 24px);
       padding: 0 clamp(16px, 2.2vw, 28px);
       height: var(--header-h);
-      /* Solid, with the datum line beneath it — not a frosted glass bar. */
+      /* Solid, with the datum line beneath it, not a frosted glass bar. */
       background: #070c18;
       border-bottom: 1px solid rgba(255,255,255,.10);
     }
@@ -1251,7 +1251,7 @@
 
     /* ONE datum for everything in the bar. The old row ran 32px, 36px and
        41px controls side by side at three type sizes, so tops and bottoms
-       staggered even though every centre lined up — that is what read as
+       staggered even though every centre lined up, that is what read as
        crooked. Height and font are set once here and never overridden. */
     .app-nav a,
     .support-link,
@@ -1308,7 +1308,7 @@
        to read as a control rather than three faint dots on a near-black bar.
        The app's own dark surfaces are all too close to the bar to separate:
        --surface measures 1.11:1 against it and --field 1.19:1, which is why
-       the button vanished. #2e3548 is 1.6:1 — plainly a button, still quiet
+       the button vanished. #2e3548 is 1.6:1, plainly a button, still quiet
        enough that "Support PacePot" keeps the only accent at rest. */
     .hmenu-btn {
       width: 40px;
@@ -1350,7 +1350,7 @@
       display: flex;
       align-items: center;
       /* The base button rule centres its contents, which centred each row as
-         a unit — the icons landed at five different offsets and the column
+         a unit, the icons landed at five different offsets and the column
          read as ragged. `text-align` cannot fix that; flex alignment can.
          With every icon 16px and the gap fixed, this lines up icons AND
          labels in one go. */
@@ -1372,7 +1372,7 @@
       transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
     }
     .hmenu-item:hover { background: var(--surface-2); transform: none; box-shadow: none; }
-    /* Shown exactly where .app-nav is hidden — same breakpoint, below. */
+    /* Shown exactly where .app-nav is hidden, same breakpoint, below. */
     .hmenu-nav-only { display: none; }
     .hmenu-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); }
     .hmenu-item:hover svg { color: var(--accent-strong); }
@@ -1443,7 +1443,7 @@
     }
     /* The two boundaries the eye actually needs: where outgoings end and
        where goals end. Both slices are measured from 0, so the band between
-       them is the difference — not the planned slice itself. */
+       them is the difference, not the planned slice itself. */
     .bsplit::before {
       content: ""; position: absolute; top: 0; bottom: 0; z-index: 1; pointer-events: none;
       left: var(--outgoing-slice, 0%);
@@ -1472,7 +1472,7 @@
       display: flex; align-items: center; gap: 10px;
     }
     .bcard-label::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .18; }
-    /* Direct child only — a bare `label:last-of-type` also matched the second
+    /* Direct child only, a bare `label:last-of-type` also matched the second
        label inside a .field-row and stripped its margin, unbalancing the row. */
     .bcard > label:last-of-type { margin-bottom: 0; }
     .bcard .budget-add label { margin-bottom: 0; }
@@ -1480,7 +1480,7 @@
     .bcard .budget-add { margin-top: 0; padding-top: 0; border-top: 0; }
 
     /* Items get the full page width, so more screen becomes more columns
-       rather than a taller scroller — same rule as the goals grid. */
+       rather than a taller scroller, same rule as the goals grid. */
     .bcard--items { padding: 0; overflow: hidden; margin-bottom: 14px; }
 
     /* Set-once settings, folded away from the monthly workflow. */
@@ -1491,7 +1491,7 @@
     .currency-field { max-width: 320px; }
 
     /* ------------------------------------------------------------------
-       ACCOUNT BALANCE — OPT-IN AND DATED
+       ACCOUNT BALANCE, OPT-IN AND DATED
        A balance PacePot cannot read is only true on the day it is typed.
        It is off by default, and when it is on it shows its own age rather
        than passing a months-old figure off as today's.
@@ -1513,7 +1513,7 @@
     .opt-copy strong { font-size: .88rem; font-weight: 700; }
     .opt-note { color: var(--muted); font-size: .78rem; font-weight: 400; line-height: 1.55; }
 
-    /* State in the pace-rule idiom the rest of v4.0 reads in — a monospace
+    /* State in the pace-rule idiom the rest of v4.0 reads in, a monospace
        graduation, not a toy switch. */
     .opt-state {
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -1539,7 +1539,7 @@
     .balance-stamp .is-stale { color: var(--amber); }
 
     /* The tile is where the number gets mistaken for a live balance, so the
-       age lives there too — and the figure is visibly demoted once it is
+       age lives there too, and the figure is visibly demoted once it is
        too old to stand behind. */
     .summary-note {
       margin-top: 7px;
@@ -1614,7 +1614,7 @@
       .field-row, .field-row.three { grid-template-columns: 1fr; }
       .site-footer { display: grid; }
       .targets-heading { gap: 8px; }
-      /* Set the variable, not the height — the rail's sticky offset and the
+      /* Set the variable, not the height, the rail's sticky offset and the
          shell's min-height both read it. */
       :root { --header-h: 54px; }
       .app-header { padding: 0 18px; gap: 10px; }
@@ -1626,7 +1626,7 @@
       .target-grid { grid-template-columns: 1fr; }
       .deposit-row { grid-template-columns: 1fr auto auto auto auto; }
       .deposit-row input { grid-column: 1; }
-      /* The menu stays — it is the only route to backup, tour and help on a
+      /* The menu stays, it is the only route to backup, tour and help on a
          phone. Support drops out; it is the one thing with a home elsewhere. */
       .header-actions .support-link { display: none; }
       .app-nav a { padding: 0 9px; font-size: .8rem; }
@@ -1707,7 +1707,7 @@
       position: sticky; top: 0; z-index: 91;
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       padding: 0 clamp(20px,5vw,60px); height: 62px;
-      /* Solid, with the datum line beneath it — not a frosted glass bar. */
+      /* Solid, with the datum line beneath it, not a frosted glass bar. */
       background: #070c18;
       border-bottom: 1px solid rgba(255,255,255,.10);
     }
@@ -1737,7 +1737,7 @@
       padding: 88px clamp(20px,5vw,60px) 72px;
     }
     /* ------------------------------------------------------------------
-       THE PACE RULE (landing) — see seo-page.css for the shared rationale.
+       THE PACE RULE (landing), see seo-page.css for the shared rationale.
        A tick scale, the label, then the datum line running out to the edge.
        ------------------------------------------------------------------ */
     .lp-kicker {
@@ -1780,7 +1780,7 @@
     .lp-cta-ghost:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.18); }
     /* Facts are annotated off the datum line like dimensions on a technical
        drawing: a leader dropping from the line, a square node where it meets.
-       Square nodes, never glowing circles — that is the whole point. */
+       Square nodes, never glowing circles, that is the whole point. */
     .lp-trust { position: relative; padding-top: 1px; }
     .lp-trust::before { content: ""; display: block; height: 1px; background: rgba(255,255,255,.14); }
     .lp-callouts { display: flex; flex-wrap: wrap; gap: clamp(16px, 3.4vw, 40px); list-style: none; margin: 0; padding: 0; }
@@ -1798,7 +1798,7 @@
 
     /* Hero visual */
     .lp-hero-visual { position: relative; display: flex; flex-direction: column; gap: 14px; }
-    /* Goal readouts: flat and measured. No blur, no glow, no status pills —
+    /* Goal readouts: flat and measured. No blur, no glow, no status pills -
        position is stated as a signed delta against the pace, which is the one
        number the product actually exists to give you. */
     .lp-preview-card {
@@ -2030,7 +2030,7 @@
     .sl-form-wrap form { display: grid; gap: 12px; }
     .sl-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .sl-form-actions { display: flex; gap: 8px; }
-    /* Totals read as four divisions on one rule — the same measured device as
+    /* Totals read as four divisions on one rule, the same measured device as
        the landing features, so the list feels part of the instrument. */
     .sl-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0; margin-bottom: 16px; }
     .sl-stat {
@@ -2059,11 +2059,11 @@
     .sl-date-row input[type=date] { font-size: .83rem; padding: 5px 9px; border-radius: var(--radius-xs); border: 1px solid var(--border-mid); background: var(--field); color: var(--ink); }
     .sl-date-result { font-size: .88rem; font-weight: 700; color: var(--accent-strong); white-space: nowrap; }
     /* Flex, not grid. A grid has fixed column tracks, so whatever does not
-       divide evenly leaves a hole in the last row — 5 cards across 3 columns
+       divide evenly leaves a hole in the last row, 5 cards across 3 columns
        sat as 3 + 2 with dead space beside the pair. Flex items on a short row
        grow to fill it instead, so a gap is impossible at any count or width,
        and no column-count arithmetic is needed to arrange them.
-       align-items: stretch keeps cards in the same row the same height —
+       align-items: stretch keeps cards in the same row the same height -
        without it, one card carrying a note stands taller than its neighbours. */
     .sl-items {
       display: flex; flex-wrap: wrap; align-items: stretch;
@@ -2076,7 +2076,7 @@
       .sl-item.sl-revealed { animation: none; }
     }
     /* ------------------------------------------------------------------
-       SAVE LIST ITEM — rebuilt for hierarchy. The price is the number you
+       SAVE LIST ITEM, rebuilt for hierarchy. The price is the number you
        actually scan for, so it dominates. Priority is a graduation down the
        left edge rather than a third pill, and the meta line drops to quiet
        monospace, so one glance gives you item + cost and nothing competes.
@@ -2094,7 +2094,7 @@
       grid-template-areas: "check name price" "check meta actions" "check note note" "check link link";
       column-gap: 12px; row-gap: 5px; align-items: baseline;
       /* The card is now stretched to its row, and a grid spreads leftover
-         height across every auto row by default — which would drift the name
+         height across every auto row by default, which would drift the name
          away from the price. Pin the rows to the top and let the slack fall
          to the bottom of the card instead. */
       align-content: start;
@@ -2131,7 +2131,7 @@
       grid-area: price; font-size: 1.18rem; font-weight: 800; color: var(--ink);
       letter-spacing: -.03em; white-space: nowrap; font-variant-numeric: tabular-nums;
     }
-    /* Quiet monospace meta — category, priority and date on one measured line. */
+    /* Quiet monospace meta, category, priority and date on one measured line. */
     .sl-meta {
       grid-area: meta; display: flex; flex-wrap: wrap; align-items: center; gap: 3px 0;
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -2155,7 +2155,7 @@
     .sl-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; min-height: 28px; padding: 4px 10px; border-radius: var(--radius-xs); font-size: .76rem; font-weight: 600; letter-spacing: 0; transition: color var(--motion-fast), background var(--motion-fast), border-color var(--motion-fast); box-shadow: none; transform: none; }
     .sl-btn:hover { color: var(--ink); background: var(--surface-3); border-color: var(--border-strong); transform: none; box-shadow: none; }
     .sl-btn.sl-remove:hover { color: var(--red); border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); }
-    /* Takes a row to itself — it is a control for the whole list, and without
+    /* Takes a row to itself, it is a control for the whole list, and without
        this it packs onto the end of the last row of cards. flex-basis, not
        grid-column, now the container is flex. */
     .sl-more-btn { flex: 0 0 100%; width: 100%; min-height: 34px; background: var(--surface); border: 1px dashed var(--border-mid); color: var(--muted); font-size: .8rem; font-weight: 600; letter-spacing: 0; border-radius: var(--radius-sm); box-shadow: none; }
@@ -2221,7 +2221,7 @@
     <div class="lp-hero-visual" aria-hidden="true">
       <div class="lp-preview-card">
         <div class="lp-card-row">
-          <span class="lp-card-name">Holiday &mdash; Tenerife</span>
+          <span class="lp-card-name">Tenerife holiday</span>
           <span class="lp-delta">+&pound;40 ahead</span>
         </div>
         <div class="lp-card-amount">&pound;1,240 <span>of &pound;2,000</span></div>
@@ -2373,7 +2373,7 @@
      Seven controls used to sit in the right cluster at four different
      heights (32 / 36 / 41px) and three type sizes, with a destructive
      "Clear" the same weight as routine actions and two competing green
-     treatments side by side. It is now brand, nav, one accent, one menu —
+     treatments side by side. It is now brand, nav, one accent, one menu -
      every control on the same 34px datum.
      ============================================================ -->
 <header class="app-header">
@@ -2488,7 +2488,7 @@
       <div class="summary summary--compact"><div class="label">Total outgoing</div><div class="value" id="topOutgoing">&pound;0</div></div>
       <div class="summary summary--compact"><div class="label">Saved so far</div><div class="value" id="savedTotal">&pound;0</div></div>
       <div class="summary summary--compact"><div class="label">Still needed</div><div class="value" id="remainingTotal">&pound;0</div></div>
-      <div class="summary summary--compact" id="goalsOnPaceCard"><div class="label">Goals on pace</div><div class="value" id="goalsOnPaceValue">&mdash;</div></div>
+      <div class="summary summary--compact" id="goalsOnPaceCard"><div class="label">Goals on pace</div><div class="value" id="goalsOnPaceValue">None yet</div></div>
       <!-- "Left in account" read as a live bank figure. It is arithmetic on a
            snapshot the user typed, so it says so, and says how old it is. -->
       <div class="summary summary--compact" id="accountCushionCard" hidden><div class="label">Left after plan</div><div class="value" id="accountCushion">&pound;0</div><div class="summary-note" id="accountCushionNote"></div></div>
@@ -2664,7 +2664,7 @@
       <div class="sl-planner" id="slPlanner" hidden>
         <div class="sl-planner-col">
           <div class="sl-planner-label">Based on your savings pot</div>
-          <div class="sl-planner-value" id="slTimeEstimate">—</div>
+          <div class="sl-planner-value" id="slTimeEstimate">Not set</div>
         </div>
         <div class="sl-planner-col">
           <div class="sl-planner-label">Monthly needed by date</div>
@@ -2745,7 +2745,7 @@
         </div>
 
         <!-- Same --outgoing-slice / --planned-slice custom properties the pie
-             used, so renderBudget() is untouched — but read off a measured
+             used, so renderBudget() is untouched, but read off a measured
              rule instead of a donut, which is the v4.0 language. -->
         <div class="bhero-split" id="budgetChart">
           <div class="bsplit" id="budgetPie" role="img" aria-label="How each month's money splits between outgoings, goals and what is left"></div>
@@ -2765,7 +2765,7 @@
             Salary <span class="field-hint">monthly, after tax</span>
             <input id="salary" type="number" min="0" step="0.01" inputmode="decimal" placeholder="2500">
           </label>
-          <p class="bcard-note">Anything else that comes in — a side income, a top-up — goes in as an item.</p>
+          <p class="bcard-note">Anything else that comes in, like a side income or a top-up, goes in as an item.</p>
         </section>
 
         <section class="bcard">
@@ -3798,7 +3798,7 @@
       if (window.__startTour) {
         window.__startTour();
       } else {
-        showToast("Tour script not ready — please refresh the page.");
+        showToast("Tour script not ready. Refresh the page and try again.");
       }
     });
 
@@ -3920,7 +3920,7 @@
       );
     });
 
-    // Switching tracking off keeps the number — it just stops counting, so
+    // Switching tracking off keeps the number, it just stops counting, so
     // turning it back on does not mean typing it in again.
     els.trackBalance.addEventListener("change", () => {
       state.trackAccountBalance = els.trackBalance.checked;
@@ -3928,7 +3928,7 @@
       if (state.trackAccountBalance) window.setTimeout(() => els.accountBalance.focus(), 60);
     });
 
-    // For a balance that is still right — confirms the date without making
+    // For a balance that is still right, confirms the date without making
     // someone retype the same figure to clear the stale flag.
     els.balanceConfirm.addEventListener("click", () => {
       if (!Number(state.accountBalance || 0)) return;
@@ -3965,7 +3965,7 @@
       });
     }
 
-    // Edits update the running total only — a full re-render here would tear
+    // Edits update the running total only, a full re-render here would tear
     // the input out from under the cursor mid-keystroke.
     els.allocationList.addEventListener("input", (event) => {
       const input = event.target.closest("[data-alloc-id]");
@@ -4323,7 +4323,7 @@
 
     function updateBudget() {
       state.salary = toMoney(els.salary.value);
-      // Editing the balance IS the act of checking it, so the clock restarts —
+      // Editing the balance IS the act of checking it, so the clock restarts -
       // but only on a real change, or every unrelated keystroke elsewhere in
       // the form would silently mark a months-old figure as fresh.
       const nextBalance = toMoney(els.accountBalance.value);
@@ -4391,7 +4391,7 @@
       els.confirmHeading.textContent = title;
       els.confirmMessage.textContent = message;
       els.confirmOk.textContent = okLabel || "Confirm";
-      // Always reassigned, never left as the previous caller set it — a custom
+      // Always reassigned, never left as the previous caller set it, a custom
       // label that leaked into the next confirm would be worse than no option.
       els.confirmCancel.textContent = (opts && opts.cancelLabel) || "Cancel";
       confirmCallback = callback;
@@ -4466,7 +4466,7 @@
           </div>
           <div class="ins-stat">
             <div class="ins-stat-label">Best month</div>
-            <div class="ins-stat-value">${h.best ? money(h.best.total) : "&mdash;"}<span class="ins-stat-sub">${h.best ? formatMonthYear(h.best.date) : ""}</span></div>
+            <div class="ins-stat-value">${h.best ? money(h.best.total) : "None yet"}<span class="ins-stat-sub">${h.best ? formatMonthYear(h.best.date) : ""}</span></div>
           </div>
           <div class="ins-stat">
             <div class="ins-stat-label">Average a month</div>
@@ -4510,12 +4510,12 @@
       const budget = budgetTotals();
       const active = state.targets.filter((t) => remainingFor(t) > 0);
 
-      // 1. Consistency (0-35) — did you save in recent months?
+      // 1. Consistency (0-35), did you save in recent months?
       const recent = history.buckets.slice(-6, -1); // 5 complete months
       const monthsSaved = recent.filter((b) => b.total > 0).length;
       const consistency = recent.length ? (monthsSaved / recent.length) * 35 : 0;
 
-      // 2. On-pace (0-35) — how close are your goals to their required pace?
+      // 2. On-pace (0-35), how close are your goals to their required pace?
       let onPace = 35;
       if (active.length) {
         const ratios = active.map((t) => {
@@ -4528,7 +4528,7 @@
         onPace = (ratios.reduce((a, b) => a + b, 0) / ratios.length) * 35;
       }
 
-      // 3. Momentum (0-20) — this month plus the recent run, against your own
+      // 3. Momentum (0-20), this month plus the recent run, against your own
       // average. The current month MUST be in this window: measuring only
       // completed months meant saving today raised your average while leaving
       // the measured window untouched, so a deposit pushed momentum *down*.
@@ -4544,7 +4544,7 @@
         momentum = Math.max(0, Math.min(20, ((thisMonth + priorAvg) / (2 * baseline)) * 10));
       }
 
-      // 4. Headroom (0-10) — is the plan affordable, or is it fiction?
+      // 4. Headroom (0-10), is the plan affordable, or is it fiction?
       let headroom = 0;
       if (budget.resources > 0) {
         headroom = budget.safeToSpend >= 0 ? 10 : Math.max(0, 10 + (budget.safeToSpend / budget.resources) * 40);
@@ -4590,7 +4590,7 @@
     // ================================================================
     // FORECAST
     // Projects each goal from the pace it has actually been saved at,
-    // not from the pace it was planned at — the planned figure is a
+    // not from the pace it was planned at, the planned figure is a
     // wish, the observed one is what will really land.
     // ================================================================
     function goalMonthlyRate(target) {
@@ -4684,7 +4684,7 @@
               <div class="fc-due" style="left:${duePct}%" title="Deadline: ${formatDate(r.target.dueDate)}"></div>
             </div>
             <div class="fc-verdict">
-              <strong>${r.projected ? formatMonthYear(r.projected) : "&mdash;"}</strong>
+              <strong>${r.projected ? formatMonthYear(r.projected) : "Not yet"}</strong>
               <span>${verdict}</span>
             </div>
           </div>`;
@@ -4694,7 +4694,7 @@
     // ================================================================
     // CALIBRATION CHECKLIST
     // Every step is derived from real state, so it cannot tick because
-    // someone clicked "next" — only because the thing actually exists.
+    // someone clicked "next", only because the thing actually exists.
     // It never blocks, and it removes itself once setup is done.
     // ================================================================
     function setupSteps() {
@@ -4796,8 +4796,8 @@
       }
     }
 
-    // A measured arc with real graduations — the pace rule bent round a
-    // corner — rather than the usual donut gauge.
+    // A measured arc with real graduations, the pace rule bent round a
+    // corner, rather than the usual donut gauge.
     function scoreDialSvg(score) {
       const R = 78, CX = 100, CY = 96;
       const pt = (deg, r) => {
@@ -4867,14 +4867,14 @@
           </div>
           <p class="score-note">${band.note}</p>
           <div class="score-parts">${bars}</div>
-          <p class="score-foot">Built only from what you control — saving regularly, keeping goals near their pace, and a plan that fits your budget.</p>
+          <p class="score-foot">Built only from what you control: saving regularly, keeping goals near their pace, and a plan that fits your budget.</p>
         </div>`;
     }
 
     // ================================================================
     // MILESTONES
     // Small, concrete things to reach for. Every one is derived from
-    // real data — nothing is awarded for opening the app.
+    // real data, nothing is awarded for opening the app.
     // ================================================================
     function milestones() {
       const h = savingsHistory(12);
@@ -4985,7 +4985,7 @@
       // Goals on pace
       const activeTargets = state.targets.filter(t => !isComplete(t));
       if (activeTargets.length === 0) {
-        els.goalsOnPaceValue.textContent = "—";
+        els.goalsOnPaceValue.textContent = "None yet";
         els.goalsOnPaceCard.classList.remove("pace-good", "pace-warn");
       } else {
         const onPace = activeTargets.filter(t => recoveryPlan(t, t.cadence || "month").status === "on-track").length;
@@ -5069,7 +5069,7 @@
 
     // ================================================================
     // ACCOUNT BALANCE FRESHNESS
-    // The balance feeds three things that all look authoritative — the
+    // The balance feeds three things that all look authoritative, the
     // "left after plan" tile, tracked net worth, and the "balance fully
     // used" alert. It is hand-typed and cannot refresh itself, so it
     // carries the date it was last set and stops being trusted after a
@@ -5135,8 +5135,8 @@
         els.balanceStamp.textContent = !value
           ? "Not set yet."
           : state.accountBalanceUpdated
-            ? `Snapshot from ${shortDate(state.accountBalanceUpdated)} — ${balanceAgeLabel()}.`
-            : "Saved before PacePot started dating this — confirm it is still right.";
+            ? `Snapshot from ${shortDate(state.accountBalanceUpdated)}, ${balanceAgeLabel()}.`
+            : "Saved before PacePot started dating this. Confirm it is still right.";
         els.balanceStamp.classList.toggle("is-stale", stale);
       }
       // Only offered when there is something to confirm and it has gone off,
@@ -5197,7 +5197,7 @@
         messages.push(`Your outgoings plus planned goal savings are ${money(budget.overspend)} higher than your monthly income.`);
       }
 
-      // Only warn off a balance we are still willing to trust — a figure of
+      // Only warn off a balance we are still willing to trust, a figure of
       // unknown or month-plus vintage is not grounds for an alert.
       if (trackedBalance() && !balanceIsStale() && budget.accountCushion <= 0) {
         messages.push("Your account balance snapshot would be fully used by this month's plan.");
@@ -5386,7 +5386,7 @@
     }
 
     // Manual tweaks to the suggested split, keyed by target id. Session-only:
-    // this is a staging area, not saved state — the deposits it produces are.
+    // this is a staging area, not saved state, the deposits it produces are.
     const allocationOverrides = new Map();
 
     // Weighting on three axes rather than priority alone. A low-priority goal
@@ -5466,7 +5466,7 @@
       }
 
       const total = suggestions.reduce((sum, item) => sum + item.amount, 0);
-      // Naming the goals and amounts, not just a total — this writes a real
+      // Naming the goals and amounts, not just a total, this writes a real
       // deposit to every goal at once, and "£600 across 2 goals" does not tell
       // you enough to spot a wrong split before it lands in your history.
       const breakdown = suggestions
@@ -5492,7 +5492,7 @@
             if (!wasComplete && isComplete(target)) completed.push(target);
           });
 
-          // Edits applied to real deposits — clear the staging area so the next
+          // Edits applied to real deposits, clear the staging area so the next
           // split is suggested fresh rather than reusing stale numbers.
           allocationOverrides.clear();
           lastAppliedSplit = applied;
@@ -5509,7 +5509,7 @@
       month: { short: "monthly", unit: "month", plural: "months" }
     };
 
-    // True minus (U+2212), not a hyphen — it matches digit width and reads as a
+    // True minus (U+2212), not a hyphen, it matches digit width and reads as a
     // sign rather than a dash.
     const MINUS = "−";
 
@@ -5544,7 +5544,7 @@
           : { label: `+${money(rounded)} ahead`, tone: "ahead" };
       }
       // Level with the pace, but the monthly figure exceeds the pot it has to
-      // come out of — worth saying plainly rather than calling it on track.
+      // come out of, worth saying plainly rather than calling it on track.
       if (!affordable) {
         return { label: "Above your pot", tone: "warn" };
       }
@@ -6192,7 +6192,7 @@
       return new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(date);
     }
 
-    // Local date parts, not toISOString() — that converts to UTC first, so a
+    // Local date parts, not toISOString(), that converts to UTC first, so a
     // deposit logged in the evening east of UTC (or the early hours west of it)
     // gets filed under the wrong day, and at a month boundary the wrong month.
     // Everything else here treats dates as local midnight, including the
@@ -6208,7 +6208,7 @@
     // One monthly aggregation of every deposit across every goal. The
     // Insights view renders it; the Pace Score and streak features read
     // the same buckets rather than recomputing them. Local-time month
-    // keys throughout — toISOString() would shift late-evening deposits
+    // keys throughout, toISOString() would shift late-evening deposits
     // into the next month for anyone east of UTC.
     // ================================================================
     function monthKey(date) {
@@ -6249,7 +6249,7 @@
       const best = withActivity.reduce((a, b) => (b.total > (a ? a.total : 0) ? b : a), null);
 
       // Average over months actually elapsed since the first deposit, not the
-      // full window — otherwise a new user's average is diluted by months that
+      // full window, otherwise a new user's average is diluted by months that
       // existed before they ever started.
       const activeSpan = earliest
         ? Math.max(1, (today.getFullYear() - earliest.getFullYear()) * 12 + (today.getMonth() - earliest.getMonth()) + 1)
@@ -6273,7 +6273,7 @@
 
     // Consecutive months ending at the current one, counted backwards. The
     // current month is not yet over, so an empty current month does not break a
-    // run — it just doesn't extend it. One missed month is forgiven; the intent
+    // run, it just doesn't extend it. One missed month is forgiven; the intent
     // is to encourage returning, not to punish a bad month.
     function saveStreak(buckets) {
       let streak = 0;
@@ -6360,7 +6360,7 @@
         salary: toMoney(parsed?.salary),
         accountBalance: toMoney(parsed?.accountBalance),
         /* Opt-in, and off by default. PacePot cannot read a bank, so this is a
-           number the user types and then forgets — presenting it as a current
+           number the user types and then forgets, presenting it as a current
            figure months later is a lie the app tells on their behalf.
            Migration: anyone who already had a balance keeps it switched on,
            but with NO date, so the dashboard asks them to confirm it rather
@@ -6461,7 +6461,7 @@
     function showToast(message, opts) {
       els.toast.textContent = message;
       // An offered action needs longer than a plain confirmation to be read,
-      // reached and clicked — 3s is not enough to undo anything.
+      // reached and clicked, 3s is not enough to undo anything.
       let life = 3000;
       if (opts && opts.actionLabel && typeof opts.onAction === "function") {
         const btn = document.createElement("button");
@@ -6636,7 +6636,7 @@
           renderSaveList();
           // Bought things clutter a list of things you are saving FOR, so ask
           // once, right here, instead of leaving a struck-through row behind.
-          // Only on the way in — unticking is already the way to undo.
+          // Only on the way in, unticking is already the way to undo.
           if (item.purchased) {
             customConfirm(
               `Bought "${item.name}"?`,
@@ -6996,7 +6996,7 @@
       // The tour's markup sits AFTER this script block in the document, so
       // resolving these at parse time returned null for every one of them.
       // Because each use is guarded (`if (D.tp)`), the whole tour then failed
-      // silently with no console error — and the Next/Skip listeners below
+      // silently with no console error, and the Next/Skip listeners below
       // were never attached either. Bind lazily instead.
       var D = {};
 
@@ -7291,7 +7291,7 @@
       var el = document.getElementById('gridGlow');
       if (!el) return;
 
-      // Coordinates live on <html> so every lit layer can read them — the app
+      // Coordinates live on <html> so every lit layer can read them, the app
       // overlay and the landing page's own layer stay in step for free.
       var root = document.documentElement;
       var tx = 0, ty = 0, cx = 0, cy = 0, raf = null, lit = false;

@@ -1,5 +1,5 @@
 /* ============================================================
-   PacePot blog styles — flat, ruled (v4.0 pace rule)
+   PacePot blog styles. Flat, ruled (v4.0 pace rule)
    Extends seo-page.css. Load order: seo-page.css → blog.css
    ============================================================ */
 
@@ -78,7 +78,7 @@
 /* A reading page does not chase the full width ladder. Prose plus its
    contents column needs about 930px; on a 2560 screen the shared ladder gave
    the card 2200px and left 537px of empty card either side. Hubs and
-   calculator pages are card grids and still use the whole ladder — this cap
+   calculator pages are card grids and still use the whole ladder. This cap
    applies only to pages that actually contain an article. */
 .page:has(.article) { max-width: min(var(--shell-max), 1400px); }
 
@@ -142,8 +142,8 @@
     transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
   }
   .toc-list a:hover { color: var(--ink); background: var(--surface-2); text-decoration: none; }
-  /* The marker is a colour and a weight change, not a bar — the left rule
-     already does the job a bar would. */
+  /* The marker is a colour and a weight change rather than a bar. The left
+     rule already does that job. */
   .toc-list a.is-current { color: var(--accent-strong); font-weight: 700; }
 }
 

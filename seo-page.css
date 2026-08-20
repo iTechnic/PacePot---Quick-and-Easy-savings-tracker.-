@@ -1,5 +1,5 @@
 /* ============================================================
-   PacePot SEO pages — flat, ruled (v4.0 pace rule)
+   PacePot SEO pages. Flat, ruled (v4.0 pace rule)
    Matches the main app (index.html) design system exactly.
    ============================================================ */
 
@@ -16,7 +16,7 @@
   --muted:         #7694ad;
   --faint:         #496070;
 
-  /* Opaque, not translucent white — these are the exact colours the old rgba
+  /* Opaque rather than translucent white. These are the exact colours the old rgba
      tints composited to over the page ground, so cards look the same, but the
      ground and the cursor-lit grid no longer show THROUGH them. The app fixed
      this in v4.0 and these pages were left on the old values, so the glow
@@ -73,7 +73,7 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--bg);
-  /* Squared paper, not gradient blobs — see the pace rule note above. */
+  /* Squared paper rather than gradient blobs. See the pace rule note above. */
   background-image:
     repeating-linear-gradient(90deg, rgba(255,255,255,.016) 0 1px, transparent 1px 88px),
     repeating-linear-gradient(180deg, rgba(255,255,255,.016) 0 1px, transparent 1px 88px);
@@ -117,7 +117,7 @@ ul, ol { padding-left: 20px; }
   padding: 0;
   height: var(--header-h);
   margin-bottom: 24px;
-  /* Solid, with the datum line beneath it — not a frosted glass bar. */
+  /* Solid, with the datum line beneath it. Not a frosted glass bar. */
   background: #070c18;
   border-bottom: 1px solid rgba(255,255,255,.10);
 }
@@ -175,7 +175,7 @@ ul, ol { padding-left: 20px; }
 }
 
 /* ------------------------------------------------------------------
-   THE PACE RULE — this site's signature device.
+   THE PACE RULE. This site's signature device.
    Section labels are read off a ruler: a short tick scale, the label,
    then the datum line running out to the edge. Deliberately flat and
    drawn in pure CSS. Replaces the pill-and-glowing-dot kicker.
@@ -517,7 +517,7 @@ h3 {
   :root { --shell-pad: 16px; }
   .page { padding-bottom: 40px; }
   :root { --header-h: 54px; }
-  /* Horizontal padding stays at 0 here too — .page already supplies it, and
+  /* Horizontal padding stays at 0 here too, .page already supplies it, and
      re-adding it pushed the brand 16px right of every card below it. */
   .topbar { margin-bottom: 16px; }
   .hero, .section, .cta { padding: 20px; }
@@ -527,7 +527,7 @@ h3 {
   .tools-grid { grid-template-columns: 1fr; }
   /* The nav used to be hidden outright here, which left Calculators and Guides
      unreachable from every static page on a phone with nothing to replace them.
-     Letting it wrap instead pushed this sticky bar to 125px — 15% of the
+     Letting it wrap instead pushed this sticky bar to 125px, 15% of the
      screen, permanently. It scrolls sideways on one line instead, the same
      treatment the app's rail gets below 900px. */
   .topbar { gap: 10px; }
