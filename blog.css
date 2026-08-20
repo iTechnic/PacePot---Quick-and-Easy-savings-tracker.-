@@ -12,8 +12,11 @@
   padding: clamp(22px,4vw,36px);
   margin-bottom: 18px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* auto-fit, so a wider page shows more posts per row instead of two very
+     stretched cards. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 14px;
+  align-items: start;
 }
 
 .post-card {
@@ -72,6 +75,13 @@
   color: var(--accent-strong);
 }
 
+/* A reading page does not chase the full width ladder. Prose plus its
+   contents column needs about 930px; on a 2560 screen the shared ladder gave
+   the card 2200px and left 537px of empty card either side. Hubs and
+   calculator pages are card grids and still use the whole ladder — this cap
+   applies only to pages that actually contain an article. */
+.page:has(.article) { max-width: min(var(--shell-max), 1400px); }
+
 /* Single article layout */
 .article {
   background: var(--surface);
@@ -82,7 +92,64 @@
   margin-bottom: 18px;
 }
 
-.article-body { max-width: 720px; }
+/* An article is prose, so it keeps a reading measure however wide the page
+   gets. Below the two-column breakpoint it centres inside the card; above
+   it, the contents sidebar takes the space instead. */
+.article-body { max-width: 74ch; margin-inline: auto; }
+
+/* ---- Contents sidebar (built by article-toc.js) ----
+   Only once there is genuinely room for a second column. Under this the
+   article stays single-column and the sidebar is not shown at all, so a
+   phone never pays for it. */
+.article-toc { display: none; }
+
+@media (min-width: 1180px) {
+  /* The two columns live in their own wrapper, so the article header stays
+     full width without needing to know what it is made of. */
+  .article-cols {
+    display: grid;
+    /* The prose track is the reading measure itself, not a fraction of the
+       card. Centring the pair keeps the gap even on both sides instead of
+       leaving several hundred pixels stranded to the right of the text. */
+    grid-template-columns: min(74ch, 100%) 232px;
+    justify-content: center;
+    gap: clamp(28px, 3vw, 56px);
+    align-items: start;
+  }
+  .article.has-toc .article-body { max-width: none; margin-inline: 0; }
+
+  .article-toc {
+    display: block;
+    position: sticky;
+    top: calc(var(--header-h, 58px) + 20px);
+    padding-left: 18px;
+    border-left: 1px solid var(--border-mid);
+    max-height: calc(100dvh - var(--header-h, 58px) - 48px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .toc-title {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .62rem; font-weight: 600; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 12px;
+  }
+  .toc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .toc-list a {
+    display: block; padding: 6px 8px; margin-left: -8px;
+    border-radius: var(--radius-xs, 6px);
+    color: var(--muted); font-size: .82rem; line-height: 1.45;
+    text-decoration: none;
+    transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+  }
+  .toc-list a:hover { color: var(--ink); background: var(--surface-2); text-decoration: none; }
+  /* The marker is a colour and a weight change, not a bar — the left rule
+     already does the job a bar would. */
+  .toc-list a.is-current { color: var(--accent-strong); font-weight: 700; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc-list a { transition: none; }
+}
 
 .article-body .lead {
   font-size: 1.08rem;

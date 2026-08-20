@@ -47,6 +47,14 @@
   --red:           #f87171;
   /* Matches the app bar, and the topbar reads it rather than hardcoding 60px. */
   --header-h:      58px;
+  /* Same width ladder as the app's :root in index.html. These pages were
+     hard-capped at 1060px, which used 55% of a 1920 screen and left 430px
+     dead either side while the app used 86%. Keep the two in step.
+     The rule from the app applies here too: extra width becomes more
+     COLUMNS, never longer lines of text. */
+  --shell-max:     1080px;
+  --shell-pad:     32px;
+
   --radius:        12px;
   --radius-sm:     8px;
   --radius-xs:     6px;
@@ -80,11 +88,18 @@ h1, h2, h3, h4 { margin: 0; color: var(--ink); letter-spacing: -.03em; line-heig
 p, li { color: var(--muted); line-height: 1.65; margin: 0; }
 ul, ol { padding-left: 20px; }
 
+@media (min-width: 1280px) { :root { --shell-max: 1200px; --shell-pad: 36px; } }
+@media (min-width: 1500px) { :root { --shell-max: 1420px; --shell-pad: 40px; } }
+@media (min-width: 1750px) { :root { --shell-max: 1660px; --shell-pad: 44px; } }
+@media (min-width: 2000px) { :root { --shell-max: 1900px; --shell-pad: 48px; } }
+@media (min-width: 2400px) { :root { --shell-max: 2200px; --shell-pad: 56px; } }
+
 /* ---- Layout ---- */
 .page {
-  width: min(1060px, calc(100% - 32px));
+  width: 100%;
+  max-width: var(--shell-max);
   margin: 0 auto;
-  padding: 0 0 60px;
+  padding: 0 var(--shell-pad) 60px;
 }
 
 /* ---- Topbar ---- */
@@ -96,7 +111,10 @@ ul, ol { padding-left: 20px; }
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 0 clamp(16px,3vw,32px);
+  /* No horizontal padding of its own: the topbar sits inside .page, which
+     already applies --shell-pad. Its own 32px was pushing the brand 32px
+     right of every section below it. */
+  padding: 0;
   height: var(--header-h);
   margin-bottom: 24px;
   /* Solid, with the datum line beneath it — not a frosted glass bar. */
@@ -228,6 +246,13 @@ h2 {
   color: var(--ink);
 }
 
+/* Prose keeps a readable measure however wide the page gets. Only the
+   direct children are capped, so grids and card rows inside a section are
+   free to spread across the full width. */
+.section > p,
+.section > ul,
+.section > ol { max-width: 78ch; }
+
 h3 {
   font-size: 1rem;
   font-weight: 700;
@@ -274,14 +299,25 @@ h3 {
   text-decoration: none;
 }
 
-/* ---- Grid layouts ---- */
+/* ---- Grid layouts ----
+   All auto-fit, so the width gained above turns into extra columns rather
+   than stretched cards. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 16px;
 }
 
-.examples { display: grid; gap: 10px; }
+/* Flex rather than grid, for the same reason the save list uses it: fixed
+   column tracks strand whatever does not divide evenly, so 3 cards in a
+   2-wide space sat as 2 + 1 with a hole. Flex items on a short last row
+   grow to fill it. */
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.example { flex: 1 1 260px; min-width: 0; }
 
 .example {
   padding: 14px 16px;
@@ -298,7 +334,13 @@ h3 {
 }
 
 /* ---- FAQ ---- */
-.faq { display: grid; gap: 10px; }
+.faq {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+}
+.faq-item { flex: 1 1 320px; min-width: 0; }
 
 .faq-item {
   padding: 16px 18px;
@@ -316,7 +358,7 @@ h3 {
 /* ---- Calculators hub grid ---- */
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
   gap: 14px;
   margin-top: 14px;
 }
@@ -472,10 +514,12 @@ h3 {
 
 /* ---- Responsive ---- */
 @media (max-width: 760px) {
-  .page { width: min(100% - 24px, 1060px); padding-bottom: 40px; }
-  .grid { grid-template-columns: 1fr; }
+  :root { --shell-pad: 16px; }
+  .page { padding-bottom: 40px; }
   :root { --header-h: 54px; }
-  .topbar { padding: 0 16px; margin-bottom: 16px; }
+  /* Horizontal padding stays at 0 here too — .page already supplies it, and
+     re-adding it pushed the brand 16px right of every card below it. */
+  .topbar { margin-bottom: 16px; }
   .hero, .section, .cta { padding: 20px; }
 }
 
